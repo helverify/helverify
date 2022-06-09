@@ -3,8 +3,17 @@ using Org.BouncyCastle.Math;
 
 namespace Helverify.Cryptography.Helper
 {
+    /// <summary>
+    /// Helper to calculate hashes consistently across the library.
+    /// </summary>
     internal static class HashHelper
     {
+        /// <summary>
+        /// Returns the SHA-256 hash for the specified numbers within the modulus of q.
+        /// </summary>
+        /// <param name="q">Modulus</param>
+        /// <param name="numbers">Numbers to be hashed</param>
+        /// <returns></returns>
         internal static BigInteger GetHash(BigInteger q, params BigInteger[] numbers)
         {
             SHA256 sha256 = SHA256.Create();

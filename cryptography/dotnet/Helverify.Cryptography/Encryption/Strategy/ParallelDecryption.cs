@@ -2,9 +2,13 @@
 
 namespace Helverify.Cryptography.Encryption.Strategy
 {
+    /// <summary>
+    /// Parallel iteration of the exponents of g to find correct decryption.
+    /// </summary>
     internal class ParallelDecryption: IDecryptionStrategy
     {
-        public int Decrypt(BigInteger generator, BigInteger p, BigInteger m)
+        /// <inheritdoc cref="IDecryptionStrategy.Decrypt"/>
+        public int Decrypt(BigInteger cipher, BigInteger p, BigInteger g)
         {
             int exp = -1;
 
@@ -22,9 +26,9 @@ namespace Helverify.Cryptography.Encryption.Strategy
                     }
 
                     BigInteger exponent = new BigInteger(i.ToString(), 10);
-                    BigInteger candidate = generator.ModPow(exponent, p).Mod(p);
+                    BigInteger candidate = g.ModPow(exponent, p).Mod(p);
 
-                    found = candidate.Equals(m);
+                    found = candidate.Equals(cipher);
 
                     if (found)
                     {

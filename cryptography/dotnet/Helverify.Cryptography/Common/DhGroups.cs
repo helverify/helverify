@@ -1,5 +1,10 @@
 ﻿namespace Helverify.Cryptography.Common
 {
+    /// <summary>
+    /// Contains a list of predefined Diffie-Hellman groups according to:
+    /// https://www.rfc-editor.org/rfc/rfc5114
+    /// https://www.rfc-editor.org/rfc/rfc3526
+    /// </summary>
     public static class DhGroups
     {
         private static readonly IList<DhGroup> Groups = new List<DhGroup>();
@@ -12,8 +17,7 @@
         public const string Modp8192 = "8192-bit MODP Group";
 
         /// <summary>
-        /// https://www.rfc-editor.org/rfc/rfc5114#page-5
-        /// https://www.rfc-editor.org/rfc/rfc3526#page-5
+        /// Constructor defining the DH groups.
         /// </summary>
         static DhGroups()
         {
@@ -52,9 +56,14 @@
             ));
         }
 
+        /// <summary>
+        /// Retrieves the Diffie-Hellman groups by name.
+        /// </summary>
+        /// <param name="name">Name of the group. Use <see cref="DhGroup"/> constants to find out which groups are available.</param>
+        /// <returns></returns>
         public static DhGroup Get(string name)
         {
-            return Groups.SingleOrDefault(g => g.Name == name);
+            return Groups.SingleOrDefault(g => g.Name == name) ?? throw new ArgumentException($"Diffie-Hellman Group {name} does not exist.", nameof(name));
         }
     }
 }

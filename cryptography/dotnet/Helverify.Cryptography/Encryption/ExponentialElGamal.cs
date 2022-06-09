@@ -36,6 +36,6 @@ namespace Helverify.Cryptography.Encryption
 
         /// <inheritdoc cref="ElGamalBase.RestoreMessage"/>
         protected override int RestoreMessage(BigInteger m, BigInteger p, BigInteger generator)
-            => _decryptionStrategy.Decrypt(generator, p, m);
+            => _decryptionStrategy.Decrypt(m, p, generator);
     }
 }

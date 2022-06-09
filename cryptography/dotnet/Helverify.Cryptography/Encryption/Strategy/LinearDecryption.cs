@@ -2,9 +2,13 @@
 
 namespace Helverify.Cryptography.Encryption.Strategy
 {
+    /// <summary>
+    /// Iterating linearly through the exponents of g to find the correct decryption of the ciphertext.
+    /// </summary>
     public class LinearDecryption: IDecryptionStrategy
     {
-        public int Decrypt(BigInteger generator, BigInteger p, BigInteger m)
+        /// <inheritdoc cref="IDecryptionStrategy.Decrypt"/>
+        public int Decrypt(BigInteger cipher, BigInteger p, BigInteger g)
         {
             int exp = -1;
 
@@ -20,8 +24,8 @@ namespace Helverify.Cryptography.Encryption.Strategy
                 }
 
                 BigInteger exponent = new BigInteger(exp.ToString(), 10);
-                BigInteger candidate = generator.ModPow(exponent, p).Mod(p);
-                found = candidate.Equals(m);
+                BigInteger candidate = g.ModPow(exponent, p).Mod(p);
+                found = candidate.Equals(cipher);
 
                 if (exp >= 10000000)
                 {
