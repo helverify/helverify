@@ -7,35 +7,38 @@ using Org.BouncyCastle.Security;
 
 namespace Helverify.Cryptography.Encryption
 {
+    /// <summary>
+    /// Base implementation for the ElGamal cryptosystem.
+    /// </summary>
     public abstract class ElGamalBase: IElGamal
     {
         private readonly SecureRandom _secureRandom;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         protected ElGamalBase()
         {
             _secureRandom = new SecureRandom();
         }
 
-        /// <summary>
-        /// https://stackoverflow.com/questions/11346200/reading-pem-rsa-public-key-only-using-bouncy-castle
-        /// https://stackoverflow.com/questions/15629551/read-rsa-privatekey-in-c-sharp-and-bouncy-castle
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <inheritdoc cref="IElGamal.GetKey"/>
         public AsymmetricKeyParameter GetKey(string path)
         {
             using StreamReader streamReader = File.OpenText(path);
             PemReader pemReader = new PemReader(streamReader);
-            AsymmetricKeyParameter keyPair = (AsymmetricKeyParameter)pemReader.ReadObject();
+            AsymmetricKeyParameter key = (AsymmetricKeyParameter)pemReader.ReadObject();
 
-            return keyPair;
+            return key;
         }
 
+        /// <inheritdoc cref="IElGamal.GetParameters"/>
         public DHParameters GetParameters(BigInteger p, BigInteger g)
         {
             return new DHParameters(p, g);
         }
 
+        /// <inheritdoc cref="IElGamal.KeyGen"/>
         public AsymmetricCipherKeyPair KeyGen(BigInteger p, BigInteger g, SecureRandom random = null)
         {
             random ??= new SecureRandom();
@@ -50,6 +53,7 @@ namespace Helverify.Cryptography.Encryption
             return kpGenerator.GenerateKeyPair();
         }
 
+        /// <inheritdoc cref="IElGamal.Encrypt"/>
         public ElGamalCipher Encrypt(int message, AsymmetricKeyParameter publicKeyParameter, BigInteger randomness = null)
         {
             DHPublicKeyParameters publicKey = (publicKeyParameter as DHPublicKeyParameters);
@@ -62,7 +66,7 @@ namespace Helverify.Cryptography.Encryption
 
             BigInteger r = randomness ?? new BigInteger(publicKey.Y.BitLength, _secureRandom).Mod(q);
 
-            BigInteger m = PrepareM(g, p, message);
+            BigInteger m = PrepareMessage(message, p, g);
 
             BigInteger c = g.ModPow(r, p).Mod(p);
             BigInteger d = m.Multiply(pk.ModPow(r, p).Mod(p)).Mod(p);
@@ -70,6 +74,7 @@ namespace Helverify.Cryptography.Encryption
             return new ElGamalCipher(c, d, r);
         }
 
+        /// <inheritdoc cref="IElGamal.Decrypt"/>
         public int Decrypt(ElGamalCipher cipher, AsymmetricKeyParameter privateKeyParameter)
         {
             DHPrivateKeyParameters privateKey = privateKeyParameter as DHPrivateKeyParameters;
@@ -85,9 +90,10 @@ namespace Helverify.Cryptography.Encryption
 
             BigInteger m = d.Multiply(cPowSkInverse).Mod(p);
 
-            return RestoreMessage(g, p, m);
+            return RestoreMessage(m, p, g);
         }
 
+        /// <inheritdoc cref="IElGamal.CombinePublicKeys"/>
         public DHPublicKeyParameters CombinePublicKeys(IList<DHPublicKeyParameters> publicKeys, DHParameters elGamalParameters)
         {
             BigInteger combinedPublicKey = BigInteger.One;
@@ -100,11 +106,13 @@ namespace Helverify.Cryptography.Encryption
             return new DHPublicKeyParameters(combinedPublicKey.Mod(elGamalParameters.P), elGamalParameters);
         }
 
+        /// <inheritdoc cref="IElGamal.DecryptShare"/>
         public BigInteger DecryptShare(ElGamalCipher cipher, DHPrivateKeyParameters privateKey, BigInteger p)
         {
             return cipher.C.ModPow(privateKey.X, p).Mod(p);
         }
 
+        /// <inheritdoc cref="IElGamal.CombineShares"/>
         public int CombineShares(IList<BigInteger> shares, BigInteger d, BigInteger p, BigInteger g)
         {
             BigInteger product = BigInteger.One;
@@ -116,11 +124,25 @@ namespace Helverify.Cryptography.Encryption
 
             BigInteger m = d.Multiply(product.ModInverse(p)).Mod(p);
 
-            return RestoreMessage(g, p, m);
+            return RestoreMessage(m, p, g);
         }
 
-        protected abstract BigInteger PrepareM(BigInteger generator, BigInteger p, int message);
+        /// <summary>
+        /// Transforms the message for encryption.
+        /// </summary>
+        /// <param name="message">Message</param>
+        /// <param name="p">Prime</param>
+        /// <param name="generator">Generator</param>
+        /// <returns></returns>
+        protected abstract BigInteger PrepareMessage(int message, BigInteger p, BigInteger generator);
 
-        protected abstract int RestoreMessage(BigInteger generator, BigInteger p, BigInteger m);
+        /// <summary>
+        /// Restores the original message.
+        /// </summary>
+        /// <param name="m">Message</param>
+        /// <param name="p">Prime</param>
+        /// <param name="generator">Generator</param>
+        /// <returns></returns>
+        protected abstract int RestoreMessage(BigInteger m, BigInteger p, BigInteger generator);
     }
 }
