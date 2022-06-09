@@ -25,6 +25,17 @@ namespace Helverify.Cryptography.ZeroKnowledge
         public BigInteger R0 { get; }
         public BigInteger R1 { get; }
 
+        /// <summary>
+        /// Constructor is private, use <see cref="Create"/> instead.
+        /// </summary>
+        /// <param name="u0">Proof parameter u0</param>
+        /// <param name="u1">Proof parameter u1</param>
+        /// <param name="v0">Proof parameter v0</param>
+        /// <param name="v1">Proof parameter v1</param>
+        /// <param name="c0">Proof parameter c0</param>
+        /// <param name="c1">Proof parameter c1</param>
+        /// <param name="r0">Proof parameter r0</param>
+        /// <param name="r1">Proof parameter r1</param>
         private ProofOfZeroOrOne(BigInteger u0, BigInteger u1, BigInteger v0, BigInteger v1, BigInteger c0, BigInteger c1, BigInteger r0, BigInteger r1)
         {
             U0 = u0;
@@ -37,6 +48,18 @@ namespace Helverify.Cryptography.ZeroKnowledge
             R1 = r1;
         }
 
+        /// <summary>
+        /// Generates a proof that the specified ciphertext contains either zero or one.
+        /// </summary>
+        /// <param name="message">Plaintext message</param>
+        /// <param name="a">First component of an ElGamal ciphertext</param>
+        /// <param name="b">Second component of an ElGamal ciphertext</param>
+        /// <param name="h">Public key of an ElGamal cryptosystem</param>
+        /// <param name="x">Randomness used to produce ElGamal ciphertext (a,b)</param>
+        /// <param name="p">Public prime p of an ElGamal cryptosystem</param>
+        /// <param name="g">Generator g of an ElGamal cryptosystem</param>
+        /// <returns>Proof of containing zero or one</returns>
+        /// <exception cref="Exception"></exception>
         public static ProofOfZeroOrOne Create(int message, BigInteger a, BigInteger b, BigInteger h, BigInteger x,
             BigInteger p, BigInteger g)
         {
@@ -53,6 +76,16 @@ namespace Helverify.Cryptography.ZeroKnowledge
             throw new Exception($"Message must be either 0 or 1, not {message}");
         }
 
+        /// <summary>
+        /// Creates a proof for the scenario where the actual message contains one.
+        /// </summary>
+        /// <param name="a">First component of an ElGamal ciphertext</param>
+        /// <param name="b">Second component of an ElGamal ciphertext</param>
+        /// <param name="h">Public key of an ElGamal cryptosystem</param>
+        /// <param name="x">Randomness used to produce ElGamal ciphertext (a,b)</param>
+        /// <param name="p">Public prime p of an ElGamal cryptosystem</param>
+        /// <param name="g">Generator g of an ElGamal cryptosystem</param>
+        /// <returns>Proof of containing zero or one</returns>
         private static ProofOfZeroOrOne CreateOne(BigInteger a, BigInteger b, BigInteger h, BigInteger x, BigInteger p, BigInteger g)
         {
             BigInteger q = p.Subtract(BigInteger.One).Multiply(BigInteger.Two.ModInverse(p)).Mod(p);
@@ -76,6 +109,16 @@ namespace Helverify.Cryptography.ZeroKnowledge
             return new ProofOfZeroOrOne(u0, u1, v0, v1, c0, c1, r0, r1);
         }
 
+        /// <summary>
+        /// Creates a proof for the scenario where the actual message contains zero.
+        /// </summary>
+        /// <param name="a">First component of an ElGamal ciphertext</param>
+        /// <param name="b">Second component of an ElGamal ciphertext</param>
+        /// <param name="h">Public key of an ElGamal cryptosystem</param>
+        /// <param name="x">Randomness used to produce ElGamal ciphertext (a,b)</param>
+        /// <param name="p">Public prime p of an ElGamal cryptosystem</param>
+        /// <param name="g">Generator g of an ElGamal cryptosystem</param>
+        /// <returns>Proof of containing zero or one</returns>
         private static ProofOfZeroOrOne CreateZero(BigInteger a, BigInteger b, BigInteger h, BigInteger x, BigInteger p, BigInteger g)
         {
             BigInteger q = p.Subtract(BigInteger.One).Multiply(BigInteger.Two.ModInverse(p)).Mod(p);
@@ -100,6 +143,15 @@ namespace Helverify.Cryptography.ZeroKnowledge
             return new ProofOfZeroOrOne(u0, u1, v0, v1, c0, c1, r0, r1);
         }
 
+        /// <summary>
+        /// Allows to verify that a ciphertext contains either the value zero or one.
+        /// </summary>
+        /// <param name="a">First component of an ElGamal ciphertext</param>
+        /// <param name="b">Second component of an ElGamal ciphertext</param>
+        /// <param name="h">Public key of an ElGamal cryptosystem</param>
+        /// <param name="p">Public prime p of an ElGamal cryptosystem</param>
+        /// <param name="g">Generator g of an ElGamal cryptosystem</param>
+        /// <returns>True if proof is valid, false if proof is invalid.</returns>
         public bool Verify(BigInteger a, BigInteger b, BigInteger h, BigInteger p, BigInteger g)
         {
             BigInteger q = p.Subtract(BigInteger.One).Multiply(BigInteger.Two.ModInverse(p)).Mod(p);
