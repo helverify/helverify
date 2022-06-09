@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32519.379
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helverify.Cryptography", "Helverify.Cryptography.csproj", "{D0597614-2E96-4C5F-93AA-AEA93746EF8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helverify.Cryptography.Tests", "..\Helverify.Cryptography.Tests\Helverify.Cryptography.Tests.csproj", "{383C3D9E-149D-4560-AFDF-B46D4E4D09EB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0597614-2E96-4C5F-93AA-AEA93746EF8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0597614-2E96-4C5F-93AA-AEA93746EF8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0597614-2E96-4C5F-93AA-AEA93746EF8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0597614-2E96-4C5F-93AA-AEA93746EF8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{383C3D9E-149D-4560-AFDF-B46D4E4D09EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{383C3D9E-149D-4560-AFDF-B46D4E4D09EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{383C3D9E-149D-4560-AFDF-B46D4E4D09EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{383C3D9E-149D-4560-AFDF-B46D4E4D09EB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {85FC5F76-2640-4409-AC16-4FFE9E571555}
+	EndGlobalSection
+EndGlobal
