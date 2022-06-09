@@ -20,12 +20,25 @@ namespace Helverify.Cryptography.ZeroKnowledge
         public BigInteger C { get; }
         public BigInteger D { get; }
 
+        /// <summary>
+        /// Constructor is private, use <see cref="Create"/> instead.
+        /// </summary>
+        /// <param name="c">Proof parameter c</param>
+        /// <param name="d">Proof parameter d</param>
         private ProofOfPrivateKeyOwnership(BigInteger c, BigInteger d)
         {
             C = c;
             D = d;
         }
 
+        /// <summary>
+        /// Creates a proof that someone owns a private key to a specific public key.
+        /// </summary>
+        /// <param name="h">Public key of an ElGamal cryptosystem</param>
+        /// <param name="x">Private key of an ElGamal cryptosystem</param>
+        /// <param name="p">Public prime p of an ElGamal cryptosystem</param>
+        /// <param name="g">Generator g of an ElGamal cryptosystem</param>
+        /// <returns>Proof of private key ownership</returns>
         public static ProofOfPrivateKeyOwnership Create(BigInteger h, BigInteger x,
             BigInteger p, BigInteger g)
         {
@@ -42,6 +55,13 @@ namespace Helverify.Cryptography.ZeroKnowledge
             return new ProofOfPrivateKeyOwnership(c, d);
         }
 
+        /// <summary>
+        /// Allows to verify that someone owns the private key to the specified public key.
+        /// </summary>
+        /// <param name="h">Public key of an ElGamal cryptosystem</param>
+        /// <param name="p">Public prime p of an ElGamal cryptosystem</param>
+        /// <param name="g">Generator g of an ElGamal cryptosystem</param>
+        /// <returns>True if proof is valid, false if is invalid</returns>
         public bool Verify(BigInteger h, BigInteger p, BigInteger g)
         {
             BigInteger q = p.Subtract(BigInteger.One).Multiply(BigInteger.Two.ModInverse(p)).Mod(p);
