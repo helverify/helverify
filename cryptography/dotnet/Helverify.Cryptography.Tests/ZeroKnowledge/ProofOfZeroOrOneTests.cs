@@ -58,5 +58,15 @@ namespace Helverify.Cryptography.Tests.ZeroKnowledge
             Assert.False(isValid4);
             Assert.False(isValid5);
         }
+
+        [Test]
+        public void TestCreateInvalidMessage()
+        {
+            // arrange
+            BigInteger x = BigInteger.One;
+
+            // arrange, act, assert
+            Assert.Throws<Exception>(() => ProofOfZeroOrOne.Create(42, x, x, x, x, x, x));
+        }
     }
 }

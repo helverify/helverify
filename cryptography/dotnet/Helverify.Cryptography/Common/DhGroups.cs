@@ -59,7 +59,7 @@
         /// <summary>
         /// Retrieves the Diffie-Hellman groups by name.
         /// </summary>
-        /// <param name="name">Name of the group. Use <see cref="DhGroup"/> constants to find out which groups are available.</param>
+        /// <param name="name">Name of the group, use <see cref="DhGroup"/> constants to find out which groups are available.</param>
         /// <returns></returns>
         public static DhGroup Get(string name)
         {

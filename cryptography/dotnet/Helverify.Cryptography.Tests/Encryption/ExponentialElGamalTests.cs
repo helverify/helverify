@@ -1,7 +1,9 @@
-﻿using Helverify.Cryptography.Encryption;
+﻿using Helverify.Cryptography.Common;
+using Helverify.Cryptography.Encryption;
 using Helverify.Cryptography.Encryption.Strategy;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
 
 namespace Helverify.Cryptography.Tests.Encryption
 {
@@ -47,6 +49,74 @@ namespace Helverify.Cryptography.Tests.Encryption
 
             // assert
             Assert.That(actualDecryption, Is.EqualTo(expectedDecryption));
+        }
+
+        [Test]
+        public void TestCooperativeDecryption()
+        {
+            // arrange
+            IElGamal elGamal = new ExponentialElGamal();
+
+            DhGroup dhGroup = DhGroups.Get(DhGroups.Modp2048);
+
+            BigInteger p = dhGroup.P;
+            BigInteger g = dhGroup.G;
+
+            AsymmetricCipherKeyPair keyPair1 = elGamal.KeyGen(p, g);
+            AsymmetricCipherKeyPair keyPair2 = elGamal.KeyGen(p, g);
+            AsymmetricCipherKeyPair keyPair3 = elGamal.KeyGen(p, g);
+
+            DHPublicKeyParameters combinedPublicKey = elGamal.CombinePublicKeys(new List<DHPublicKeyParameters>
+            {
+                (keyPair1.Public as DHPublicKeyParameters)!,
+                (keyPair2.Public as DHPublicKeyParameters)!,
+                (keyPair3.Public as DHPublicKeyParameters)!
+            },
+            elGamal.GetParameters(p, g));
+
+            int message1 = 1;
+            int message2 = 0;
+            int message3 = 1;
+
+            ElGamalCipher cipher1 = elGamal.Encrypt(message1, combinedPublicKey);
+            ElGamalCipher cipher2 = elGamal.Encrypt(message2, combinedPublicKey);
+            ElGamalCipher cipher3 = elGamal.Encrypt(message3, combinedPublicKey);
+            ElGamalCipher combinedCipher = cipher1.Add(cipher2, p).Add(cipher3, p);
+
+            // act
+            BigInteger share1 = elGamal.DecryptShare(combinedCipher, keyPair1.Private as DHPrivateKeyParameters, p);
+            BigInteger share2 = elGamal.DecryptShare(combinedCipher, keyPair2.Private as DHPrivateKeyParameters, p);
+            BigInteger share3 = elGamal.DecryptShare(combinedCipher, keyPair3.Private as DHPrivateKeyParameters, p);
+            int message =
+                elGamal.CombineShares(new List<BigInteger> { share1, share2, share3 }, combinedCipher.D, p, g);
+
+            // assert
+            Assert.That(message, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Bla()
+        {
+            IElGamal elGamal = new ExponentialElGamal();
+
+            // choose a predefined Diffie-Hellman group
+            DhGroup dhGroup = DhGroups.Get(DhGroups.Modp2048);
+
+            BigInteger p = dhGroup.P;
+            BigInteger g = dhGroup.G;
+
+            // generate a key pair
+            AsymmetricCipherKeyPair keyPair = elGamal.KeyGen(p, g);
+
+            int message1 = 1;
+            int message2 = 1;
+
+            // encrypt the messages using the public key
+            ElGamalCipher cipher1 = elGamal.Encrypt(message1, keyPair.Public);
+            ElGamalCipher cipher2 = elGamal.Encrypt(message2, keyPair.Public);
+
+            // perform the addition of the ciphertexts
+            ElGamalCipher combinedCipher = cipher1.Add(cipher1, p);
         }
 
         private static object[] _getAdditionParams =

@@ -11,6 +11,7 @@ namespace Helverify.Cryptography.Encryption
     /// <summary>
     /// Inspired by the following sources:
     /// Bernhard2016
+    /// Elgamal1985
     /// https://github.com/meck93/evote-crypto
     /// https://github.com/meck93/evote-crypto/blob/master/src/ff-elGamal/encryption.ts
     /// https://github.com/bcgit/bc-csharp/
