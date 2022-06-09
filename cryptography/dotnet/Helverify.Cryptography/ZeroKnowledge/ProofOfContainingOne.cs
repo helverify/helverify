@@ -22,6 +22,12 @@ namespace Helverify.Cryptography.ZeroKnowledge
         public BigInteger V { get; }
         public BigInteger S { get; }
 
+        /// <summary>
+        /// Private constructor, use <see cref="Create"/> instead.
+        /// </summary>
+        /// <param name="u">Proof parameter u</param>
+        /// <param name="v">Proof parameter v</param>
+        /// <param name="s">Proof parameter s</param>
         private ProofOfContainingOne(BigInteger u, BigInteger v, BigInteger s)
         {
             U = u;
@@ -29,6 +35,16 @@ namespace Helverify.Cryptography.ZeroKnowledge
             S = s;
         }
 
+        /// <summary>
+        /// Creates a proof that a ciphertext contains the value one.
+        /// </summary>
+        /// <param name="a">First component of an ElGamal ciphertext</param>
+        /// <param name="b">Second component of an ElGamal ciphertext</param>
+        /// <param name="h">Public key of an ElGamal cryptosystem</param>
+        /// <param name="x">Private key of an ElGamal cryptosystem</param>
+        /// <param name="p">Public prime p of an ElGamal cryptosystem</param>
+        /// <param name="g">Generator g of an ElGamal cryptosystem</param>
+        /// <returns>Proof that a ciphertext contains the value one.</returns>
         public static ProofOfContainingOne Create(BigInteger a, BigInteger b, BigInteger h, BigInteger x, BigInteger p, BigInteger g)
         {
             BigInteger q = p.Subtract(BigInteger.One).Multiply(BigInteger.Two.ModInverse(p)).Mod(p);
@@ -45,6 +61,15 @@ namespace Helverify.Cryptography.ZeroKnowledge
             return new ProofOfContainingOne(u, v, s);
         }
 
+        /// <summary>
+        /// Allows to verify that a ciphertext contains the value one.
+        /// </summary>
+        /// <param name="a">First component of an ElGamal ciphertext</param>
+        /// <param name="b">Second component of an ElGamal ciphertext</param>
+        /// <param name="h">Public key of an ElGamal cryptosystem</param>
+        /// <param name="p">Public prime p of an ElGamal cryptosystem</param>
+        /// <param name="g">Generator g of an ElGamal cryptosystem</param>
+        /// <returns>True if the ciphertext represents one, false otherwise.</returns>
         public bool Verify(BigInteger a, BigInteger b, BigInteger h, BigInteger p, BigInteger g)
         {
             BigInteger q = p.Subtract(BigInteger.One).Multiply(BigInteger.Two.ModInverse(p)).Mod(p);
