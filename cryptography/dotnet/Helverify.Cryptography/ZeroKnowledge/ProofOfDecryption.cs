@@ -7,6 +7,13 @@ using Org.BouncyCastle.Security;
 
 namespace Helverify.Cryptography.ZeroKnowledge
 {
+    /// <summary>
+    /// Chaum1993
+    /// Bernhard2016
+    /// KillerProvotum2020
+    /// 
+    /// Chaum-Pedersen Proof
+    /// </summary>
     public class ProofOfDecryption
     {
         private static readonly SecureRandom SecureRandom = new(new DigestRandomGenerator(new Sha256Digest()));
