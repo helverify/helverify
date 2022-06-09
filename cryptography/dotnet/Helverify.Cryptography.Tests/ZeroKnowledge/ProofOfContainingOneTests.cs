@@ -7,10 +7,10 @@ using Org.BouncyCastle.Math;
 
 namespace Helverify.Cryptography.Tests.ZeroKnowledge
 {
-    internal class ProofOfZeroOrOneTests
+    internal class ProofOfContainingOneTests
     {
-        [Test]
-        public void TestVerify()
+        [Test, TestCaseSource(nameof(_getMessages))]
+        public void TestVerify(int message1, int message2, int message3, bool expectedValidity)
         {
             // arrange
             IElGamal elGamal = new ExponentialElGamal();
@@ -32,31 +32,33 @@ namespace Helverify.Cryptography.Tests.ZeroKnowledge
                 },
                 elGamal.GetParameters(p, g));
 
-            int message1 = 0;
-            int message2 = 1;
-            int message3 = 2;
-
-
             ElGamalCipher cipher1 = elGamal.Encrypt(message1, combinedPublicKey);
             ElGamalCipher cipher2 = elGamal.Encrypt(message2, combinedPublicKey);
             ElGamalCipher cipher3 = elGamal.Encrypt(message3, combinedPublicKey);
 
-            ProofOfZeroOrOne proof1 = ProofOfZeroOrOne.Create(message1, cipher1.C, cipher1.D, combinedPublicKey.Y, cipher1.R, p, g);
-            ProofOfZeroOrOne proof2 = ProofOfZeroOrOne.Create(message2, cipher2.C, cipher2.D, combinedPublicKey.Y, cipher2.R, p, g);
+            ElGamalCipher combinedCipher = cipher1.Add(cipher2, p).Add(cipher3, p);
+
+            ProofOfContainingOne proof = ProofOfContainingOne.Create(combinedCipher.C, combinedCipher.D,
+                combinedPublicKey.Y, combinedCipher.R, p, g);
 
             // act
-            bool isValid1 = proof1.Verify(cipher1.C, cipher1.D, combinedPublicKey.Y, p, g);
-            bool isValid2 = proof2.Verify(cipher2.C, cipher2.D, combinedPublicKey.Y, p, g);
-            bool isValid3 = proof1.Verify(cipher3.C, cipher3.D, combinedPublicKey.Y, p, g);
-            bool isValid4 = proof1.Verify(cipher2.C, cipher2.D, combinedPublicKey.Y, p, g);
-            bool isValid5 = proof2.Verify(cipher1.C, cipher1.D, combinedPublicKey.Y, p, g);
+            bool isValid = proof.Verify(combinedCipher.C, combinedCipher.D, combinedPublicKey.Y, p, g);
 
             // assert
-            Assert.True(isValid1);
-            Assert.True(isValid2);
-            Assert.False(isValid3);
-            Assert.False(isValid4);
-            Assert.False(isValid5);
+            Assert.That(isValid, Is.EqualTo(expectedValidity));
         }
+
+        private static object[] _getMessages =
+        {
+            new object[]{0, 0, 0, false},
+            new object[]{1, 0, 0, true},
+            new object[]{0, 1, 0, true},
+            new object[]{0, 0, 1, true},
+            new object[]{0, 1, 1, false},
+            new object[]{1, 0, 1, false},
+            new object[]{1, 1, 0, false},
+            new object[]{1, 1, 1, false},
+            new object[]{2, 1, 7, false},
+        };
     }
 }
