@@ -93,32 +93,7 @@ namespace Helverify.Cryptography.Tests.Encryption
             // assert
             Assert.That(message, Is.EqualTo(2));
         }
-
-        [Test]
-        public void Bla()
-        {
-            IElGamal elGamal = new ExponentialElGamal();
-
-            // choose a predefined Diffie-Hellman group
-            DhGroup dhGroup = DhGroups.Get(DhGroups.Modp2048);
-
-            BigInteger p = dhGroup.P;
-            BigInteger g = dhGroup.G;
-
-            // generate a key pair
-            AsymmetricCipherKeyPair keyPair = elGamal.KeyGen(p, g);
-
-            int message1 = 1;
-            int message2 = 1;
-
-            // encrypt the messages using the public key
-            ElGamalCipher cipher1 = elGamal.Encrypt(message1, keyPair.Public);
-            ElGamalCipher cipher2 = elGamal.Encrypt(message2, keyPair.Public);
-
-            // perform the addition of the ciphertexts
-            ElGamalCipher combinedCipher = cipher1.Add(cipher1, p);
-        }
-
+        
         private static object[] _getAdditionParams =
         {
             new object[]{new List<int>{7, 12, 36}, 55},
