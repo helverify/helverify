@@ -10,16 +10,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Helverify.VotingAuthority.Backend.csproj", "."]
-RUN dotnet restore "./Helverify.VotingAuthority.Backend.csproj"
+COPY ["Helverify.ConsensusNode.Backend.csproj", "."]
+RUN dotnet restore "./Helverify.ConsensusNode.Backend.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "Helverify.VotingAuthority.Backend.csproj" -c Release -o /app/build --build-arg MongoDbConnectionString="mongodb://localhost:27017"
+RUN dotnet build "Helverify.ConsensusNode.Backend.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Helverify.VotingAuthority.Backend.csproj" -c Release -o /app/publish
+RUN dotnet publish "Helverify.ConsensusNode.Backend.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Helverify.VotingAuthority.Backend.dll"]
+ENTRYPOINT ["dotnet", "Helverify.ConsensusNode.Backend.dll"]
