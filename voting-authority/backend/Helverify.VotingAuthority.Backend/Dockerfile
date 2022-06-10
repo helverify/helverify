@@ -11,7 +11,7 @@ COPY ["Helverify.VotingAuthority.Backend.csproj", "."]
 RUN dotnet restore "./Helverify.VotingAuthority.Backend.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "Helverify.VotingAuthority.Backend.csproj" -c Release -o /app/build
+RUN dotnet build "Helverify.VotingAuthority.Backend.csproj" -c Release -o /app/build --build-arg MongoDbConnectionString="mongodb://localhost:27017"
 
 FROM build AS publish
 RUN dotnet publish "Helverify.VotingAuthority.Backend.csproj" -c Release -o /app/publish
