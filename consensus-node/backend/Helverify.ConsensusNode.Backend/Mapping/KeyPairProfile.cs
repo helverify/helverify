@@ -1,19 +1,19 @@
 ﻿using AutoMapper;
 using Helverify.ConsensusNode.Backend.Dto;
+using Helverify.ConsensusNode.Domain.Model;
 using Helverify.Cryptography.ZeroKnowledge;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 
 namespace Helverify.ConsensusNode.Backend.Mapping
 {
-    public class MappingProfile: Profile
+    public class KeyPairProfile: Profile
     {
-        public MappingProfile()
+        public KeyPairProfile()
         {
             CreatePublicKeyMapping();
             CreateProofMapping();
         }
-
         private void CreateProofMapping()
         {
             CreateMap<ProofOfPrivateKeyOwnership, ProofOfPrivateKeyDto>()

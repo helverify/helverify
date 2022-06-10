@@ -9,7 +9,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper( cfg => cfg.AddProfile<MappingProfile>());
+builder.Services.AddAutoMapper( cfg =>
+{
+    cfg.AddProfile<KeyPairProfile>();
+    cfg.AddProfile<DecryptionProfile>();
+});
+
 builder.Services.AddDomainConfiguration();
 
 var app = builder.Build();
