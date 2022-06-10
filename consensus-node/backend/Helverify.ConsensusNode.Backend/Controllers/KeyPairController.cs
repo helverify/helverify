@@ -34,10 +34,20 @@ namespace Helverify.ConsensusNode.Backend.Controllers
 
             _keyPairHandler.SaveToDisk(keyPair);
             
+            return Get();
+        }
+
+        [HttpGet]
+        [Route("public-key")]
+        [Produces("application/json")]
+        public ActionResult<PublicKeyDto> Get()
+        {
+            AsymmetricCipherKeyPair keyPair = _keyPairHandler.LoadFromDisk();
+
             ProofOfPrivateKeyOwnership proof = _keyPairHandler.GeneratePrivateKeyProof(keyPair);
 
             PublicKeyDto publicKeyDto = _mapper.Map<PublicKeyDto>((keyPair.Public, proof));
-            
+
             return publicKeyDto;
         }
     }

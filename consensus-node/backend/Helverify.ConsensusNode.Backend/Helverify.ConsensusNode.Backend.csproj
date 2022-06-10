@@ -7,6 +7,7 @@
     <UserSecretsId>588f6f90-3620-41de-bf91-a82d360d6883</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
+	<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,8 +24,15 @@
 
   <ItemGroup>
     <Reference Include="Helverify.Cryptography">
-      <HintPath>..\..\..\cryptography\dotnet\Helverify.Cryptography\bin\Release\net6.0\Helverify.Cryptography.dll</HintPath>
+      <HintPath>..\Helverify.Cryptography.dll</HintPath>
+      <Private>True</Private>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Helverify.Cryptography.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

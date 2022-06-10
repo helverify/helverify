@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helverify.VotingAuthority.Backend", "Helverify.VotingAuthority.Backend.csproj", "{B780A43D-8334-4400-B68A-10907D438CD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helverify.VotingAuthority.Backend", "Helverify.VotingAuthority.Backend\Helverify.VotingAuthority.Backend.csproj", "{B780A43D-8334-4400-B68A-10907D438CD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helverify.VotingAuthority.DataAccess", "..\Helverify.VotingAuthority.DataAccess\Helverify.VotingAuthority.DataAccess.csproj", "{22F47A52-ECCA-435B-AD88-2378A8CD478C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helverify.VotingAuthority.DataAccess", "Helverify.VotingAuthority.DataAccess\Helverify.VotingAuthority.DataAccess.csproj", "{22F47A52-ECCA-435B-AD88-2378A8CD478C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helverify.VotingAuthority.Domain", "..\Helverify.VotingAuthority.Domain\Helverify.VotingAuthority.Domain.csproj", "{C15D6DA0-AEE7-4E38-9F0B-1977CECA4D32}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helverify.VotingAuthority.Domain", "Helverify.VotingAuthority.Domain\Helverify.VotingAuthority.Domain.csproj", "{C15D6DA0-AEE7-4E38-9F0B-1977CECA4D32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

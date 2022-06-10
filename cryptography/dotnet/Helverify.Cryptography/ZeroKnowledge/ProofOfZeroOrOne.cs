@@ -26,7 +26,7 @@ namespace Helverify.Cryptography.ZeroKnowledge
         public BigInteger R1 { get; }
 
         /// <summary>
-        /// Constructor is private, use <see cref="Create"/> instead.
+        /// Constructor
         /// </summary>
         /// <param name="u0">Proof parameter u0</param>
         /// <param name="u1">Proof parameter u1</param>
@@ -36,7 +36,7 @@ namespace Helverify.Cryptography.ZeroKnowledge
         /// <param name="c1">Proof parameter c1</param>
         /// <param name="r0">Proof parameter r0</param>
         /// <param name="r1">Proof parameter r1</param>
-        private ProofOfZeroOrOne(BigInteger u0, BigInteger u1, BigInteger v0, BigInteger v1, BigInteger c0, BigInteger c1, BigInteger r0, BigInteger r1)
+        public ProofOfZeroOrOne(BigInteger u0, BigInteger u1, BigInteger v0, BigInteger v1, BigInteger c0, BigInteger c1, BigInteger r0, BigInteger r1)
         {
             U0 = u0;
             U1 = u1;

@@ -23,12 +23,12 @@ namespace Helverify.Cryptography.ZeroKnowledge
         public BigInteger S { get; }
 
         /// <summary>
-        /// Private constructor, use <see cref="Create"/> instead.
+        /// Constructor
         /// </summary>
         /// <param name="u">Proof parameter u</param>
         /// <param name="v">Proof parameter v</param>
         /// <param name="s">Proof parameter s</param>
-        private ProofOfContainingOne(BigInteger u, BigInteger v, BigInteger s)
+        public ProofOfContainingOne(BigInteger u, BigInteger v, BigInteger s)
         {
             U = u;
             V = v;

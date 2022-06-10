@@ -1,8 +1,10 @@
-﻿using Helverify.VotingAuthority.Backend.Dto;
+﻿using Helverify.Cryptography.ZeroKnowledge;
+using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.DataAccess.Database;
 using Helverify.VotingAuthority.DataAccess.Rest;
 using Helverify.VotingAuthority.Domain.Model;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
@@ -32,6 +34,16 @@ namespace Helverify.VotingAuthority.Backend.Controllers
                 new KeyPairRequestDto { P = election.P, G = election.G });
 
             // Todo: proof validation
+            ProofOfPrivateKeyOwnership proof = new ProofOfPrivateKeyOwnership(
+                new BigInteger(publicKey.ProofOfPrivateKey.C, 16), new BigInteger(publicKey.ProofOfPrivateKey.D, 16));
+
+            bool isValid = proof.Verify(new BigInteger(publicKey.PublicKey, 16), new BigInteger(election.P, 16),
+                new BigInteger(election.G, 16));
+
+            if (!isValid)
+            {
+                throw new Exception("Consensus node has private key matching the specified public key");
+            }
 
             registration.PublicKey = publicKey.PublicKey;
 
