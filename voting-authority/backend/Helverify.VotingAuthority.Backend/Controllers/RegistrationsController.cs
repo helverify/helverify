@@ -1,10 +1,8 @@
-﻿using Helverify.Cryptography.ZeroKnowledge;
-using Helverify.VotingAuthority.Backend.Dto;
-using Helverify.VotingAuthority.DataAccess.Database;
-using Helverify.VotingAuthority.DataAccess.Rest;
+﻿using Helverify.VotingAuthority.DataAccess.Database;
+using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
@@ -12,47 +10,39 @@ namespace Helverify.VotingAuthority.Backend.Controllers
     [ApiController]
     public class RegistrationsController : ControllerBase
     {
+        private const string ContentType = "application/json";
+
         private readonly IMongoService<Registration> _registrationService;
         private readonly IMongoService<Election> _electionService;
-        private readonly IRestClient _restClient;
-
-        public RegistrationsController(IMongoService<Registration> registrationService, IMongoService<Election> electionService, IRestClient restClient)
+        private readonly IConsensusNodeService _consensusNodeService;
+        
+        public RegistrationsController(IMongoService<Registration> registrationService, IMongoService<Election> electionService, IConsensusNodeService consensusNodeService)
         {
             _registrationService = registrationService;
             _electionService = electionService;
-            _restClient = restClient;
+            _consensusNodeService = consensusNodeService;
         }
 
         [HttpPost]
+        [Consumes(ContentType)]
+        [Produces(ContentType)]
         public async Task<ActionResult<Registration>> Post([FromRoute] string electionId, [FromBody] Registration registration)
         {
             registration.ElectionId = electionId;
             
             Election election = await _electionService.GetAsync(electionId);
 
-            PublicKeyDto publicKey = await _restClient.Call<PublicKeyDto>(HttpMethod.Post, new Uri(registration.Endpoint, "/api/key-pair"),
-                new KeyPairRequestDto { P = election.P, G = election.G });
+            PublicKeyDto publicKey = await _consensusNodeService.GenerateKeyPairAsync(registration.Endpoint, election);
 
-            // Todo: proof validation
-            ProofOfPrivateKeyOwnership proof = new ProofOfPrivateKeyOwnership(
-                new BigInteger(publicKey.ProofOfPrivateKey.C, 16), new BigInteger(publicKey.ProofOfPrivateKey.D, 16));
-
-            bool isValid = proof.Verify(new BigInteger(publicKey.PublicKey, 16), new BigInteger(election.P, 16),
-                new BigInteger(election.G, 16));
-
-            if (!isValid)
-            {
-                throw new Exception("Consensus node has private key matching the specified public key");
-            }
-
-            registration.PublicKey = publicKey.PublicKey;
-
+            registration.SetPublicKey(publicKey, election);
+           
             await _registrationService.CreateAsync(registration);
 
             return registration;
         }
 
         [HttpGet]
+        [Produces(ContentType)]
         public async Task<ActionResult<List<Registration>>> Get()
         {
             return await _registrationService.GetAsync();
@@ -60,6 +50,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Produces(ContentType)]
         public async Task<ActionResult<Registration>> Get(string id)
         {
             return await _registrationService.GetAsync(id);
@@ -67,7 +58,9 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<ActionResult<Registration>> Put(string id, Registration registration)
+        [Consumes(ContentType)]
+        [Produces(ContentType)]
+        public async Task<ActionResult<Registration>> Put(string id, [FromBody] Registration registration)
         {
             await _registrationService.UpdateAsync(id, registration);
 

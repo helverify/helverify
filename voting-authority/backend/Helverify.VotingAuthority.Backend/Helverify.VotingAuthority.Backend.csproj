@@ -11,17 +11,16 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
-    <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Helverify.VotingAuthority.Domain\Helverify.VotingAuthority.Domain.csproj" />
   </ItemGroup>
-    
+
   <ItemGroup>
     <Reference Include="Helverify.Cryptography">
-      <HintPath>..\..\..\cryptography\dotnet\Helverify.Cryptography\bin\Release\net6.0\Helverify.Cryptography.dll</HintPath>
+      <HintPath>..\Helverify.Cryptography.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

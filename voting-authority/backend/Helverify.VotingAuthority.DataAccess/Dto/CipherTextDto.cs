@@ -1,6 +1,6 @@
-﻿namespace Helverify.VotingAuthority.Backend.Dto
+﻿namespace Helverify.VotingAuthority.DataAccess.Dto
 {
-    public class ProofOfPrivateKeyDto
+    public class CipherTextDto
     {
         public string C { get; set; }
         public string D { get; set; }
