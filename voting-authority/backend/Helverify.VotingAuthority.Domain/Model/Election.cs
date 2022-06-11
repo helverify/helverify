@@ -27,9 +27,11 @@ namespace Helverify.VotingAuthority.Domain.Model
 
         public BigInteger? PublicKey { get; set; }
 
-        public void CombinePublicKeys(IEnumerable<Registration> registrations)
+        public IList<Registration> Registrations { get; set; } = new List<Registration>();
+
+        public void CombinePublicKeys()
         {
-            IList<BigInteger> publicKeys = registrations.Select(r => new BigInteger(r.PublicKey, 16)).ToList();
+            IList<BigInteger> publicKeys = Registrations.Select(r => r.PublicKey!).ToList();
 
             List<DHPublicKeyParameters> dhPublicKeys = publicKeys.Select(pk => new DHPublicKeyParameters(pk, DhParameters)).ToList();
 

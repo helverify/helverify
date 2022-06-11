@@ -13,6 +13,7 @@ builder.Services.AddDomainConfiguration();
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<ElectionDtoProfile>();
+    cfg.AddProfile<RegistrationDtoProfile>();
 });
 
 var app = builder.Build();

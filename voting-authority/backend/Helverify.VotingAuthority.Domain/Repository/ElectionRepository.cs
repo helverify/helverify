@@ -5,14 +5,16 @@ using Helverify.VotingAuthority.Domain.Model;
 
 namespace Helverify.VotingAuthority.Domain.Repository
 {
-    internal class ElectionRepository : IElectionRepository
+    internal class ElectionRepository : IRepository<Election>
     {
         private readonly IMongoService<ElectionDao> _mongoService;
+        private readonly IRepository<Registration> _registrationRepository;
         private readonly IMapper _mapper;
 
-        public ElectionRepository(IMongoService<ElectionDao> mongoService, IMapper mapper)
+        public ElectionRepository(IMongoService<ElectionDao> mongoService, IRepository<Registration> registrationRepository, IMapper mapper)
         {
             _mongoService = mongoService;
+            _registrationRepository = registrationRepository;
             _mapper = mapper;
         }
 
@@ -30,6 +32,8 @@ namespace Helverify.VotingAuthority.Domain.Repository
             ElectionDao electionDao = await _mongoService.GetAsync(id);
 
             Election election = _mapper.Map<Election>(electionDao);
+
+            election.Registrations = (await _registrationRepository.GetAsync()).Where(r => r.ElectionId == id).ToList();
 
             return election;
         }

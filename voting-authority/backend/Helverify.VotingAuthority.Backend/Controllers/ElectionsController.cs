@@ -2,7 +2,6 @@
 using Helverify.Cryptography.Encryption;
 using Helverify.Cryptography.ZeroKnowledge;
 using Helverify.VotingAuthority.Backend.Dto;
-using Helverify.VotingAuthority.DataAccess.Database;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Repository;
@@ -19,15 +18,15 @@ namespace Helverify.VotingAuthority.Backend.Controllers
     {
         private const string ContentType = "application/json";
 
-        private readonly IElectionRepository _electionRepository;
-        private readonly IMongoService<Registration> _registrationService;
+        private readonly IRepository<Election> _electionRepository;
+        private readonly IRepository<Registration> _registrationRepository;
         private readonly IConsensusNodeService _consensusNodeService;
         private readonly IMapper _mapper;
 
-        public ElectionsController(IElectionRepository electionRepository, IMongoService<Registration> registrationService, IConsensusNodeService consensusNodeService, IMapper mapper)
+        public ElectionsController(IRepository<Election> electionRepository, IRepository<Registration> registrationRepository, IConsensusNodeService consensusNodeService, IMapper mapper)
         {
             _electionRepository = electionRepository;
-            _registrationService = registrationService;
+            _registrationRepository = registrationRepository;
             _consensusNodeService = consensusNodeService;
             _mapper = mapper;
         }
@@ -99,9 +98,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         {
             Election election = await _electionRepository.GetAsync(id);
 
-            IEnumerable<Registration> registrations = (await _registrationService.GetAsync()).Where(r => r.ElectionId == id);
-
-            election.CombinePublicKeys(registrations);
+            election.CombinePublicKeys();
 
             election = await _electionRepository.UpdateAsync(id, election);
 
@@ -144,7 +141,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         {
             Election election = await _electionRepository.GetAsync(id);
 
-            IList<Registration> consensusNodes = (await _registrationService.GetAsync()).Where(r => r.ElectionId == id).ToList();
+            IList<Registration> consensusNodes = (await _registrationRepository.GetAsync()).Where(r => r.ElectionId == id).ToList();
             IList<string> shares = new List<string>();
 
             foreach (Registration node in consensusNodes)
@@ -157,7 +154,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
                     new BigInteger(share.ProofOfDecryption.S, 16));
 
                 bool isValid = proof.Verify(new BigInteger(cipher.C, 16), new BigInteger(cipher.D, 16),
-                    new DHPublicKeyParameters(new BigInteger(node.PublicKey, 16), election.DhParameters));
+                    new DHPublicKeyParameters(node.PublicKey, election.DhParameters));
 
                 if (!isValid)
                 {
