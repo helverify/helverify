@@ -9,17 +9,17 @@ namespace Helverify.VotingAuthority.DataAccess.Dao
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; }
+        public string? Id { get; set; } 
 
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
-        public string Question { get; set; }
+        public string Question { get; set; } = string.Empty;
 
-        public IList<ElectionOptionDao> Options { get; set; }
+        public IList<ElectionOptionDao> Options { get; set; } = new List<ElectionOptionDao>();
 
-        public string P { get; set; }
+        public string P { get; set; } = string.Empty;
 
-        public string G { get; set; }
+        public string G { get; set; } = string.Empty;
 
         public string? PublicKey { get; set; }
     }

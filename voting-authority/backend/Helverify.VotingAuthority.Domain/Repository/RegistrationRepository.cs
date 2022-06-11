@@ -5,26 +5,34 @@ using Helverify.VotingAuthority.Domain.Model;
 
 namespace Helverify.VotingAuthority.Domain.Repository
 {
+    /// <inheritdoc cref="IRepository{T}"/>
     internal class RegistrationRepository : IRepository<Registration>
     {
         private readonly IMongoService<RegistrationDao> _mongoService;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mongoService">MongoDB accessor</param>
+        /// <param name="mapper">Automapper</param>
         public RegistrationRepository(IMongoService<RegistrationDao> mongoService, IMapper mapper)
         {
             _mongoService = mongoService;
             _mapper = mapper;
         }
 
-        public async Task<Registration> CreateAsync(Registration registration)
+        /// <inheritdoc cref="IRepository{T}.CreateAsync"/>
+        public async Task<Registration> CreateAsync(Registration entity)
         {
-            RegistrationDao registrationDao = _mapper.Map<RegistrationDao>(registration);
+            RegistrationDao registrationDao = _mapper.Map<RegistrationDao>(entity);
 
             await _mongoService.CreateAsync(registrationDao);
 
             return _mapper.Map<Registration>(registrationDao);
         }
 
+        /// <inheritdoc cref="IRepository{T}.GetAsync(string {id})"/>
         public async Task<Registration> GetAsync(string id)
         {
             RegistrationDao registrationDao = await _mongoService.GetAsync(id);
@@ -34,6 +42,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             return registration;
         }
 
+        /// <inheritdoc cref="IRepository{T}.GetAsync()"/>
         public async Task<IList<Registration>> GetAsync()
         {
             IList<RegistrationDao> registrationDaos = (await _mongoService.GetAsync()).ToList();
@@ -43,15 +52,17 @@ namespace Helverify.VotingAuthority.Domain.Repository
             return registrations;
         }
 
-        public async Task<Registration> UpdateAsync(string id, Registration registration)
+        /// <inheritdoc cref="IRepository{T}.UpdateAsync"/>
+        public async Task<Registration> UpdateAsync(string id, Registration entity)
         {
-            RegistrationDao registrationDao = _mapper.Map<RegistrationDao>(registration);
+            RegistrationDao registrationDao = _mapper.Map<RegistrationDao>(entity);
 
             await _mongoService.UpdateAsync(id, registrationDao);
 
             return _mapper.Map<Registration>(registrationDao);
         }
 
+        /// <inheritdoc cref="IRepository{T}.DeleteAsync"/>
         public async Task DeleteAsync(string id)
         {
             await _mongoService.RemoveAsync(id);

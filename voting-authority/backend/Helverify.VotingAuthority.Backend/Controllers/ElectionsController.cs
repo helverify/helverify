@@ -12,6 +12,9 @@ using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
+    /// <summary>
+    /// Controller for handling the election API
+    /// </summary>
     [Route("api/elections")]
     [ApiController]
     public class ElectionsController : ControllerBase
@@ -23,6 +26,13 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         private readonly IConsensusNodeService _consensusNodeService;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="electionRepository">Repository for elections</param>
+        /// <param name="registrationRepository">Repository for registrations</param>
+        /// <param name="consensusNodeService">Accessor to consensus node service</param>
+        /// <param name="mapper">Automapper</param>
         public ElectionsController(IRepository<Election> electionRepository, IRepository<Registration> registrationRepository, IConsensusNodeService consensusNodeService, IMapper mapper)
         {
             _electionRepository = electionRepository;
@@ -31,6 +41,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Create a new election.
+        /// </summary>
+        /// <param name="electionDto">Election parameters</param>
+        /// <returns>Newly created election</returns>
         [HttpPost]
         [Consumes(ContentType)]
         [Produces(ContentType)]
@@ -45,6 +60,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Provides the election with the specified id.
+        /// </summary>
+        /// <param name="id">Election identifier</param>
+        /// <returns>Election with the specified id.</returns>
         [HttpGet]
         [Route("{id}")]
         [Produces(ContentType)]
@@ -57,6 +77,10 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Provides a list of all elections.
+        /// </summary>
+        /// <returns>List of elections</returns>
         [HttpGet]
         [Produces(ContentType)]
         public async Task<ActionResult<IList<ElectionDto>>> Get()
@@ -68,6 +92,12 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// Updates a specific election.
+        /// </summary>
+        /// <param name="id">Election identifier</param>
+        /// <param name="electionDto">Election parameters</param>
+        /// <returns>Updated election</returns>
         [HttpPut]
         [Route("{id}")]
         [Consumes(ContentType)]
@@ -83,6 +113,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Removes an election.
+        /// </summary>
+        /// <param name="id">Election identifier</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("{id}")]
         public async Task Delete(string id)
@@ -90,6 +125,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             await _electionRepository.DeleteAsync(id);
         }
 
+        /// <summary>
+        /// Combines and stores the public keys of all registered consensus nodes of the specified election.
+        /// </summary>
+        /// <param name="id">Election identifier</param>
+        /// <returns>Election public key</returns>
         [HttpPut]
         [Route("{id}/public-key")]
         [Consumes(ContentType)]
@@ -146,7 +186,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             foreach (Registration node in consensusNodes)
             {
-                DecryptionShareDto share = await _consensusNodeService.DecryptShareAsync(node.Endpoint, cipher.C, cipher.D);
+                DecryptionShareDto? share = await _consensusNodeService.DecryptShareAsync(node.Endpoint, cipher.C, cipher.D);
 
                 ProofOfDecryption proof = new ProofOfDecryption(new BigInteger(share.ProofOfDecryption.D, 16), 
                     new BigInteger(share.ProofOfDecryption.U, 16),

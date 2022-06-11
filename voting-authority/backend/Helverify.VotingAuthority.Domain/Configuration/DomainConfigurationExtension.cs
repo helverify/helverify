@@ -7,8 +7,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Helverify.VotingAuthority.Domain.Configuration
 {
+    /// <summary>
+    /// Configuration extension for the Domain layer.
+    /// </summary>
     public static class DomainConfigurationExtension
     {
+        /// <summary>
+        /// Registers all services exposed by the Domain layer.
+        /// </summary>
+        /// <param name="services">ServiceCollection for DI</param>
+        /// <returns></returns>
         public static IServiceCollection AddDomainConfiguration(this IServiceCollection services)
         {
             services.AddAutoMapper(cfg =>

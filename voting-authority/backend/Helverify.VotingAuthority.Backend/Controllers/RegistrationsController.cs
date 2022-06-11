@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
+    /// <summary>
+    /// Controller for handling the registration API.
+    /// </summary>
     [Route("api/elections/{electionId}/registrations")]
     [ApiController]
     public class RegistrationsController : ControllerBase
@@ -19,6 +22,13 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         private readonly IConsensusNodeService _consensusNodeService;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="registrationRepository">Repository for registrations</param>
+        /// <param name="electionRepository">Repository for elections</param>
+        /// <param name="consensusNodeService">Accessor to consensus node service</param>
+        /// <param name="mapper">Automapper</param>
         public RegistrationsController(IRepository<Registration> registrationRepository, IRepository<Election> electionRepository, 
             IConsensusNodeService consensusNodeService, IMapper mapper)
         {
@@ -28,6 +38,12 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Register a new consensus node.
+        /// </summary>
+        /// <param name="electionId">Election identifier</param>
+        /// <param name="registrationDto">Consensus node registration details</param>
+        /// <returns>Newly created registration details</returns>
         [HttpPost]
         [Consumes(ContentType)]
         [Produces(ContentType)]
@@ -39,7 +55,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             
             Election election = await _electionRepository.GetAsync(electionId);
 
-            PublicKeyDto publicKey = await _consensusNodeService.GenerateKeyPairAsync(registrationDto.Endpoint, election);
+            PublicKeyDto? publicKey = await _consensusNodeService.GenerateKeyPairAsync(registrationDto.Endpoint, election);
 
             registration.SetPublicKey(publicKey, election);
 
@@ -50,6 +66,10 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Provides a list of all registered consensus nodes.
+        /// </summary>
+        /// <returns>List of registered consensus nodes</returns>
         [HttpGet]
         [Produces(ContentType)]
         public async Task<ActionResult<List<RegistrationDto>>> Get()
@@ -61,6 +81,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// Provides the details of a specific consensus node registration.
+        /// </summary>
+        /// <param name="id">Registration identifier</param>
+        /// <returns>Details of a registered consensus node.</returns>
         [HttpGet]
         [Route("{id}")]
         [Produces(ContentType)]
@@ -73,6 +98,12 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Updates a consensus node registration.
+        /// </summary>
+        /// <param name="id">Registration identifier</param>
+        /// <param name="registrationDto">Registration details</param>
+        /// <returns>Updated consensus node registration</returns>
         [HttpPut]
         [Route("{id}")]
         [Consumes(ContentType)]
@@ -88,6 +119,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Removes a consensus node registration.
+        /// </summary>
+        /// <param name="id">Registration identifier</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("{id}")]
         public async Task Delete(string id)

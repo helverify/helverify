@@ -7,7 +7,7 @@
 
     public class Cipher
     {
-        public string C { get; set; }
-        public string D { get; set; }
+        public string C { get; set; } = string.Empty;
+        public string D { get; set; } = string.Empty;
     }
 }

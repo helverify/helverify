@@ -10,8 +10,8 @@ namespace Helverify.VotingAuthority.DataAccess.Dao
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
-        public string Name { get; set; }
-        public Uri Endpoint { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public Uri? Endpoint { get; set; }
         public string? ElectionId { get; set; }
         public string? PublicKey { get; set; }
     }

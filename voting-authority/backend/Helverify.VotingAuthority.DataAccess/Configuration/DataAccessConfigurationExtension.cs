@@ -5,8 +5,17 @@ using MongoDB.Driver;
 
 namespace Helverify.VotingAuthority.DataAccess.Configuration
 {
+    /// <summary>
+    /// Configuration extension for the DataAccess layer.
+    /// </summary>
     public static class DataAccessConfigurationExtension
     {
+        /// <summary>
+        /// Registers all services exposed by the DataAccess layer.
+        /// </summary>
+        /// <param name="services">ServiceCollection for DI</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public static IServiceCollection AddDataAccessConfiguration(this IServiceCollection services)
         {
             string connectionString = Environment.GetEnvironmentVariable("MongoDbConnectionString") ?? throw new InvalidOperationException();

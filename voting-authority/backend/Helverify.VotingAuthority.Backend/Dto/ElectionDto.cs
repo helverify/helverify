@@ -1,19 +1,43 @@
 ﻿namespace Helverify.VotingAuthority.Backend.Dto
 {
+    /// <summary>
+    /// Represents an Election
+    /// </summary>
     public class ElectionDto
     {
+        /// <summary>
+        /// Unique election identifier.
+        /// </summary>
         public string? Id { get; set; }
 
-        public string Name { get; set; }
+        /// <summary>
+        /// Name of the election.
+        /// </summary>
+        public string Name { get; set; } = string.Empty;
 
-        public string Question { get; set; }
+        /// <summary>
+        /// Voting/election question
+        /// </summary>
+        public string Question { get; set; } = string.Empty;
 
-        public IList<ElectionOptionDto> Options { get; set; }
+        /// <summary>
+        /// Represents the voting options for this election.
+        /// </summary>
+        public IList<ElectionOptionDto> Options { get; set; } = new List<ElectionOptionDto>();
 
-        public string P { get; set; }
+        /// <summary>
+        /// Prime p of the ElGamal cryptosystem.
+        /// </summary>
+        public string P { get; set; } = string.Empty;
 
-        public string G { get; set; }
+        /// <summary>
+        /// Generator g of the ElGamal cryptosystem.
+        /// </summary>
+        public string G { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Election public key
+        /// </summary>
         public string? PublicKey { get; set; }
     }
 }
