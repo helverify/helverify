@@ -25,8 +25,7 @@ namespace Helverify.VotingAuthority.Domain.Model
             ProofOfPrivateKeyOwnership proof = new ProofOfPrivateKeyOwnership(
                 new BigInteger(publicKeyDto.ProofOfPrivateKey.C, 16), new BigInteger(publicKeyDto.ProofOfPrivateKey.D, 16));
 
-            bool isValid = proof.Verify(new BigInteger(publicKeyDto.PublicKey, 16), new BigInteger(election.P, 16),
-                new BigInteger(election.G, 16));
+            bool isValid = proof.Verify(new BigInteger(publicKeyDto.PublicKey, 16), election.P, election.G);
 
             if (!isValid)
             {

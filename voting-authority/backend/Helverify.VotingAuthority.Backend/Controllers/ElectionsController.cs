@@ -1,9 +1,11 @@
-﻿using Helverify.Cryptography.Encryption;
+﻿using AutoMapper;
+using Helverify.Cryptography.Encryption;
 using Helverify.Cryptography.ZeroKnowledge;
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.DataAccess.Database;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Repository;
 using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -17,75 +19,95 @@ namespace Helverify.VotingAuthority.Backend.Controllers
     {
         private const string ContentType = "application/json";
 
-        private readonly IMongoService<Election> _electionService;
+        private readonly IElectionRepository _electionRepository;
         private readonly IMongoService<Registration> _registrationService;
         private readonly IConsensusNodeService _consensusNodeService;
+        private readonly IMapper _mapper;
 
-        public ElectionsController(IMongoService<Election> electionService, IMongoService<Registration> registrationService, IConsensusNodeService consensusNodeService)
+        public ElectionsController(IElectionRepository electionRepository, IMongoService<Registration> registrationService, IConsensusNodeService consensusNodeService, IMapper mapper)
         {
-            _electionService = electionService;
+            _electionRepository = electionRepository;
             _registrationService = registrationService;
             _consensusNodeService = consensusNodeService;
+            _mapper = mapper;
         }
 
         [HttpPost]
         [Consumes(ContentType)]
         [Produces(ContentType)]
-        public async Task<ActionResult<Election>> Post([FromBody] Election election)
+        public async Task<ActionResult<ElectionDto>> Post([FromBody] ElectionDto electionDto)
         {
-            await _electionService.CreateAsync(election);
+            Election election = _mapper.Map<Election>(electionDto);
 
-            return Ok(election);
+            election = await _electionRepository.CreateAsync(election);
+
+            ElectionDto result = _mapper.Map<ElectionDto>(election);
+
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("{id}")]
         [Produces(ContentType)]
-        public async Task<ActionResult<Election>> Get(string id)
+        public async Task<ActionResult<ElectionDto>> Get(string id)
         {
-            return await _electionService.GetAsync(id);
+            Election election = await _electionRepository.GetAsync(id);
+
+            ElectionDto result = _mapper.Map<ElectionDto>(election);
+
+            return Ok(result);
         }
 
         [HttpGet]
         [Produces(ContentType)]
-        public async Task<ActionResult<List<Election>>> Get()
+        public async Task<ActionResult<IList<ElectionDto>>> Get()
         {
-            return await _electionService.GetAsync();
+            IList<Election> elections = await _electionRepository.GetAsync();
+
+            IList<ElectionDto> results = _mapper.Map<IList<ElectionDto>>(elections);
+
+            return Ok(results);
         }
 
         [HttpPut]
         [Route("{id}")]
         [Consumes(ContentType)]
         [Produces(ContentType)]
-        public async Task<ActionResult<Election>> Put(string id, [FromBody] Election election)
+        public async Task<ActionResult<Election>> Put(string id, [FromBody] ElectionDto electionDto)
         {
-            await _electionService.UpdateAsync(id, election);
+            Election election = _mapper.Map<Election>(electionDto);
 
-            return election;
+            election = await _electionRepository.UpdateAsync(id, election);
+
+            ElectionDto result = _mapper.Map<ElectionDto>(election);
+
+            return Ok(result);
         }
 
         [HttpDelete]
         [Route("{id}")]
         public async Task Delete(string id)
         {
-            await _electionService.RemoveAsync(id);
+            await _electionRepository.DeleteAsync(id);
         }
 
         [HttpPut]
         [Route("{id}/public-key")]
         [Consumes(ContentType)]
         [Produces(ContentType)]
-        public async Task<ActionResult<Election>> Put(string id)
+        public async Task<ActionResult<ElectionDto>> Put(string id)
         {
-            Election election = await _electionService.GetAsync(id);
+            Election election = await _electionRepository.GetAsync(id);
 
             IEnumerable<Registration> registrations = (await _registrationService.GetAsync()).Where(r => r.ElectionId == id);
 
             election.CombinePublicKeys(registrations);
 
-            await _electionService.UpdateAsync(id, election);
+            election = await _electionRepository.UpdateAsync(id, election);
 
-            return election;
+            ElectionDto result = _mapper.Map<ElectionDto>(election);
+
+            return Ok(result);
         }
 
 
@@ -99,7 +121,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Route("{id}/encrypt")]
         public async Task<ActionResult<Cipher>> Encrypt(string id, Message message)
         {
-            Election election = await _electionService.GetAsync(id);
+            Election election = await _electionRepository.GetAsync(id);
 
             ElGamalCipher cipher = election.Encrypt(message.M);
 
@@ -120,7 +142,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Route("{id}/decrypt")]
         public async Task<ActionResult<Message>> Decrypt(string id, Cipher cipher)
         {
-            Election election = await _electionService.GetAsync(id);
+            Election election = await _electionRepository.GetAsync(id);
 
             IList<Registration> consensusNodes = (await _registrationService.GetAsync()).Where(r => r.ElectionId == id).ToList();
             IList<string> shares = new List<string>();

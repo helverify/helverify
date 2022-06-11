@@ -1,3 +1,4 @@
+using Helverify.VotingAuthority.Backend.Mapping;
 using Helverify.VotingAuthority.Domain.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDomainConfiguration();
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<ElectionDtoProfile>();
+});
 
 var app = builder.Build();
 

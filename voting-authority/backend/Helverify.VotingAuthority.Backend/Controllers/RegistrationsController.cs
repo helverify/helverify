@@ -1,6 +1,7 @@
 ﻿using Helverify.VotingAuthority.DataAccess.Database;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Repository;
 using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,13 +14,13 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         private const string ContentType = "application/json";
 
         private readonly IMongoService<Registration> _registrationService;
-        private readonly IMongoService<Election> _electionService;
+        private readonly IElectionRepository _electionRepository;
         private readonly IConsensusNodeService _consensusNodeService;
         
-        public RegistrationsController(IMongoService<Registration> registrationService, IMongoService<Election> electionService, IConsensusNodeService consensusNodeService)
+        public RegistrationsController(IMongoService<Registration> registrationService, IElectionRepository electionRepository, IConsensusNodeService consensusNodeService)
         {
             _registrationService = registrationService;
-            _electionService = electionService;
+            _electionRepository = electionRepository;
             _consensusNodeService = consensusNodeService;
         }
 
@@ -30,7 +31,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         {
             registration.ElectionId = electionId;
             
-            Election election = await _electionService.GetAsync(electionId);
+            Election election = await _electionRepository.GetAsync(electionId);
 
             PublicKeyDto publicKey = await _consensusNodeService.GenerateKeyPairAsync(registration.Endpoint, election);
 

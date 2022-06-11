@@ -1,5 +1,6 @@
 ﻿using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.DataAccess.Rest;
+using Helverify.VotingAuthority.Domain.Extensions;
 using Helverify.VotingAuthority.Domain.Model;
 
 namespace Helverify.VotingAuthority.Domain.Service
@@ -19,7 +20,7 @@ namespace Helverify.VotingAuthority.Domain.Service
         public async Task<PublicKeyDto> GenerateKeyPairAsync(Uri endpoint, Election election)
         {
             return await _restClient.Call<PublicKeyDto>(HttpMethod.Post, new Uri(endpoint, KeyPairRoute),
-                new KeyPairRequestDto { P = election.P, G = election.G });
+                new KeyPairRequestDto { P = election.P.ExportToHexString(), G = election.G.ExportToHexString() });
         }
 
         public async Task<DecryptionShareDto> DecryptShareAsync(Uri endpoint, string c, string d)
