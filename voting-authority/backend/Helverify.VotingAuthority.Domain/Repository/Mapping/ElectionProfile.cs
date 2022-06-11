@@ -5,7 +5,7 @@ using Helverify.VotingAuthority.Domain.Model;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 {
-    internal class ElectionProfile: Profile
+    public class ElectionProfile: Profile
     {
         public ElectionProfile()
         {

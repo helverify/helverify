@@ -1,10 +1,12 @@
-﻿using Helverify.VotingAuthority.DataAccess.Configuration;
+﻿using System.Runtime.CompilerServices;
+using Helverify.VotingAuthority.DataAccess.Configuration;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Repository;
 using Helverify.VotingAuthority.Domain.Repository.Mapping;
 using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.Extensions.DependencyInjection;
 
+[assembly: InternalsVisibleTo("Helverify.VotingAuthority.Domain.Tests")]
 namespace Helverify.VotingAuthority.Domain.Configuration
 {
     /// <summary>
