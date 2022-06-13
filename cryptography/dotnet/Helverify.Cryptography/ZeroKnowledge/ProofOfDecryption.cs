@@ -24,13 +24,13 @@ namespace Helverify.Cryptography.ZeroKnowledge
         public BigInteger S { get; }
 
         /// <summary>
-        /// Private constructor, use <see cref="Create"/> instead.
+        /// Constructor
         /// </summary>
         /// <param name="d">Proof parameter d</param>
         /// <param name="u">Proof parameter u</param>
         /// <param name="v">Proof parameter v</param>
         /// <param name="s">Proof parameter s</param>
-        private ProofOfDecryption(BigInteger d, BigInteger u, BigInteger v, BigInteger s)
+        public ProofOfDecryption(BigInteger d, BigInteger u, BigInteger v, BigInteger s)
         {
             D = d;
             U = u;

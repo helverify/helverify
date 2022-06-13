@@ -21,11 +21,11 @@ namespace Helverify.Cryptography.ZeroKnowledge
         public BigInteger D { get; }
 
         /// <summary>
-        /// Constructor is private, use <see cref="Create"/> instead.
+        /// Constructor
         /// </summary>
         /// <param name="c">Proof parameter c</param>
         /// <param name="d">Proof parameter d</param>
-        private ProofOfPrivateKeyOwnership(BigInteger c, BigInteger d)
+        public ProofOfPrivateKeyOwnership(BigInteger c, BigInteger d)
         {
             C = c;
             D = d;

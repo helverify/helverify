@@ -1,0 +1,45 @@
+version: "3.9"
+services:
+    va-mongodb: #https://hub.docker.com/_/mongo
+        image: mongo
+        restart: always
+        ports:
+            - 27017:27017
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: voting-authority
+    
+    va-backend:
+        ports:
+            - 5001:5000
+        environment: 
+            - ASPNETCORE_URLS=http://+:5000
+            - MongoDbConnectionString=mongodb://root:voting-authority@host.docker.internal:27017
+        build:
+            context: ../voting-authority/backend/
+            dockerfile: Helverify.VotingAuthority.Backend/Dockerfile    
+        links:
+            - va-mongodb
+            - consensus-backend1
+            - consensus-backend2
+        depends_on:
+            - va-mongodb
+    
+    consensus-backend1:
+        ports:
+            - 5002:5000
+        environment: 
+            - ASPNETCORE_URLS=http://+:5000
+        build:
+            context: ../consensus-node/backend/
+            dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
+    
+    consensus-backend2:
+        ports:
+            - 5003:5000
+        environment: 
+            - ASPNETCORE_URLS=http://+:5000
+        build:
+            context: ../consensus-node/backend/
+            dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
+           
