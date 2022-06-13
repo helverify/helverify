@@ -1,12 +1,13 @@
 ﻿using Helverify.Cryptography.Encryption;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 
-namespace Helverify.VotingAuthority.Domain.Tests.Model
+namespace Helverify.VotingAuthority.Domain.Tests.Model.Virtual
 {
-    internal class EncryptedBallotTests
+    internal class BallotTests
     {
 
         [Test]
@@ -28,17 +29,17 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model
             };
 
             BallotTemplate ballotTemplate = new BallotTemplate(election);
-            
+
             IElGamal elGamal = new ExponentialElGamal();
-            
+
             AsymmetricCipherKeyPair keyPair = elGamal.KeyGen(election.P, election.G);
-            
+
             DHPublicKeyParameters publicKey = (keyPair.Public as DHPublicKeyParameters)!;
-            
-            IList<IList<int>> plainTextOptions = ballotTemplate.PlainTextOptions;
-            
+
+            IList<PlainTextOption> plainTextOptions = ballotTemplate.PlainTextOptions;
+
             // act
-            EncryptedBallot ballot = new EncryptedBallot(plainTextOptions, publicKey);
+            Ballot ballot = new Ballot(plainTextOptions, publicKey);
 
             // assert
             Assert.That(ballot.EncryptedOptions[0].Values, Has.Count.EqualTo(3));
@@ -79,7 +80,7 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model
 
             DHPublicKeyParameters publicKey = (keyPair.Public as DHPublicKeyParameters)!;
 
-            EncryptedBallot ballot = new EncryptedBallot(new List<IList<int>>(), publicKey);
+            Ballot ballot = new Ballot(new List<PlainTextOption>(), publicKey);
 
             ballot.EncryptedOptions = new List<EncryptedOption>
             {

@@ -3,33 +3,45 @@ using Helverify.Cryptography.ZeroKnowledge;
 using Helverify.VotingAuthority.Domain.Helper;
 using Org.BouncyCastle.Crypto.Parameters;
 
-namespace Helverify.VotingAuthority.Domain.Model
+namespace Helverify.VotingAuthority.Domain.Model.Virtual
 {
-    public class EncryptedBallot
+    public class Ballot
     {
-        public string Code { get; set; }
+        public string Code { get; }
+
         public IList<EncryptedOption> EncryptedOptions { get; internal set; }
+
+        public IList<PlainTextOption> PlainTextOptions { get; internal set; }
 
         public IList<SumProof> RowProofs { get; }
 
         public IList<SumProof> ColumnProofs { get; }
 
-        public EncryptedBallot(IList<IList<int>> plainTextOptions, DHPublicKeyParameters publicKey)
+        public Ballot(IList<PlainTextOption> plainTextOptions, DHPublicKeyParameters publicKey)
         {
             EncryptedOptions = new List<EncryptedOption>();
+            PlainTextOptions = new List<PlainTextOption>();
             RowProofs = new List<SumProof>();
             ColumnProofs = new List<SumProof>();
 
-            foreach (IList<int> plainTextOption in plainTextOptions)
+            foreach (PlainTextOption plainTextOption in plainTextOptions)
             {
-                EncryptedOptions.Add(new EncryptedOption(publicKey, plainTextOption));
+                EncryptedOption encryptedOption = new EncryptedOption(publicKey, plainTextOption.Values);
+
+                PlainTextOption ptOption = plainTextOption.Clone();
+
+                ptOption.ShortCode = encryptedOption.ShortCode;
+
+                PlainTextOptions.Add(ptOption);
+
+                EncryptedOptions.Add(encryptedOption);
             }
 
             GenerateRowProofs(publicKey);
 
             GenerateColumnProofs(publicKey);
 
-            Code = HashHelper.Hash(GetAllCiphers().ToArray());
+            Code = HashHelper.Hash(AllCiphers);
 
             // sort options by short code to hide positional information
             EncryptedOptions = EncryptedOptions.OrderBy(e => e.ShortCode).ToList();
@@ -89,9 +101,25 @@ namespace Helverify.VotingAuthority.Domain.Model
             return sum;
         }
 
-        private IList<ElGamalCipher> GetAllCiphers()
+        private ElGamalCipher[] AllCiphers => EncryptedOptions.SelectMany(e => e.Values.Select(v => v.Cipher)).ToArray();
+    }
+
+    public class PlainTextOption
+    {
+        public string ShortCode { get; set; }
+        public string Name { get; set; }
+        public IList<int> Values { get; }
+
+        public PlainTextOption(string name, IList<int> values)
         {
-            return EncryptedOptions.SelectMany(e => e.Values.Select(v => v.Cipher)).ToList();
+            Name = name;
+            Values = values;
+            ShortCode = string.Empty;
+        }
+
+        public PlainTextOption Clone()
+        {
+            return new PlainTextOption(Name, Values);
         }
     }
 }

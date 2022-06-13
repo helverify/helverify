@@ -2,7 +2,7 @@
 using Helverify.Cryptography.ZeroKnowledge;
 using Org.BouncyCastle.Crypto.Parameters;
 
-namespace Helverify.VotingAuthority.Domain.Model;
+namespace Helverify.VotingAuthority.Domain.Model.Virtual;
 
 public class SumProof
 {

@@ -1,13 +1,13 @@
 ﻿using Helverify.VotingAuthority.Domain.Helper;
 using Org.BouncyCastle.Crypto.Parameters;
 
-namespace Helverify.VotingAuthority.Domain.Model;
+namespace Helverify.VotingAuthority.Domain.Model.Virtual;
 
 public class EncryptedOption
 {
     public IList<EncryptedOptionValue> Values { get; }
     public string ShortCode { get; internal set; }
-    public string Hash { get;  }
+    public string Hash { get; }
 
     public EncryptedOption(DHPublicKeyParameters publicKey, IList<int> plainTextOption)
     {
@@ -21,6 +21,7 @@ public class EncryptedOption
         }
 
         Hash = HashHelper.Hash(Values.Select(v => v.Cipher).ToArray());
+
         ShortCode = Hash.Substring(0, 2);
     }
 }
