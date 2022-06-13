@@ -8,6 +8,7 @@ using Org.BouncyCastle.OpenSsl;
 
 namespace Helverify.ConsensusNode.Domain.Model
 {
+    /// <inheritdoc cref="IKeyPairHandler"/>
     internal class KeyPairHandler : IKeyPairHandler
     {
         private const string PrivateKeyFileName = "private.pem";
@@ -17,17 +18,23 @@ namespace Helverify.ConsensusNode.Domain.Model
         private readonly IFileSystem _fileSystem;
         private readonly IElGamal _elGamal;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="fileSystem">File system abstraction</param>
         public KeyPairHandler(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
             _elGamal = new ExponentialElGamal();
         }
-        
+
+        /// <inheritdoc cref="IKeyPairHandler.CreateKeyPair"/>
         public AsymmetricCipherKeyPair CreateKeyPair(BigInteger p, BigInteger g)
         {
             return _elGamal.KeyGen(p, g);
         }
 
+        /// <inheritdoc cref="IKeyPairHandler.GeneratePrivateKeyProof"/>
         public ProofOfPrivateKeyOwnership GeneratePrivateKeyProof(AsymmetricCipherKeyPair keyPair)
         {
             DHPublicKeyParameters publicKey = keyPair.Public as DHPublicKeyParameters;
@@ -39,6 +46,7 @@ namespace Helverify.ConsensusNode.Domain.Model
             return ProofOfPrivateKeyOwnership.Create(pk, sk, publicKey.Parameters.P, publicKey.Parameters.G);
         }
 
+        /// <inheritdoc cref="IKeyPairHandler.LoadFromDisk"/>
         public AsymmetricCipherKeyPair LoadFromDisk()
         {
             AsymmetricKeyParameter publicKey = LoadFromDisk(PublicKeyFileName);
@@ -46,22 +54,23 @@ namespace Helverify.ConsensusNode.Domain.Model
 
             return new AsymmetricCipherKeyPair(publicKey, privateKey);
         }
-
-        private AsymmetricKeyParameter LoadFromDisk(string fileName)
-        {
-            using StreamReader streamReader = _fileSystem.File.OpenText(_fileSystem.Path.Combine(KeyPath, fileName));
-            
-            PemReader pemReader = new PemReader(streamReader);
-            
-            AsymmetricKeyParameter key = (AsymmetricKeyParameter)pemReader.ReadObject();
-
-            return key;
-        }
-
+        
+        /// <inheritdoc cref="IKeyPairHandler.SaveToDisk"/>
         public void SaveToDisk(AsymmetricCipherKeyPair keyPair)
         {
             SaveToDisk(keyPair.Public, "public.pem");
             SaveToDisk(keyPair.Private, "private.pem");
+        }
+
+        private AsymmetricKeyParameter LoadFromDisk(string fileName)
+        {
+            using StreamReader streamReader = _fileSystem.File.OpenText(_fileSystem.Path.Combine(KeyPath, fileName));
+
+            PemReader pemReader = new PemReader(streamReader);
+
+            AsymmetricKeyParameter key = (AsymmetricKeyParameter)pemReader.ReadObject();
+
+            return key;
         }
 
         private void SaveToDisk(AsymmetricKeyParameter key, string fileName)

@@ -7,8 +7,14 @@ using Org.BouncyCastle.Math;
 
 namespace Helverify.ConsensusNode.Backend.Mapping
 {
+    /// <summary>
+    /// Automapper mapping profile for decryption dto.
+    /// </summary>
     public class DecryptionProfile: Profile
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public DecryptionProfile()
         {
             CreateDecryptionShareMapping();
@@ -18,18 +24,18 @@ namespace Helverify.ConsensusNode.Backend.Mapping
 
         private void CreateEncryptedShareMapping()
         {
-            CreateMap<EncryptedShareRequestDto, EncryptedShare>()
+            CreateMap<EncryptedShareRequestDto, Ciphertext>()
                 .ConstructUsing(dto => CreateEncryptedShare(dto));
         }
 
-        private EncryptedShare CreateEncryptedShare(EncryptedShareRequestDto dto)
+        private Ciphertext CreateEncryptedShare(EncryptedShareRequestDto dto)
         {
             BigInteger c = new BigInteger(dto.Cipher.C, 16);
             BigInteger d = new BigInteger(dto.Cipher.D, 16);
 
             ElGamalCipher cipher = new ElGamalCipher(c, d, null);
 
-            return new EncryptedShare(cipher);
+            return new Ciphertext(cipher);
         }
 
         private void CreateProofOfDecryptionMapping()

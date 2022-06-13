@@ -6,6 +6,9 @@ using Org.BouncyCastle.Crypto;
 
 namespace Helverify.ConsensusNode.Backend.Controllers
 {
+    /// <summary>
+    /// Controller for cooperative decryption
+    /// </summary>
     [Route("api/decryption")]
     [ApiController]
     public class DecryptionController: ControllerBase
@@ -13,12 +16,22 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         private readonly IKeyPairHandler _keyPairHandler;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="keyPairHandler">Key pair service</param>
+        /// <param name="mapper">Automapper</param>
         public DecryptionController(IKeyPairHandler keyPairHandler, IMapper mapper)
         {
             _keyPairHandler = keyPairHandler;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Decrypts this node's share of the specified ciphertext.
+        /// </summary>
+        /// <param name="requestDto">Ciphertext of an ElGamal cryptosystem</param>
+        /// <returns>Decrypted share</returns>
         [HttpPost]
         [Consumes("application/json")]
         [Produces("application/json")]
@@ -26,9 +39,9 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         {
             AsymmetricCipherKeyPair keyPair = _keyPairHandler.LoadFromDisk();
             
-            EncryptedShare encryptedShare = _mapper.Map<EncryptedShare>(requestDto);
+            Ciphertext ciphertext = _mapper.Map<Ciphertext>(requestDto);
 
-            DecryptedShare decryptedShare = encryptedShare.Decrypt(keyPair);
+            DecryptedShare decryptedShare = ciphertext.Decrypt(keyPair);
 
             DecryptionShareDto response = _mapper.Map<DecryptionShareDto>(decryptedShare);
 

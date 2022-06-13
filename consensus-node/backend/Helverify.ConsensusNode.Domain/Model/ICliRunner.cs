@@ -1,5 +1,8 @@
 ﻿namespace Helverify.ConsensusNode.Domain.Model;
 
+/// <summary>
+/// Allows to run commands on the system command line.
+/// </summary>
 internal interface ICliRunner
 {
     /// <summary>

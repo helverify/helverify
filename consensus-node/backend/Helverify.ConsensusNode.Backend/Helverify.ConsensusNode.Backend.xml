@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Helverify.ConsensusNode.Backend</name>
+    </assembly>
+    <members>
+        <member name="T:Helverify.ConsensusNode.Backend.Controllers.DecryptionController">
+            <summary>
+            Controller for cooperative decryption
+            </summary>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.DecryptionController.#ctor(Helverify.ConsensusNode.Domain.Model.IKeyPairHandler,AutoMapper.IMapper)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="keyPairHandler">Key pair service</param>
+            <param name="mapper">Automapper</param>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.DecryptionController.Post(Helverify.ConsensusNode.Backend.Dto.EncryptedShareRequestDto)">
+            <summary>
+            Decrypts this node's share of the specified ciphertext.
+            </summary>
+            <param name="requestDto">Ciphertext of an ElGamal cryptosystem</param>
+            <returns>Decrypted share</returns>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Controllers.KeyPairController">
+            <summary>
+            Controller for handling key pairs.
+            </summary>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.KeyPairController.#ctor(Helverify.ConsensusNode.Domain.Model.IKeyPairHandler,AutoMapper.IMapper)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="keyPairHandler">Key pair service</param>
+            <param name="mapper">Automapper</param>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.KeyPairController.Post(Helverify.ConsensusNode.Backend.Dto.KeyPairRequestDto)">
+            <summary>
+            Generates a new key pair and stores it to the file system.
+            </summary>
+            <param name="requestDto">Public parameters of the ElGamal cryptosystem</param>
+            <returns>The public key of this consensus node</returns>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.KeyPairController.Get">
+            <summary>
+            Returns the current public key of this consensus node.
+            </summary>
+            <returns>The public key of this consensus node</returns>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Dto.CipherTextDto">
+            <summary>
+            Represents an ElGamal ciphertext
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.CipherTextDto.C">
+            <summary>
+            First component of an ElGamal ciphertext (c)
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.CipherTextDto.D">
+            <summary>
+            Second component of an ElGamal ciphertext (d)
+            </summary>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Dto.DecryptionShareDto">
+            <summary>
+            Represents a decrypted share of an ElGamal ciphertext
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.DecryptionShareDto.DecryptedShare">
+            <summary>
+            Content of the decrypted share
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.DecryptionShareDto.ProofOfDecryption">
+            <summary>
+            Chaum-Pedersen proof that the encryption has been done correctly.
+            </summary>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Dto.EncryptedShareRequestDto">
+            <summary>
+            Represents an ElGamal ciphertext for cooperative decryption.
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.EncryptedShareRequestDto.Cipher">
+            <summary>
+            ElGamal ciphertext
+            </summary>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Dto.KeyPairRequestDto">
+            <summary>
+            Represents the public parameters of an ElGamal cryptosystem for key generation.
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.KeyPairRequestDto.P">
+            <summary>
+            Public prime p of an ElGamal cryptosystem
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.KeyPairRequestDto.G">
+            <summary>
+            Generator g of an ElGamal cryptosystem
+            </summary>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Dto.ProofOfDecryptionDto">
+            <summary>
+            Represents a Chaum-Pedersen proof which proves the correct decryption of a message.
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.ProofOfDecryptionDto.D">
+            <summary>
+            d (Chaum-Pedersen)
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.ProofOfDecryptionDto.U">
+            <summary>
+            u (Chaum-Pedersen)
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.ProofOfDecryptionDto.V">
+            <summary>
+            v (Chaum-Pedersen)
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.ProofOfDecryptionDto.S">
+            <summary>
+            s (Chaum-Pedersen)
+            </summary>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Dto.ProofOfPrivateKeyDto">
+            <summary>
+            Represents the Schnorr-Proof of owning a private key to a given public key.
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.ProofOfPrivateKeyDto.C">
+            <summary>
+            c (Schnorr-Proof)
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.ProofOfPrivateKeyDto.D">
+            <summary>
+            d (Schnorr-Proof)
+            </summary>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Dto.PublicKeyDto">
+            <summary>
+            Represents a public key with the corresponding proof of private key ownership.
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.PublicKeyDto.PublicKey">
+            <summary>
+            Public key
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.PublicKeyDto.ProofOfPrivateKey">
+            <summary>
+            Schnorr-Proof of private key ownership
+            </summary>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Mapping.DecryptionProfile">
+            <summary>
+            Automapper mapping profile for decryption dto.
+            </summary>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Mapping.DecryptionProfile.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Mapping.KeyPairProfile">
+            <summary>
+            Automapper mapping profile for public key dto.
+            </summary>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Mapping.KeyPairProfile.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Mapping.KeyPairProfile.CreatePublicKeyMapping">
+            <summary>
+            Tuple trick from https://stackoverflow.com/questions/21413273/automapper-convert-from-multiple-sources
+            </summary>
+        </member>
+    </members>
+</doc>

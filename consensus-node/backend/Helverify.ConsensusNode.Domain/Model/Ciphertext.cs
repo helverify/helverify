@@ -5,17 +5,30 @@ using Org.BouncyCastle.Crypto.Parameters;
 
 namespace Helverify.ConsensusNode.Domain.Model
 {
-    public class EncryptedShare
+    /// <summary>
+    /// ElGamal Ciphertext
+    /// </summary>
+    public class Ciphertext
     {
         private readonly IElGamal _elGamal;
         private readonly ElGamalCipher _cipher;
 
-        public EncryptedShare(ElGamalCipher cipher)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="cipher">Original ElGamal ciphertext</param>
+        public Ciphertext(ElGamalCipher cipher)
         {
             _elGamal = new ExponentialElGamal();
             _cipher = cipher;
         }
 
+        /// <summary>
+        /// Decrypts this consensus node's share of the ciphertext.
+        /// </summary>
+        /// <param name="keyPair">ElGamal key pair</param>
+        /// <returns>Decrypted share</returns>
+        /// <exception cref="Exception"></exception>
         public DecryptedShare Decrypt(AsymmetricCipherKeyPair keyPair)
         {
             DHPublicKeyParameters publicKey = keyPair.Public as DHPublicKeyParameters ?? throw new Exception("No public key found.");

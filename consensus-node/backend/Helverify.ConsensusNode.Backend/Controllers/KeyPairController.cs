@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using AutoMapper;
+﻿using AutoMapper;
 using Helverify.ConsensusNode.Backend.Dto;
 using Helverify.ConsensusNode.Domain.Model;
 using Helverify.Cryptography.ZeroKnowledge;
@@ -9,6 +8,9 @@ using Org.BouncyCastle.Math;
 
 namespace Helverify.ConsensusNode.Backend.Controllers
 {
+    /// <summary>
+    /// Controller for handling key pairs.
+    /// </summary>
     [Route("api/key-pair")]
     [ApiController]
     public class KeyPairController: ControllerBase
@@ -16,12 +18,22 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         private readonly IKeyPairHandler _keyPairHandler;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="keyPairHandler">Key pair service</param>
+        /// <param name="mapper">Automapper</param>
         public KeyPairController(IKeyPairHandler keyPairHandler, IMapper mapper)
         {
             _keyPairHandler = keyPairHandler;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Generates a new key pair and stores it to the file system.
+        /// </summary>
+        /// <param name="requestDto">Public parameters of the ElGamal cryptosystem</param>
+        /// <returns>The public key of this consensus node</returns>
         [HttpPost]
         [Consumes("application/json")]
         [Produces("application/json")]
@@ -37,6 +49,10 @@ namespace Helverify.ConsensusNode.Backend.Controllers
             return Get();
         }
 
+        /// <summary>
+        /// Returns the current public key of this consensus node.
+        /// </summary>
+        /// <returns>The public key of this consensus node</returns>
         [HttpGet]
         [Route("public-key")]
         [Produces("application/json")]

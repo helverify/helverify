@@ -8,6 +8,8 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
 	<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<DocumentationFile>Helverify.ConsensusNode.Backend.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
