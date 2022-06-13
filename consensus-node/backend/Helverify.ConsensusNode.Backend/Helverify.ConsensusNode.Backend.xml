@@ -20,7 +20,7 @@
             <summary>
             Decrypts this node's share of the specified ciphertext.
             </summary>
-            <param name="requestDto">Ciphertext of an ElGamal cryptosystem</param>
+            <param name="requestDto">CipherText of an ElGamal cryptosystem</param>
             <returns>Decrypted share</returns>
         </member>
         <member name="T:Helverify.ConsensusNode.Backend.Controllers.KeyPairController">

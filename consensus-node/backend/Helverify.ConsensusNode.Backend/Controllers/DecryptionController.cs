@@ -30,7 +30,7 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         /// <summary>
         /// Decrypts this node's share of the specified ciphertext.
         /// </summary>
-        /// <param name="requestDto">Ciphertext of an ElGamal cryptosystem</param>
+        /// <param name="requestDto">CipherText of an ElGamal cryptosystem</param>
         /// <returns>Decrypted share</returns>
         [HttpPost]
         [Consumes("application/json")]
@@ -39,9 +39,9 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         {
             AsymmetricCipherKeyPair keyPair = _keyPairHandler.LoadFromDisk();
             
-            Ciphertext ciphertext = _mapper.Map<Ciphertext>(requestDto);
+            CipherText cipherText = _mapper.Map<CipherText>(requestDto);
 
-            DecryptedShare decryptedShare = ciphertext.Decrypt(keyPair);
+            DecryptedShare decryptedShare = cipherText.Decrypt(keyPair);
 
             DecryptionShareDto response = _mapper.Map<DecryptionShareDto>(decryptedShare);
 

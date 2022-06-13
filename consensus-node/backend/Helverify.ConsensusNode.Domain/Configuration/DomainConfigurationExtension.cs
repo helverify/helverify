@@ -1,8 +1,9 @@
 ﻿using System.IO.Abstractions;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Helverify.ConsensusNode.Domain.Model;
-using Helverify.Cryptography.Encryption;
 
+[assembly: InternalsVisibleTo("Helverify.ConsensusNode.Domain.Tests")]
 namespace Helverify.ConsensusNode.Domain.Configuration
 {
     public static class DomainConfigurationExtension

@@ -11,9 +11,9 @@ namespace Helverify.ConsensusNode.Domain.Model
     /// <inheritdoc cref="IKeyPairHandler"/>
     internal class KeyPairHandler : IKeyPairHandler
     {
-        private const string PrivateKeyFileName = "private.pem";
-        private const string PublicKeyFileName = "public.pem";
-        private const string KeyPath = "/usr/local/keys";
+        internal const string PrivateKeyFileName = "private.pem";
+        internal const string PublicKeyFileName = "public.pem";
+        internal const string KeyPath = "/usr/local/keys";
 
         private readonly IFileSystem _fileSystem;
         private readonly IElGamal _elGamal;

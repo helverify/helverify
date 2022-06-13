@@ -6,9 +6,9 @@ using Org.BouncyCastle.Crypto.Parameters;
 namespace Helverify.ConsensusNode.Domain.Model
 {
     /// <summary>
-    /// ElGamal Ciphertext
+    /// ElGamal CipherText
     /// </summary>
-    public class Ciphertext
+    public class CipherText
     {
         private readonly IElGamal _elGamal;
         private readonly ElGamalCipher _cipher;
@@ -17,7 +17,7 @@ namespace Helverify.ConsensusNode.Domain.Model
         /// Constructor
         /// </summary>
         /// <param name="cipher">Original ElGamal ciphertext</param>
-        public Ciphertext(ElGamalCipher cipher)
+        public CipherText(ElGamalCipher cipher)
         {
             _elGamal = new ExponentialElGamal();
             _cipher = cipher;

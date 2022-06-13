@@ -24,18 +24,18 @@ namespace Helverify.ConsensusNode.Backend.Mapping
 
         private void CreateEncryptedShareMapping()
         {
-            CreateMap<EncryptedShareRequestDto, Ciphertext>()
+            CreateMap<EncryptedShareRequestDto, CipherText>()
                 .ConstructUsing(dto => CreateEncryptedShare(dto));
         }
 
-        private Ciphertext CreateEncryptedShare(EncryptedShareRequestDto dto)
+        private CipherText CreateEncryptedShare(EncryptedShareRequestDto dto)
         {
             BigInteger c = new BigInteger(dto.Cipher.C, 16);
             BigInteger d = new BigInteger(dto.Cipher.D, 16);
 
             ElGamalCipher cipher = new ElGamalCipher(c, d, null);
 
-            return new Ciphertext(cipher);
+            return new CipherText(cipher);
         }
 
         private void CreateProofOfDecryptionMapping()
