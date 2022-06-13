@@ -104,5 +104,10 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// Builds Diffie-Hellman parameters from the ElGamal cryptosystem parameters.
         /// </summary>
         public DHParameters DhParameters => new (P, G);
+
+        public BallotTemplate GenerateBallotTemplate()
+        {
+            return new BallotTemplate(this);
+        }
     }
 }

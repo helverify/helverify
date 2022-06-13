@@ -65,7 +65,7 @@
             For testing purposes
             </summary>
             <param name="id"></param>
-            <param name="message"></param>
+            <param name="option"></param>
             <returns></returns>
         </member>
         <member name="M:Helverify.VotingAuthority.Backend.Controllers.ElectionsController.Decrypt(System.String,Helverify.VotingAuthority.Backend.Dto.Cipher)">
