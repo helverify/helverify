@@ -1,6 +1,12 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.5-alpine3.15-amd64 AS base
+
+RUN apk add geth
+RUN apk add bind-tools
+RUN apk add jq
+
+#FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
@@ -11,6 +17,7 @@ COPY ["Helverify.ConsensusNode.Backend/Helverify.ConsensusNode.Backend.csproj", 
 COPY ["Helverify.ConsensusNode.Domain/Helverify.ConsensusNode.Domain.csproj", "Helverify.ConsensusNode.Domain/"]
 RUN dotnet restore "Helverify.ConsensusNode.Backend/Helverify.ConsensusNode.Backend.csproj"
 COPY . .
+
 WORKDIR "/src/Helverify.ConsensusNode.Backend"
 RUN dotnet build "Helverify.ConsensusNode.Backend.csproj" -c Release -o /app/build
 
