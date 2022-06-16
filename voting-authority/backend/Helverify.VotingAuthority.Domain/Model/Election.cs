@@ -1,5 +1,6 @@
 ﻿using Helverify.Cryptography.Encryption;
 using Helverify.VotingAuthority.Domain.Extensions;
+using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 
@@ -104,5 +105,10 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// Builds Diffie-Hellman parameters from the ElGamal cryptosystem parameters.
         /// </summary>
         public DHParameters DhParameters => new (P, G);
+
+        public BallotTemplate GenerateBallotTemplate()
+        {
+            return new BallotTemplate(this);
+        }
     }
 }
