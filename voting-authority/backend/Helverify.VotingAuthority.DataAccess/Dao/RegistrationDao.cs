@@ -14,5 +14,6 @@ namespace Helverify.VotingAuthority.DataAccess.Dao
         public Uri? Endpoint { get; set; }
         public string? ElectionId { get; set; }
         public string? PublicKey { get; set; }
+        public string AccountAddress { get; set; }
     }
 }

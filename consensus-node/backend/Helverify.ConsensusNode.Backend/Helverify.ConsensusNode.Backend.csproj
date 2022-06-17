@@ -35,6 +35,12 @@
     <None Update="Helverify.Cryptography.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="scripts\start-consensusnode.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="scripts\start-mining.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="scripts\start-rpc.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
