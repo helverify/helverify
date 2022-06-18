@@ -5,6 +5,7 @@ FROM alpine:3.16.0
 RUN apk add geth
 RUN apk add nano
 RUN apk add jq
+RUN apk add bind-tools
 
 ENTRYPOINT /bin/sh
 

@@ -53,18 +53,18 @@ services:
             context: ../consensus-node/backend/
             dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
             
-    geth-bootstrap-node:
-        ports:
-            - 30303:30303
-        environment: 
-            - ASPNETCORE_URLS=http://+:5000
-            - BC_ACCOUNT_PWD=test3
-        volumes: 
-            - ./bootstrap/home:/home/
-        build:
-            context: ./bootstrap
-            dockerfile: Dockerfile
-        tty: true # https://stackoverflow.com/questions/38546755/docker-compose-keep-container-running
+    #geth-bootstrap-node:
+    #    ports:
+    #        - 30303:30303
+    #    environment: 
+    #        - ASPNETCORE_URLS=http://+:5000
+    #        - BC_ACCOUNT_PWD=test3
+    #    volumes: 
+    #        - ./bootstrap/home:/home/
+    #    build:
+    #        context: ./bootstrap
+    #        dockerfile: Dockerfile
+    #    tty: true # https://stackoverflow.com/questions/38546755/docker-compose-keep-container-running
         
     geth-rpc-node:
         ports:
