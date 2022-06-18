@@ -1,5 +1,6 @@
 ﻿using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Blockchain;
 
 namespace Helverify.VotingAuthority.Domain.Service;
 
@@ -24,4 +25,10 @@ public interface IConsensusNodeService
     /// <param name="d">Second component of ElGamal cipher (d)</param>
     /// <returns></returns>
     Task<DecryptionShareDto?> DecryptShareAsync(Uri endpoint, string c, string d);
+
+    Task InitializeGenesisBlock(Uri endpoint, Genesis genesis);
+    Task<string> CreateBcAccount(Uri endpoint);
+    Task<string> StartPeers(Uri endpoint);
+    Task InitializeNodes(Uri endpoint, NodesDto nodesDto);
+    Task StartSealing(Uri endpoint);
 }

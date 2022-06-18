@@ -16,12 +16,12 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Blockchain
         public void TestGenesis()
         {
             // arrange
-            //Genesis genesis = new Genesis
+            //GenesisDto genesis = new GenesisDto
             //{
             //    Config = new Config
             //    {
             //        ChainId = 13337,
-            //        Clique = new Clique
+            //        CliqueDto = new CliqueDto
             //        {
             //            Epoch = 30000,
             //            Period = 5
@@ -37,18 +37,29 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Blockchain
             //    Difficulty = "1",
             //    Extradata = "0x000000000000000000000000000000000000000000000000000000000000000017C65ABfbCC0c235E113768DF66432B24806cA150000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
             //    GasLimit = "8000000",
-            //    Alloc = new Dictionary<string, AccountBalance>
+            //    Alloc = new Dictionary<string, AccountBalanceDto>
             //    {
-            //        {"17C65ABfbCC0c235E113768DF66432B24806cA15", new AccountBalance{Balance = "3000000000"}},
-            //        {"b587afE7AaAFD1457a2F87C9B38740454605354b", new AccountBalance{Balance = "3000000000"}}
+            //        {"17C65ABfbCC0c235E113768DF66432B24806cA15", new AccountBalanceDto{Balance = "3000000000"}},
+            //        {"b587afE7AaAFD1457a2F87C9B38740454605354b", new AccountBalanceDto{Balance = "3000000000"}}
             //    }
             //};
 
-            Genesis genesis = new Genesis(new List<RegistrationDao>
+            Account auth1 = new Account("b488f7E0Ddde1A2EFd1c70ba88C6c0C053aDb177", "42");
+            Account auth2 = new Account("8100cBC8594F99130bFAa706E1007cC8b742edb8", "73");
+            Account other = new Account("FF00c130bFAa70660bFAa706E1007cC8b742edb8", "92");
+
+
+            IList<Account> authorities = new List<Account>
             {
-                new (){ AccountAddress = "b488f7E0Ddde1A2EFd1c70ba88C6c0C053aDb177" },
-                new (){ AccountAddress = "8100cBC8594F99130bFAa706E1007cC8b742edb8" },
-            }, 13337, "4000000000000000000000000000", 30000, 5);
+                auth1, auth2
+            };
+
+            IList<Account> prefundedAccounts = new List<Account>
+            {
+                auth1, auth2, other
+            };
+            
+            Genesis genesis = new Genesis(13337, authorities, prefundedAccounts);
 
             JsonSerializerSettings settings = new JsonSerializerSettings
             {

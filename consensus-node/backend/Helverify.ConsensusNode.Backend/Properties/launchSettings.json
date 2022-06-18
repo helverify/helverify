@@ -32,7 +32,11 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "publishAllPorts": true,
-      "useSSL": false
+      "useSSL": false,
+      "environmentVariables": {
+        "PORT": "30303",
+        "BC_ACCOUNT_PWD":  "test1" 
+      }
     }
   }
 }

@@ -2,6 +2,7 @@
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Blockchain;
 using Helverify.VotingAuthority.Domain.Repository;
 using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
     public class RegistrationsController : ControllerBase
     {
         private const string ContentType = "application/json";
+
+        private const string InitialFunds = "1000000000000000";
 
         private readonly IRepository<Registration> _registrationRepository;
         private readonly IRepository<Election> _electionRepository;
@@ -129,6 +132,53 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         public async Task Delete(string id)
         {
             await _registrationRepository.DeleteAsync(id);
+        }
+
+        [HttpPost]
+        [Route("blockchain-setup")]
+        public async Task Setup([FromRoute] string electionId)
+        {
+            Election election = await _electionRepository.GetAsync(electionId);
+            
+            IList<Registration> registrations = election.Registrations;
+
+            foreach (Registration registration in registrations)
+            {
+                string bcAddress = await _consensusNodeService.CreateBcAccount(registration.Endpoint);
+
+                registration.Account = new Account(bcAddress, InitialFunds);
+            }
+
+            IList<Account> authorities = registrations.Select(r => r.Account).ToList();
+
+            Genesis genesis = new Genesis(13337, authorities, authorities);
+            
+            foreach (Registration registration in registrations)
+            {
+                await _consensusNodeService.InitializeGenesisBlock(registration.Endpoint, genesis);
+            }
+
+            foreach (Registration registration in registrations)
+            {
+                registration.Enode =  await _consensusNodeService.StartPeers(registration.Endpoint);
+                
+                await _registrationRepository.UpdateAsync(registration.Id!, registration);
+            }
+
+            NodesDto nodes = new NodesDto
+            {
+                Nodes = registrations.Select(r => r.Enode).ToList()
+            };
+
+            foreach (Registration registration in registrations)
+            {
+                await _consensusNodeService.InitializeNodes(registration.Endpoint, nodes);
+            }
+
+            foreach (Registration registration in registrations)
+            {
+                await _consensusNodeService.StartSealing(registration.Endpoint);
+            }
         }
     }
 }

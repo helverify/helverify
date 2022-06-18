@@ -4,6 +4,12 @@ ethdir=/home/eth
 
 rm -rf $ethdir/data
 
+rm $ethdir/address
+
+rm $ethdir/nodes.json
+
+rm $ethdir/genesis.json
+
 mkdir -p $ethdir/data
 
 echo $BC_ACCOUNT_PWD > $ethdir/password

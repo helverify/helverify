@@ -7,7 +7,7 @@ do
     sleep 5
 done
 
-for element in $(jq '.nodes[]' nodes);
+for element in $(jq '.nodes[]' $ethdir/nodes.json);
 do
     geth attach $ethdir/data/geth.ipc --exec "admin.addPeer($element)"
 done

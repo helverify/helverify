@@ -21,10 +21,12 @@ namespace Helverify.VotingAuthority.Domain.Configuration
         /// <returns></returns>
         public static IServiceCollection AddDomainConfiguration(this IServiceCollection services)
         {
+            services.AddTransient<GenesisConverter>();
             services.AddAutoMapper(cfg =>
             {
                 cfg.AddProfile<ElectionProfile>();
                 cfg.AddProfile<RegistrationProfile>();
+                cfg.AddProfile<GenesisProfile>();
             });
             services.AddDataAccessConfiguration();
             services.AddSingleton<IConsensusNodeService, ConsensusNodeService>();

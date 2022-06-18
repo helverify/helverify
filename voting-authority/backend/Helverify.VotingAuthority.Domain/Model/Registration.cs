@@ -1,6 +1,7 @@
 ﻿using Helverify.Cryptography.ZeroKnowledge;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Extensions;
+using Helverify.VotingAuthority.Domain.Model.Blockchain;
 using Org.BouncyCastle.Math;
 
 
@@ -35,6 +36,10 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// Public key of the consensus node.
         /// </summary>
         public BigInteger? PublicKey { get; set; }
+
+        public Account Account { get; set; }
+
+        public string Enode { get; set; }
 
         /// <summary>
         /// Updates the registration with the public key of the consensus node.

@@ -10,7 +10,7 @@ namespace Helverify.ConsensusNode.Domain.Model
         /// </summary>
         /// <param name="command">Command to be executed</param>
         /// <param name="arguments">Arguments as a string</param>
-        public void Execute(string command, string arguments)
+        public Process Execute(string command, string arguments)
         {
             Process process = new Process
             {
@@ -22,6 +22,8 @@ namespace Helverify.ConsensusNode.Domain.Model
             };
             
             process.Start();
+            
+            return process;
         }
     }
 }
