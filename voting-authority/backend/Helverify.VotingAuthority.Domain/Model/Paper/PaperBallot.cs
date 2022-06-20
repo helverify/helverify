@@ -3,26 +3,56 @@ using Helverify.VotingAuthority.Domain.Model.Virtual;
 
 namespace Helverify.VotingAuthority.Domain.Model.Paper
 {
+    /// <summary>
+    /// Represents a paper ballot consisting of two virtual ballots.
+    /// </summary>
     public class PaperBallot
     {
+        /// <summary>
+        /// Election in for this paper ballot has been produced.
+        /// </summary>
         public Election Election { get; }
-        public string BallotId { get; set; }
-        public IList<Ballot> EncryptedBallots { get; set; } = new List<Ballot>(2);
 
+        /// <summary>
+        /// Identifier, consists of the hash of both virtual ballots.
+        /// </summary>
+        public string BallotId { get; }
+
+        /// <summary>
+        /// Contains the two virtual ballots.
+        /// </summary>
+        public IList<VirtualBallot> Ballots { get; } = new List<VirtualBallot>(2);
+
+        /// <summary>
+        /// Contains the ballot options with their corresponding pairs of short codes.
+        /// </summary>
         public IList<PaperBallotOption> Options = new List<PaperBallotOption>();
 
-        public PaperBallot(Election election, Ballot ballot1, Ballot ballot2)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="election">Corresponding election</param>
+        /// <param name="ballot1">First virtual ballot</param>
+        /// <param name="ballot2">Second virtual ballot</param>
+        public PaperBallot(Election election, VirtualBallot ballot1, VirtualBallot ballot2)
         {
             Election = election;
 
-            EncryptedBallots.Add(ballot1);
-            EncryptedBallots.Add(ballot2);
+            Ballots.Add(ballot1);
+            Ballots.Add(ballot2);
 
             BallotId = HashHelper.Hash(ballot1.Code, ballot2.Code);
 
             SetUpShortCodes(ballot1, ballot2);
         }
-        private void SetUpShortCodes(Ballot ballot1, Ballot ballot2)
+
+        /// <summary>
+        /// Populates the options by calculating the short codes.
+        /// </summary>
+        /// <param name="ballot1">First virtual ballot</param>
+        /// <param name="ballot2">Second virtual ballot</param>
+        /// <exception cref="Exception">Throws if the supplied ballots contain different options, i.e., they are incompatible.</exception>
+        private void SetUpShortCodes(VirtualBallot ballot1, VirtualBallot ballot2)
         {
             for (int i = 0; i < ballot1.PlainTextOptions.Count; i++)
             {
@@ -34,7 +64,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
 
                 string name = option1.Name == option2.Name
                     ? option1.Name
-                    : throw new Exception("Ballot options do not match.");
+                    : throw new Exception("VirtualBallot options do not match.");
 
                 Options.Add(new PaperBallotOption(name, shortCode1, shortCode2));
             }

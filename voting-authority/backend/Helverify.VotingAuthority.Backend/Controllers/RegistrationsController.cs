@@ -18,7 +18,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
     {
         private const string ContentType = "application/json";
 
-        private const string InitialFunds = "1000000000000000";
+        private const string InitialFunds = "1000000000000000000000000000000000000";
 
         private readonly IRepository<Registration> _registrationRepository;
         private readonly IRepository<Election> _electionRepository;
@@ -134,6 +134,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             await _registrationRepository.DeleteAsync(id);
         }
 
+        /// <summary>
+        /// Initializes the Proof-of-Authority blockchain using the consensus nodes registered for the election.
+        /// </summary>
+        /// <param name="electionId">Election identifier</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("blockchain-setup")]
         public async Task Setup([FromRoute] string electionId)
@@ -147,6 +152,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
                 string bcAddress = await _consensusNodeService.CreateBcAccount(registration.Endpoint);
 
                 registration.Account = new Account(bcAddress, InitialFunds);
+
+                await _registrationRepository.UpdateAsync(registration.Id!, registration);
             }
 
             IList<Account> authorities = registrations.Select(r => r.Account).ToList();

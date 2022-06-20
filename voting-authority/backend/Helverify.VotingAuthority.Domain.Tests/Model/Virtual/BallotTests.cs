@@ -39,27 +39,27 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Virtual
             IList<PlainTextOption> plainTextOptions = ballotTemplate.PlainTextOptions;
 
             // act
-            Ballot ballot = new Ballot(plainTextOptions, publicKey);
+            VirtualBallot virtualBallot = new VirtualBallot(plainTextOptions, publicKey);
 
             // assert
-            Assert.That(ballot.EncryptedOptions[0].Values, Has.Count.EqualTo(3));
-            Assert.That(ballot.EncryptedOptions[1].Values, Has.Count.EqualTo(3));
-            Assert.That(ballot.EncryptedOptions[2].Values, Has.Count.EqualTo(3));
+            Assert.That(virtualBallot.EncryptedOptions[0].Values, Has.Count.EqualTo(3));
+            Assert.That(virtualBallot.EncryptedOptions[1].Values, Has.Count.EqualTo(3));
+            Assert.That(virtualBallot.EncryptedOptions[2].Values, Has.Count.EqualTo(3));
 
-            Assert.That(ballot.EncryptedOptions[0].Values[0].IsValid(publicKey), Is.True);
-            Assert.That(ballot.EncryptedOptions[0].Values[1].IsValid(publicKey), Is.True);
-            Assert.That(ballot.EncryptedOptions[0].Values[2].IsValid(publicKey), Is.True);
+            Assert.That(virtualBallot.EncryptedOptions[0].Values[0].IsValid(publicKey), Is.True);
+            Assert.That(virtualBallot.EncryptedOptions[0].Values[1].IsValid(publicKey), Is.True);
+            Assert.That(virtualBallot.EncryptedOptions[0].Values[2].IsValid(publicKey), Is.True);
 
-            Assert.That(ballot.EncryptedOptions[1].Values[0].IsValid(publicKey), Is.True);
-            Assert.That(ballot.EncryptedOptions[1].Values[1].IsValid(publicKey), Is.True);
-            Assert.That(ballot.EncryptedOptions[1].Values[2].IsValid(publicKey), Is.True);
+            Assert.That(virtualBallot.EncryptedOptions[1].Values[0].IsValid(publicKey), Is.True);
+            Assert.That(virtualBallot.EncryptedOptions[1].Values[1].IsValid(publicKey), Is.True);
+            Assert.That(virtualBallot.EncryptedOptions[1].Values[2].IsValid(publicKey), Is.True);
 
-            Assert.That(ballot.EncryptedOptions[2].Values[0].IsValid(publicKey), Is.True);
-            Assert.That(ballot.EncryptedOptions[2].Values[1].IsValid(publicKey), Is.True);
-            Assert.That(ballot.EncryptedOptions[2].Values[2].IsValid(publicKey), Is.True);
+            Assert.That(virtualBallot.EncryptedOptions[2].Values[0].IsValid(publicKey), Is.True);
+            Assert.That(virtualBallot.EncryptedOptions[2].Values[1].IsValid(publicKey), Is.True);
+            Assert.That(virtualBallot.EncryptedOptions[2].Values[2].IsValid(publicKey), Is.True);
 
-            Assert.That(ballot.RowProofs.All(r => r.IsValid(publicKey)), Is.True);
-            Assert.That(ballot.ColumnProofs.All(r => r.IsValid(publicKey)), Is.True);
+            Assert.That(virtualBallot.RowProofs.All(r => r.IsValid(publicKey)), Is.True);
+            Assert.That(virtualBallot.ColumnProofs.All(r => r.IsValid(publicKey)), Is.True);
         }
 
         [Test, TestCaseSource(nameof(GetShortCodes))]
@@ -80,16 +80,16 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Virtual
 
             DHPublicKeyParameters publicKey = (keyPair.Public as DHPublicKeyParameters)!;
 
-            Ballot ballot = new Ballot(new List<PlainTextOption>(), publicKey);
+            VirtualBallot virtualBallot = new VirtualBallot(new List<PlainTextOption>(), publicKey);
 
-            ballot.EncryptedOptions = new List<EncryptedOption>
+            virtualBallot.EncryptedOptions = new List<EncryptedOption>
             {
                 new (publicKey, new List<int> { 0, 1 }){ShortCode = shortCode1},
                 new (publicKey, new List<int> { 1, 0 }){ShortCode = shortCode2}
             };
 
             // act
-            bool areUnique = ballot.AreShortCodesUnique();
+            bool areUnique = virtualBallot.AreShortCodesUnique();
 
             // assert
             Assert.That(areUnique, Is.EqualTo(expected));

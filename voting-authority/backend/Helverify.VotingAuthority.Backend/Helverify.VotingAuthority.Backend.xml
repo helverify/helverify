@@ -126,6 +126,13 @@
             <param name="id">Registration identifier</param>
             <returns></returns>
         </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.Setup(System.String)">
+            <summary>
+            Initializes the Proof-of-Authority blockchain using the consensus nodes registered for the election.
+            </summary>
+            <param name="electionId">Election identifier</param>
+            <returns></returns>
+        </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.ElectionDto">
             <summary>
             Represents an Election
