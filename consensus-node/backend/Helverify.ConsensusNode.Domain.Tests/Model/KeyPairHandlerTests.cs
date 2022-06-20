@@ -1,6 +1,5 @@
 ﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using System.Runtime.CompilerServices;
 using Helverify.ConsensusNode.Domain.Model;
 using Helverify.Cryptography.ZeroKnowledge;
 using Org.BouncyCastle.Crypto;

@@ -32,6 +32,8 @@ namespace Helverify.VotingAuthority.Domain.Configuration
             services.AddSingleton<IConsensusNodeService, ConsensusNodeService>();
             services.AddScoped<IRepository<Election>, ElectionRepository>();
             services.AddScoped<IRepository<Registration>, RegistrationRepository>();
+            services.AddScoped<ICliRunner, CliRunner>();
+            services.AddScoped<IBlockchainSetup, BlockchainSetup>();
 
             return services;
         }

@@ -22,6 +22,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         private readonly IRepository<Election> _electionRepository;
         private readonly IConsensusNodeService _consensusNodeService;
         private readonly IMapper _mapper;
+        private readonly IBlockchainSetup _blockchainSetup;
 
         /// <summary>
         /// Constructor
@@ -30,13 +31,15 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <param name="electionRepository">Repository for elections</param>
         /// <param name="consensusNodeService">Accessor to consensus node service</param>
         /// <param name="mapper">Automapper</param>
+        /// <param name="blockchainSetup">Service to set up the blockchain</param>
         public RegistrationsController(IRepository<Registration> registrationRepository, IRepository<Election> electionRepository, 
-            IConsensusNodeService consensusNodeService, IMapper mapper)
+            IConsensusNodeService consensusNodeService, IMapper mapper, IBlockchainSetup blockchainSetup)
         {
             _registrationRepository = registrationRepository;
             _electionRepository = electionRepository;
             _consensusNodeService = consensusNodeService;
             _mapper = mapper;
+            _blockchainSetup = blockchainSetup;
         }
 
         /// <summary>
@@ -145,23 +148,19 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             
             IList<Registration> registrations = election.Registrations;
 
-            BlockchainSetup blockchainSetup = new BlockchainSetup(_consensusNodeService);
+            await _blockchainSetup.CreateAccountsAsync(registrations);
 
-            await blockchainSetup.CreateAccountsAsync(registrations);
+            Genesis genesis = await _blockchainSetup.PropagateGenesisBlockAsync(registrations);
 
-            await blockchainSetup.PropagateGenesisBlockAsync(registrations);
+            NodesDto nodes = await _blockchainSetup.StartPeersAsync(registrations);
 
-            NodesDto nodes = await blockchainSetup.StartPeersAsync(registrations);
+            await _blockchainSetup.InitializeNodesAsync(registrations, nodes);
 
-            await blockchainSetup.InitializeNodesAsync(registrations, nodes);
-
-            await blockchainSetup.StartSealingAsync(registrations);
+            await _blockchainSetup.StartSealingAsync(registrations);
 
             await UpdateRegistrations(registrations);
 
-            // create BC address for this service
-
-            // create RPC endpoint on port 8545
+            _blockchainSetup.RegisterRpcEndpoint(genesis, nodes);
         }
 
         private async Task UpdateRegistrations(IList<Registration> registrations)
