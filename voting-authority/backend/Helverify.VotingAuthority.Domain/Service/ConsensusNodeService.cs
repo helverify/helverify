@@ -57,6 +57,7 @@ namespace Helverify.VotingAuthority.Domain.Service
             });
         }
 
+        /// <inheritdoc cref="IConsensusNodeService.InitializeGenesisBlock"/>
         public async Task InitializeGenesisBlock(Uri endpoint, Genesis genesis)
         {
             GenesisDto genesisDto = _mapper.Map<GenesisDto>(genesis);
@@ -64,21 +65,25 @@ namespace Helverify.VotingAuthority.Domain.Service
             await _restClient.Call(HttpMethod.Post, new Uri(endpoint, BcGenesisRoute), genesisDto);
         }
 
+        /// <inheritdoc cref="IConsensusNodeService.CreateBcAccount"/>
         public async Task<string> CreateBcAccount(Uri endpoint)
         {
             return await _restClient.Call<string>(HttpMethod.Post, new Uri(endpoint, BcAddressRoute)) ?? string.Empty;
         }
 
+        /// <inheritdoc cref="IConsensusNodeService.StartPeers"/>
         public async Task<string> StartPeers(Uri endpoint)
         {
             return await _restClient.Call<string>(HttpMethod.Post, new Uri(endpoint, BcPeerRoute)) ?? string.Empty;
         }
 
+        /// <inheritdoc cref="IConsensusNodeService.InitializeNodes"/>
         public async Task InitializeNodes(Uri endpoint, NodesDto nodesDto)
         {
             await _restClient.Call(HttpMethod.Post, new Uri(endpoint, BcNodesRoute), nodesDto);
         }
 
+        /// <inheritdoc cref="IConsensusNodeService.StartSealing"/>
         public async Task StartSealing(Uri endpoint)
         {
             await _restClient.Call(HttpMethod.Post, new Uri(endpoint, BcSealingRoute));

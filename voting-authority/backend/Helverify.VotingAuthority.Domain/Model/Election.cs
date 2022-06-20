@@ -106,6 +106,10 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// </summary>
         public DHParameters DhParameters => new (P, G);
 
+        /// <summary>
+        /// Creates the ballot template for this election.
+        /// </summary>
+        /// <returns></returns>
         public BallotTemplate GenerateBallotTemplate()
         {
             return new BallotTemplate(this);
