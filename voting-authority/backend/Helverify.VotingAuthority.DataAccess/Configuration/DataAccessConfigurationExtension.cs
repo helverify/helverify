@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions;
 using Helverify.VotingAuthority.DataAccess.Database;
 using Helverify.VotingAuthority.DataAccess.Rest;
+using Ipfs.Http;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 
@@ -20,10 +21,12 @@ namespace Helverify.VotingAuthority.DataAccess.Configuration
         public static IServiceCollection AddDataAccessConfiguration(this IServiceCollection services)
         {
             string connectionString = Environment.GetEnvironmentVariable("MongoDbConnectionString") ?? throw new InvalidOperationException();
-            
+            string ipfsHost = Environment.GetEnvironmentVariable("IpfsHost") ?? throw new InvalidOperationException();
+
+
             services.AddHttpClient();
             services.AddSingleton<IRestClient, RestClient>();
-
+            services.AddSingleton(cfg => new IpfsClient(ipfsHost));
             services.AddScoped<IMongoClient>(_ => new MongoClient(connectionString));
             services.AddScoped(typeof(IMongoService<>), typeof(MongoService<>));
             services.AddScoped<IFileSystem, FileSystem>();

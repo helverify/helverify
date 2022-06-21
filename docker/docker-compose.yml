@@ -11,14 +11,15 @@ services:
     
     va-backend:
         ports:
-            - 5001:5000
+            - 5000:5000
             - 8545:8545
             - 30300:30300
         environment: 
             - ASPNETCORE_URLS=http://+:5000
             - MongoDbConnectionString=mongodb://root:voting-authority@host.docker.internal:27017
             - BC_ACCOUNT_PWD=test3
-            - PORT=30304
+            - PORT=30300
+            - IpfsHost=http://localhost:5001
         build:
             context: ../voting-authority/backend/
             dockerfile: Helverify.VotingAuthority.Backend/Dockerfile    
@@ -84,8 +85,53 @@ services:
         build:
             context: ../consensus-node/backend/
             dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
+            
+    ipfs-node1:
+        image: ipfs/go-ipfs
+        volumes: 
+            - ./ipfs1/export:/export
+            - ./ipfs1/data:/data
+            - ./ipfs1/home:/home/ipfs
+        environment: 
+            - ipfs_staging=/export
+            - ipfs_data=/data
+            - IPFS_SWARM_KEY_FILE=/home/ipfs/swarm.key
+        ports:
+            - 4001:4001
+            - 5001:5001
+            - 8080:8080
+
+    ipfs-node2:
+        image: ipfs/go-ipfs
+        volumes: 
+            - ./ipfs2/export:/export
+            - ./ipfs2/data:/data
+            - ./ipfs2/home:/home/ipfs
+        environment: 
+            - ipfs_staging=/export
+            - ipfs_data=/data
+            - IPFS_SWARM_KEY_FILE=/home/ipfs/swarm.key
+        ports:
+            - 4002:4001
+            
+    ipfs-node3:
+        image: ipfs/go-ipfs
+        volumes: 
+            - ./ipfs3/export:/export
+            - ./ipfs3/data:/data
+            - ./ipfs3/home:/home/ipfs
+        environment: 
+            - ipfs_staging=/export
+            - ipfs_data=/data
+            - IPFS_SWARM_KEY_FILE=/home/ipfs/swarm.key
+        ports:
+            - 4003:4001
                     
 # BC Configuration according to: 
 #  https://medium.com/coinmonks/private-ethereum-by-example-b77063bb634f
 #  https://geth.ethereum.org/docs/interface/private-network
 #  https://geth.ethereum.org/docs/rpc/server
+#  https://docs.ipfs.io/how-to/run-ipfs-inside-docker/#private-swarms-inside-docker
+# IPFS:
+#  swarm key generation: https://discuss.ipfs.io/t/private-ipfs-network/12441/3
+#  environment variables: https://github.com/ipfs/go-ipfs/blob/master/docs/environment-variables.md
