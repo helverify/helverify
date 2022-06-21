@@ -1,7 +1,10 @@
-﻿using Helverify.Cryptography.Encryption;
+﻿using AutoMapper;
+using Helverify.Cryptography.Encryption;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
+using Helverify.VotingAuthority.Domain.Repository;
+using Helverify.VotingAuthority.Domain.Repository.Mapping;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
@@ -41,7 +44,7 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Paper
             };
 
             BallotTemplate ballotTemplate = new BallotTemplate(election);
-            
+
             VirtualBallot ballot1 = ballotTemplate.Encrypt();
             VirtualBallot ballot2 = ballotTemplate.Encrypt();
 
