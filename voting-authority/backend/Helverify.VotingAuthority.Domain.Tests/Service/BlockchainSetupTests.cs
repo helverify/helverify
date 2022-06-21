@@ -112,17 +112,26 @@ namespace Helverify.VotingAuthority.Domain.Tests.Service
             IBlockchainSetup setup = new BlockchainSetup(_consensusNodeService.Object, _cliRunner, _mapper, _fileSystem);
 
             // act, assert
-            Assert.DoesNotThrowAsync(() => setup.PropagateGenesisBlockAsync(_registrations));
+            Assert.DoesNotThrowAsync(() => setup.PropagateGenesisBlockAsync(_registrations, new Account("0x123F", "100")));
         }
 
         [Test]
         public async Task TestCreateAccountsAsync()
         {
+            _fileSystem.Directory.CreateDirectory("/home/eth");
+            _fileSystem.File.WriteAllText("/home/eth/address", "0x123F");
+
             Uri endpoint1 = new Uri("http://localhost:5555");
             Uri endpoint2 = new Uri("http://localhost:6666");
+
             string bcAddress1 = "0x123456789";
             string bcAddress2 = "0x987654321";
             
+            Mock<ICliRunner> cliRunner = new Mock<ICliRunner>();
+            
+            cliRunner.Setup(c => c.Execute(It.IsAny<string>(), It.IsAny<string>()));
+
+
             IList<Registration> registrations = new List<Registration>
             {
                 new ()
@@ -138,14 +147,15 @@ namespace Helverify.VotingAuthority.Domain.Tests.Service
             _consensusNodeService.Setup(c => c.CreateBcAccount(endpoint1)).ReturnsAsync(bcAddress1);
             _consensusNodeService.Setup(c => c.CreateBcAccount(endpoint2)).ReturnsAsync(bcAddress2);
 
-            BlockchainSetup setup = new BlockchainSetup(_consensusNodeService.Object, _cliRunner, _mapper, _fileSystem);
+            BlockchainSetup setup = new BlockchainSetup(_consensusNodeService.Object, cliRunner.Object, _mapper, _fileSystem);
 
             // act
-            await setup.CreateAccountsAsync(registrations);
+            string nodesAddress = await setup.CreateAccountsAsync(registrations);
 
             // assert
             Assert.That(registrations[0].Account.Address, Is.EqualTo(bcAddress1));
             Assert.That(registrations[1].Account.Address, Is.EqualTo(bcAddress2));
+            Assert.That(nodesAddress, Is.EqualTo("0x123F"));
         }
 
         [Test]

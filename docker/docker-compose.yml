@@ -12,9 +12,13 @@ services:
     va-backend:
         ports:
             - 5001:5000
+            - 8545:8545
+            - 30300:30300
         environment: 
             - ASPNETCORE_URLS=http://+:5000
             - MongoDbConnectionString=mongodb://root:voting-authority@host.docker.internal:27017
+            - BC_ACCOUNT_PWD=test3
+            - PORT=30304
         build:
             context: ../voting-authority/backend/
             dockerfile: Helverify.VotingAuthority.Backend/Dockerfile    
@@ -38,7 +42,7 @@ services:
         build:
             context: ../consensus-node/backend/
             dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
-    
+            
     consensus-backend2:
         ports:
             - 5003:5000
@@ -52,36 +56,35 @@ services:
         build:
             context: ../consensus-node/backend/
             dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
-            
-    #geth-bootstrap-node:
-    #    ports:
-    #        - 30303:30303
-    #    environment: 
-    #        - ASPNETCORE_URLS=http://+:5000
-    #        - BC_ACCOUNT_PWD=test3
-    #    volumes: 
-    #        - ./bootstrap/home:/home/
-    #    build:
-    #        context: ./bootstrap
-    #        dockerfile: Dockerfile
-    #    tty: true # https://stackoverflow.com/questions/38546755/docker-compose-keep-container-running
-        
-    geth-rpc-node:
+    
+    consensus-backend3:
         ports:
-            - 8545:8545
-            - 30304:30304
+            - 5004:5000
+            - 30303:30303
         environment: 
             - ASPNETCORE_URLS=http://+:5000
             - BC_ACCOUNT_PWD=test3
+            - PORT=30303
+        volumes: 
+            - ./consensus3:/home/
+        build:
+            context: ../consensus-node/backend/
+            dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
+            
+    consensus-backend4:
+        ports:
+            - 5005:5000
+            - 30304:30304
+        environment: 
+            - ASPNETCORE_URLS=http://+:5000
+            - BC_ACCOUNT_PWD=test4
             - PORT=30304
         volumes: 
-            - ./remix/home:/home/
+            - ./consensus4:/home/
         build:
-            context: ./remix
-            dockerfile: Dockerfile
-        tty: true # https://stackoverflow.com/questions/38546755/docker-compose-keep-container-running
-                
-            
+            context: ../consensus-node/backend/
+            dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
+                    
 # BC Configuration according to: 
 #  https://medium.com/coinmonks/private-ethereum-by-example-b77063bb634f
 #  https://geth.ethereum.org/docs/interface/private-network

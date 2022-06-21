@@ -81,7 +81,7 @@
             Controller for handling the registration API.
             </summary>
         </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.#ctor(Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Registration},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Service.IConsensusNodeService,AutoMapper.IMapper)">
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.#ctor(Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Registration},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Service.IConsensusNodeService,AutoMapper.IMapper,Helverify.VotingAuthority.Domain.Service.IBlockchainSetup)">
             <summary>
             Constructor
             </summary>
@@ -89,6 +89,7 @@
             <param name="electionRepository">Repository for elections</param>
             <param name="consensusNodeService">Accessor to consensus node service</param>
             <param name="mapper">Automapper</param>
+            <param name="blockchainSetup">Service to set up the blockchain</param>
         </member>
         <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.Post(System.String,Helverify.VotingAuthority.Backend.Dto.RegistrationDto)">
             <summary>

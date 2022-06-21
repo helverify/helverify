@@ -62,9 +62,7 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         [Route("account")]
         public ActionResult PostAccount()
         {
-            Process initialization = _cliRunner.Execute($"{ScriptDir}{InitScript}", string.Empty);
-
-            initialization.WaitForExit();
+            _cliRunner.Execute($"{ScriptDir}{InitScript}", string.Empty).WaitForExit();
 
             string nodeAddress = _fileSystem.File.ReadAllText($"{HomeDir}{AddressFile}");
 
@@ -86,10 +84,8 @@ namespace Helverify.ConsensusNode.Backend.Controllers
 
             _fileSystem.File.WriteAllText($"{HomeDir}{GenesisFile}", genesisJson);
 
-            Process genesisInit = _cliRunner.Execute($"{ScriptDir}{InitGenesisScript}", string.Empty);
-
-            genesisInit.WaitForExit();
-
+            _cliRunner.Execute($"{ScriptDir}{InitGenesisScript}", string.Empty).WaitForExit();
+            
             return Ok();
         }
         
@@ -105,9 +101,7 @@ namespace Helverify.ConsensusNode.Backend.Controllers
 
             startConsensusNode.WaitForExit();
 
-            Process getEnode = _cliRunner.Execute(BinSh, $"{ScriptDir}{EnodeScript}");
-
-            getEnode.WaitForExit();
+            _cliRunner.Execute(BinSh, $"{ScriptDir}{EnodeScript}").WaitForExit();
 
             string enode = _fileSystem.File.ReadAllText($"{HomeDir}{EnodeFile}");
 
@@ -141,10 +135,8 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         [Route("sealing")]
         public ActionResult PostSealing()
         {
-            Process genesisInit = _cliRunner.Execute($"{ScriptDir}{StartMiningScript}", string.Empty);
+            _cliRunner.Execute($"{ScriptDir}{StartMiningScript}", string.Empty).WaitForExit();
 
-            genesisInit.WaitForExit();
-            
             return Ok();
         }
     }

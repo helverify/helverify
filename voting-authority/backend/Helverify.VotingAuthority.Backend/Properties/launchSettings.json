@@ -5,7 +5,7 @@
     "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "http://localhost:20646",
-      "sslPort": 44330
+      "sslPort": 0
     }
   },
   "profiles": {
@@ -31,11 +31,13 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
-      "publishAllPorts": true,
-      "useSSL": false,
       "environmentVariables": {
-        "MongoDbConnectionString": "mongodb://root:voting-authority@host.docker.internal:27017"
-      }
+        "BC_ACCOUNT_PWD": "test-va",
+        "MongoDbConnectionString": "mongodb://root:voting-authority@host.docker.internal:27017",
+        "PORT": "30305"
+      },
+      "publishAllPorts": true,
+      "useSSL": false
     }
   }
 }

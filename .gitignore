@@ -403,3 +403,5 @@ FodyWeavers.xsd
 /docker/remix/home/eth
 
 *.ipc
+/docker/consensus3/eth
+/docker/consensus4/eth

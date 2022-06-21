@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using System.Text.RegularExpressions;
 using AutoMapper;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Model;
@@ -22,6 +23,9 @@ namespace Helverify.VotingAuthority.Domain.Service
 
         private const string GenesisFile = "genesis.json";
         private const string NodesFile = "nodes.json";
+        private const string AddressFile = "address";
+        
+        private const string NewLine = @"\n";
 
         private readonly IConsensusNodeService _consensusNodeService;
         private readonly ICliRunner _cliRunner;
@@ -84,11 +88,15 @@ namespace Helverify.VotingAuthority.Domain.Service
         }
 
         /// <inheritdoc cref="IBlockchainSetup.PropagateGenesisBlockAsync"/>
-        public async Task<Genesis> PropagateGenesisBlockAsync(IList<Registration> registrations)
+        public async Task<Genesis> PropagateGenesisBlockAsync(IList<Registration> registrations, Account rpcAccount)
         {
             IList<Account> authorities = registrations.Select(r => r.Account).ToList();
 
-            Genesis genesis = new Genesis(13337, authorities, authorities);
+            IList<Account> prefundedAccounts = new List<Account>(authorities);
+            
+            prefundedAccounts.Add(rpcAccount);
+
+            Genesis genesis = new Genesis(13337, authorities, prefundedAccounts);
 
             foreach (Registration registration in registrations)
             {
@@ -99,21 +107,29 @@ namespace Helverify.VotingAuthority.Domain.Service
         }
 
         /// <inheritdoc cref="IBlockchainSetup.CreateAccountsAsync"/>
-        public async Task CreateAccountsAsync(IList<Registration> registrations)
+        public async Task<string> CreateAccountsAsync(IList<Registration> registrations)
         {
+            // init remote nodes
             foreach (Registration registration in registrations)
             {
                 string bcAddress = await _consensusNodeService.CreateBcAccount(registration.Endpoint);
 
                 registration.Account = new Account(bcAddress, InitialFunds);
             }
+
+            // init this node
+            _cliRunner.Execute($"{ScriptDir}{InitScript}", string.Empty);
+
+            string accountAddress = _fileSystem.File.ReadAllText($"{HomeDir}{AddressFile}");
+
+            accountAddress = Regex.Replace(accountAddress, NewLine, string.Empty);
+
+            return accountAddress;
         }
 
         /// <inheritdoc cref="IBlockchainSetup.RegisterRpcEndpoint"/>
         public void RegisterRpcEndpoint(Genesis genesis, NodesDto nodes)
         {
-            _cliRunner.Execute($"{ScriptDir}{InitScript}", string.Empty);
-
             GenesisDto genesisDto = _mapper.Map<GenesisDto>(genesis);
 
             string genesisJson = JsonConvert.SerializeObject(genesisDto, _jsonSerializerSettings);

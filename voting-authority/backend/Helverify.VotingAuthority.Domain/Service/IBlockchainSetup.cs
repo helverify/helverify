@@ -35,15 +35,16 @@ public interface IBlockchainSetup
     /// Propagates the genesis block to all consensus nodes.
     /// </summary>
     /// <param name="registrations">Consensus node registrations</param>
+    /// <param name="rpcAccount">Account of this node</param>
     /// <returns></returns>
-    Task<Genesis> PropagateGenesisBlockAsync(IList<Registration> registrations);
+    Task<Genesis> PropagateGenesisBlockAsync(IList<Registration> registrations, Account rpcAccount);
 
     /// <summary>
     /// Creates a new blockchain account on every consensus node and updates the address of the account in the registration.
     /// </summary>
     /// <param name="registrations">Consensus node registration</param>
     /// <returns></returns>
-    Task CreateAccountsAsync(IList<Registration> registrations);
+    Task<string> CreateAccountsAsync(IList<Registration> registrations);
 
     /// <summary>
     /// Sets up an RPC endpoint to the blockchain.
