@@ -21,7 +21,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
         public IList<EncryptedOption> EncryptedOptions { get; internal set; }
 
         /// <summary>
-        /// Options / canidates represented as plaintext
+        /// Options / candidates represented as plaintext
         /// </summary>
         public IList<PlainTextOption> PlainTextOptions { get; }
 

@@ -27,6 +27,7 @@ namespace Helverify.VotingAuthority.Domain.Configuration
                 cfg.AddProfile<ElectionProfile>();
                 cfg.AddProfile<RegistrationProfile>();
                 cfg.AddProfile<GenesisProfile>();
+                cfg.AddProfile<BallotProfile>();
             });
             services.AddDataAccessConfiguration();
             services.AddSingleton<IConsensusNodeService, ConsensusNodeService>();
