@@ -12,9 +12,13 @@ services:
     va-backend:
         ports:
             - 5001:5000
+            - 8545:8545
+            - 30300:30300
         environment: 
             - ASPNETCORE_URLS=http://+:5000
             - MongoDbConnectionString=mongodb://root:voting-authority@host.docker.internal:27017
+            - BC_ACCOUNT_PWD=test3
+            - PORT=30304
         build:
             context: ../voting-authority/backend/
             dockerfile: Helverify.VotingAuthority.Backend/Dockerfile    
@@ -28,18 +32,60 @@ services:
     consensus-backend1:
         ports:
             - 5002:5000
+            - 30301:30301
         environment: 
             - ASPNETCORE_URLS=http://+:5000
+            - BC_ACCOUNT_PWD=test1
+            - PORT=30301
+        volumes: 
+            - ./consensus1:/home/
+        build:
+            context: ../consensus-node/backend/
+            dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
+            
+    consensus-backend2:
+        ports:
+            - 5003:5000
+            - 30302:30302
+        environment: 
+            - ASPNETCORE_URLS=http://+:5000
+            - BC_ACCOUNT_PWD=test2
+            - PORT=30302
+        volumes: 
+            - ./consensus2:/home/
         build:
             context: ../consensus-node/backend/
             dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
     
-    consensus-backend2:
+    consensus-backend3:
         ports:
-            - 5003:5000
+            - 5004:5000
+            - 30303:30303
         environment: 
             - ASPNETCORE_URLS=http://+:5000
+            - BC_ACCOUNT_PWD=test3
+            - PORT=30303
+        volumes: 
+            - ./consensus3:/home/
         build:
             context: ../consensus-node/backend/
             dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
-           
+            
+    consensus-backend4:
+        ports:
+            - 5005:5000
+            - 30304:30304
+        environment: 
+            - ASPNETCORE_URLS=http://+:5000
+            - BC_ACCOUNT_PWD=test4
+            - PORT=30304
+        volumes: 
+            - ./consensus4:/home/
+        build:
+            context: ../consensus-node/backend/
+            dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
+                    
+# BC Configuration according to: 
+#  https://medium.com/coinmonks/private-ethereum-by-example-b77063bb634f
+#  https://geth.ethereum.org/docs/interface/private-network
+#  https://geth.ethereum.org/docs/rpc/server

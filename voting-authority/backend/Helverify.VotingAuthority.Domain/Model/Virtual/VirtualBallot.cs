@@ -5,19 +5,42 @@ using Org.BouncyCastle.Crypto.Parameters;
 
 namespace Helverify.VotingAuthority.Domain.Model.Virtual
 {
-    public class Ballot
+    /// <summary>
+    /// Represents a virtual ballot (as opposed to the physical paper ballot)
+    /// </summary>
+    public class VirtualBallot
     {
+        /// <summary>
+        /// Long ballot code, consisting of the hash of all encryptions.
+        /// </summary>
         public string Code { get; }
 
+        /// <summary>
+        /// Options / candidates represented as ciphertext
+        /// </summary>
         public IList<EncryptedOption> EncryptedOptions { get; internal set; }
 
-        public IList<PlainTextOption> PlainTextOptions { get; internal set; }
+        /// <summary>
+        /// Options / canidates represented as plaintext
+        /// </summary>
+        public IList<PlainTextOption> PlainTextOptions { get; }
 
+        /// <summary>
+        /// Proofs which show that each sums up to one.
+        /// </summary>
         public IList<SumProof> RowProofs { get; }
 
+        /// <summary>
+        /// Proofs which show that each column sums up to one.
+        /// </summary>
         public IList<SumProof> ColumnProofs { get; }
 
-        public Ballot(IList<PlainTextOption> plainTextOptions, DHPublicKeyParameters publicKey)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="plainTextOptions">Options / candidates in plain text</param>
+        /// <param name="publicKey">Public key of the election which is used to encrypt the ballots</param>
+        public VirtualBallot(IList<PlainTextOption> plainTextOptions, DHPublicKeyParameters publicKey)
         {
             EncryptedOptions = new List<EncryptedOption>();
             PlainTextOptions = new List<PlainTextOption>();
@@ -47,6 +70,10 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
             EncryptedOptions = EncryptedOptions.OrderBy(e => e.ShortCode).ToList();
         }
 
+        /// <summary>
+        /// Evaluates if all short codes are unique.
+        /// </summary>
+        /// <returns>True if short codes are unique, false otherwise.</returns>
         public bool AreShortCodesUnique()
         {
             IEnumerable<string> shortCodes = EncryptedOptions.Select(e => e.ShortCode.ToLower());
@@ -54,6 +81,10 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
             return shortCodes.Distinct().Count() == EncryptedOptions.Count;
         }
 
+        /// <summary>
+        /// Generates a proof for each column of encryptions, proving that each column sums up to one.
+        /// </summary>
+        /// <param name="publicKey">Public key of the election, used to encrypt the options.</param>
         private void GenerateColumnProofs(DHPublicKeyParameters publicKey)
         {
             foreach (EncryptedOption encOption in EncryptedOptions)
@@ -74,6 +105,10 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
             }
         }
 
+        /// <summary>
+        /// Generates a proof for each row of encryptions, proving that each row sums up to one.
+        /// </summary>
+        /// <param name="publicKey">Public key of the election, used to encrypt the options.</param>
         private void GenerateRowProofs(DHPublicKeyParameters publicKey)
         {
             foreach (EncryptedOption encOption in EncryptedOptions)
@@ -89,37 +124,27 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
             }
         }
 
-        private static ElGamalCipher SumUpCiphers(DHPublicKeyParameters publicKey, IList<ElGamalCipher> rowCiphers)
+        /// <summary>
+        /// Performs homomorphic addition of ciphertexts.
+        /// </summary>
+        /// <param name="publicKey">Public key of the election</param>
+        /// <param name="ciphers">Ciphertexts</param>
+        /// <returns></returns>
+        private static ElGamalCipher SumUpCiphers(DHPublicKeyParameters publicKey, IList<ElGamalCipher> ciphers)
         {
-            ElGamalCipher sum = rowCiphers[0];
+            ElGamalCipher sum = ciphers[0];
 
-            for (int i = 1; i < rowCiphers.Count; i++)
+            for (int i = 1; i < ciphers.Count; i++)
             {
-                sum = sum.Add(rowCiphers[i], publicKey.Parameters.P);
+                sum = sum.Add(ciphers[i], publicKey.Parameters.P);
             }
 
             return sum;
         }
 
+        /// <summary>
+        /// Extracts all ciphertexts from the encrypted options
+        /// </summary>
         private ElGamalCipher[] AllCiphers => EncryptedOptions.SelectMany(e => e.Values.Select(v => v.Cipher)).ToArray();
-    }
-
-    public class PlainTextOption
-    {
-        public string ShortCode { get; set; }
-        public string Name { get; set; }
-        public IList<int> Values { get; }
-
-        public PlainTextOption(string name, IList<int> values)
-        {
-            Name = name;
-            Values = values;
-            ShortCode = string.Empty;
-        }
-
-        public PlainTextOption Clone()
-        {
-            return new PlainTextOption(Name, Values);
-        }
     }
 }

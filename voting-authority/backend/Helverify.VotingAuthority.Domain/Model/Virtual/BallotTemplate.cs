@@ -2,12 +2,25 @@
 
 namespace Helverify.VotingAuthority.Domain.Model.Virtual
 {
+    /// <summary>
+    /// Template containing all options of the ballot for an election. Defined once per election.
+    /// </summary>
     public class BallotTemplate
     {
+        /// <summary>
+        /// Election for which the options are valid.
+        /// </summary>
         public Election Election { get; set; }
 
+        /// <summary>
+        /// Contains the plaintext options for the election.
+        /// </summary>
         public IList<PlainTextOption> PlainTextOptions { get; } = new List<PlainTextOption>();
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="election">Election for which this template is valid.</param>
         public BallotTemplate(Election election)
         {
             Election = election;
@@ -25,9 +38,13 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
             }
         }
 
-        public Ballot Encrypt(DHPublicKeyParameters publicKey)
+        /// <summary>
+        /// Encrypts the ballot template, generating a unique virtual ballot.
+        /// </summary>
+        /// <returns></returns>
+        public VirtualBallot Encrypt()
         {
-            return new Ballot(PlainTextOptions, publicKey);
+            return new VirtualBallot(PlainTextOptions, new DHPublicKeyParameters(Election.PublicKey, Election.DhParameters));
         }
     }
 }

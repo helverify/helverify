@@ -4,6 +4,12 @@
         <name>Helverify.ConsensusNode.Backend</name>
     </assembly>
     <members>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.BlockchainController.PostAccount">
+            <summary>
+            Creates a new Ethereum account and returns its address
+            </summary>
+            <returns>Ethereum address of this consensus node</returns>
+        </member>
         <member name="T:Helverify.ConsensusNode.Backend.Controllers.DecryptionController">
             <summary>
             Controller for cooperative decryption

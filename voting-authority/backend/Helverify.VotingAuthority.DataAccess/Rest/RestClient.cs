@@ -49,5 +49,29 @@ namespace Helverify.VotingAuthority.DataAccess.Rest
 
             return result;
         }
+
+        /// <inheritdoc cref="IRestClient.Call"/>
+        public async Task Call(HttpMethod method, Uri endpoint, object? body = null)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(method, endpoint);
+
+            request.Headers.Add("Accept", "application/json");
+
+            if (body != null)
+            {
+                string jsonBody = JsonSerializer.Serialize(body);
+
+                request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+            }
+
+            HttpClient client = _httpClientFactory.CreateClient();
+
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(response.StatusCode.ToString());
+            }
+        }
     }
 }

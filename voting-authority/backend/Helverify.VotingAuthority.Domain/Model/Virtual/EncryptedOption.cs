@@ -3,12 +3,31 @@ using Org.BouncyCastle.Crypto.Parameters;
 
 namespace Helverify.VotingAuthority.Domain.Model.Virtual;
 
+/// <summary>
+/// Represents an encrypted option.
+/// </summary>
 public class EncryptedOption
 {
+    /// <summary>
+    /// List of encryptions and corresponding proofs
+    /// </summary>
     public IList<EncryptedOptionValue> Values { get; }
-    public string ShortCode { get; internal set; }
+
+    /// <summary>
+    /// Short code of this option / candidate
+    /// </summary>
+    public string ShortCode { get; internal init; }
+
+    /// <summary>
+    /// Complete hash of all encryptions
+    /// </summary>
     public string Hash { get; }
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="publicKey">Public key of the election</param>
+    /// <param name="plainTextOption">Option in plaintext, list of zeros and a one (position of one = selected candidate / option)</param>
     public EncryptedOption(DHPublicKeyParameters publicKey, IList<int> plainTextOption)
     {
         Values = new List<EncryptedOptionValue>();

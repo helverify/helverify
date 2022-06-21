@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen(opt =>
     opt.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "Consensus Node API",
+        Title = "Voting Authority API",
     });
 
     opt.IncludeXmlComments("Helverify.VotingAuthority.Backend.xml");

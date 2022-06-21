@@ -397,3 +397,11 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/docker/consensus1/eth
+/docker/consensus2/eth
+/docker/bootstrap/home/eth
+/docker/remix/home/eth
+
+*.ipc
+/docker/consensus3/eth
+/docker/consensus4/eth

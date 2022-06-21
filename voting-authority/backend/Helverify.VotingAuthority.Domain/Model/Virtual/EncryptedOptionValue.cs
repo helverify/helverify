@@ -5,11 +5,26 @@ using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Model.Virtual;
 
+/// <summary>
+/// Represents one encrypted value of an option.
+/// </summary>
 public class EncryptedOptionValue
 {
+    /// <summary>
+    /// ElGamal ciphertext
+    /// </summary>
     public ElGamalCipher Cipher { get; }
+    
+    /// <summary>
+    /// Proof that the ciphertext either contains the value zero or one.
+    /// </summary>
     public ProofOfZeroOrOne ProofOfZeroOrOne { get; }
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="option">Plain text value of the option (= 0 or 1)</param>
+    /// <param name="publicKey">Public key of the election</param>
     public EncryptedOptionValue(int option, DHPublicKeyParameters publicKey)
     {
         IElGamal elGamal = new ExponentialElGamal();
@@ -20,6 +35,11 @@ public class EncryptedOptionValue
             publicKey.Parameters.P, publicKey.Parameters.G);
     }
 
+    /// <summary>
+    /// Verifies the proof that the ciphertext contains either the value zero or one.
+    /// </summary>
+    /// <param name="publicKey">Public key of the election</param>
+    /// <returns>True if the proof is valid, false otherwise</returns>
     public bool IsValid(DHPublicKeyParameters publicKey)
     {
         return ProofOfZeroOrOne.Verify(Cipher.C, Cipher.D, publicKey.Y, publicKey.Parameters.P, publicKey.Parameters.G);

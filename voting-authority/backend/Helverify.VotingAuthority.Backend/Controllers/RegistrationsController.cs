@@ -2,6 +2,7 @@
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Blockchain;
 using Helverify.VotingAuthority.Domain.Repository;
 using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         private readonly IRepository<Election> _electionRepository;
         private readonly IConsensusNodeService _consensusNodeService;
         private readonly IMapper _mapper;
+        private readonly IBlockchainSetup _blockchainSetup;
 
         /// <summary>
         /// Constructor
@@ -29,13 +31,15 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <param name="electionRepository">Repository for elections</param>
         /// <param name="consensusNodeService">Accessor to consensus node service</param>
         /// <param name="mapper">Automapper</param>
+        /// <param name="blockchainSetup">Service to set up the blockchain</param>
         public RegistrationsController(IRepository<Registration> registrationRepository, IRepository<Election> electionRepository, 
-            IConsensusNodeService consensusNodeService, IMapper mapper)
+            IConsensusNodeService consensusNodeService, IMapper mapper, IBlockchainSetup blockchainSetup)
         {
             _registrationRepository = registrationRepository;
             _electionRepository = electionRepository;
             _consensusNodeService = consensusNodeService;
             _mapper = mapper;
+            _blockchainSetup = blockchainSetup;
         }
 
         /// <summary>
@@ -129,6 +133,42 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         public async Task Delete(string id)
         {
             await _registrationRepository.DeleteAsync(id);
+        }
+
+        /// <summary>
+        /// Initializes the Proof-of-Authority blockchain using the consensus nodes registered for the election.
+        /// </summary>
+        /// <param name="electionId">Election identifier</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("blockchain-setup")]
+        public async Task Setup([FromRoute] string electionId)
+        {
+            Election election = await _electionRepository.GetAsync(electionId);
+            
+            IList<Registration> registrations = election.Registrations;
+
+            string nodeAddress = await _blockchainSetup.CreateAccountsAsync(registrations);
+
+            Genesis genesis = await _blockchainSetup.PropagateGenesisBlockAsync(registrations, new Account(nodeAddress, "1000000000000000000000000000000000000000"));
+
+            NodesDto nodes = await _blockchainSetup.StartPeersAsync(registrations);
+
+            await _blockchainSetup.InitializeNodesAsync(registrations, nodes);
+
+            await _blockchainSetup.StartSealingAsync(registrations);
+
+            await UpdateRegistrations(registrations);
+
+            _blockchainSetup.RegisterRpcEndpoint(genesis, nodes);
+        }
+
+        private async Task UpdateRegistrations(IList<Registration> registrations)
+        {
+            foreach (Registration registration in registrations)
+            {
+                await _registrationRepository.UpdateAsync(registration.Id!, registration);
+            }
         }
     }
 }

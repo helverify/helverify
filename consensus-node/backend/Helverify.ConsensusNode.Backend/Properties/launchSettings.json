@@ -5,7 +5,7 @@
     "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "http://localhost:35137",
-      "sslPort": 44352
+      "sslPort": 0
     }
   },
   "profiles": {
@@ -31,6 +31,10 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "environmentVariables": {
+        "BC_ACCOUNT_PWD": "test1",
+        "PORT": "30303"
+      },
       "publishAllPorts": true,
       "useSSL": false
     }

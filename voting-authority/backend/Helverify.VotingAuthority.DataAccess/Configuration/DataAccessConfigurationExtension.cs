@@ -1,4 +1,5 @@
-﻿using Helverify.VotingAuthority.DataAccess.Database;
+﻿using System.IO.Abstractions;
+using Helverify.VotingAuthority.DataAccess.Database;
 using Helverify.VotingAuthority.DataAccess.Rest;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -25,6 +26,7 @@ namespace Helverify.VotingAuthority.DataAccess.Configuration
 
             services.AddScoped<IMongoClient>(_ => new MongoClient(connectionString));
             services.AddScoped(typeof(IMongoService<>), typeof(MongoService<>));
+            services.AddScoped<IFileSystem, FileSystem>();
             
             return services;
         }
