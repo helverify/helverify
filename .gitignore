@@ -405,3 +405,7 @@ FodyWeavers.xsd
 *.ipc
 /docker/consensus3/eth
 /docker/consensus4/eth
+
+/docker/ipfs*/
+*.key
+swarm.key

@@ -34,7 +34,8 @@
       "environmentVariables": {
         "BC_ACCOUNT_PWD": "test-va",
         "MongoDbConnectionString": "mongodb://root:voting-authority@host.docker.internal:27017",
-        "PORT": "30305"
+        "PORT": "30305",
+        "IpfsHost":  "http://host.docker.internal:8080" 
       },
       "publishAllPorts": true,
       "useSSL": false
