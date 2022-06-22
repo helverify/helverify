@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.DataAccess.Database;
-using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
+using Helverify.VotingAuthority.Domain.Model.Paper;
+using MongoDB.Driver;
 
 namespace Helverify.VotingAuthority.Domain.Repository
 {
@@ -35,7 +36,9 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IRepository{T}.GetAsync(string {id})"/>
         public async Task<PaperBallot> GetAsync(string id)
         {
-            PrintBallotDao printBallotDao = await _mongoService.GetAsync(id);
+            // https://kevsoft.net/2020/02/28/finding-documents-in-mongodb-using-csharp.html
+            
+            PrintBallotDao? printBallotDao = await GetSinglePrintBallot(id);
 
             PaperBallot paperBallot = _mapper.Map<PaperBallot>(printBallotDao);
 
@@ -57,7 +60,9 @@ namespace Helverify.VotingAuthority.Domain.Repository
         {
             PrintBallotDao printBallotDao = _mapper.Map<PrintBallotDao>(entity);
 
-            await _mongoService.UpdateAsync(id, printBallotDao);
+            string mongoId = (await GetSinglePrintBallot(id)).Id;
+
+            await _mongoService.UpdateAsync(mongoId, printBallotDao);
 
             return _mapper.Map<PaperBallot>(printBallotDao);
         }
@@ -65,7 +70,14 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IRepository{T}.DeleteAsync"/>
         public async Task DeleteAsync(string id)
         {
-            await _mongoService.RemoveAsync(id);
+            string mongoId = (await GetSinglePrintBallot(id)).Id;
+            
+            await _mongoService.RemoveAsync(mongoId);
+        }
+
+        private async Task<PrintBallotDao> GetSinglePrintBallot(string id)
+        {
+            return await _mongoService.Collection.Find(p => p.BallotId == id).SingleAsync();
         }
     }
 }

@@ -7,7 +7,6 @@ using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Helverify.VotingAuthority.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Nethereum.Web3;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
@@ -19,19 +18,19 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
         private readonly IStorageClient _storageClient;
         private readonly IRepository<Election> _electionRepository;
-        //private readonly IRepository<PaperBallot> _ballotRepository;
+        private readonly IRepository<PaperBallot> _ballotRepository;
         private readonly IMapper _mapper;
         private readonly IElectionContractRepository _contractRepository;
 
         public BallotsController(IStorageClient storageClient, 
             IRepository<Election> electionRepository, 
-            //IRepository<PaperBallot> ballotRepository, 
+            IRepository<PaperBallot> ballotRepository, 
             IMapper mapper, 
             IElectionContractRepository contractRepository)
         {
             _storageClient = storageClient;
             _electionRepository = electionRepository;
-            //_ballotRepository = ballotRepository;
+            _ballotRepository = ballotRepository;
             _mapper = mapper;
             _contractRepository = contractRepository;
         }
@@ -45,6 +44,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [HttpGet]
         [Consumes(ContentType)]
         [Produces(ContentType)]
+        [Route("encrypted")]
         public async Task<ActionResult<IList<VirtualBallotDao>>> Get([FromRoute] string electionId, string id)
         {
             Election election = await _electionRepository.GetAsync(electionId);
@@ -55,6 +55,17 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             VirtualBallotDao paperBallot2 = await _storageClient.Retrieve<VirtualBallotDao>(paperBallotDto.Ballot2Ipfs);
 
             return new List<VirtualBallotDao> { paperBallot1, paperBallot2 };
+        }
+
+        [HttpGet]
+        [Produces(ContentType)]
+        public async Task<ActionResult<PrintBallotDto>> GetPrint(string id)
+        {
+            PaperBallot paperBallot = await _ballotRepository.GetAsync(id);
+
+            PrintBallotDto printBallot = _mapper.Map<PrintBallotDto>(paperBallot);
+
+            return printBallot;
         }
 
         [HttpPost]
@@ -81,11 +92,9 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
                 await _contractRepository.StoreBallot(election, paperBallot.BallotId, ballot1.Code, cid1, ballot2.Code, cid2);
                 
-                //await _ballotRepository.CreateAsync(paperBallot); TODO: define mappings
+                await _ballotRepository.CreateAsync(paperBallot);
             }
-
             
-
             IList<string> ballotIds = await _contractRepository.GetBallotIds(election);
 
             return Ok(ballotIds);

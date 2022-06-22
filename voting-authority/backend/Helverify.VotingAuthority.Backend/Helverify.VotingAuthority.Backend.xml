@@ -4,6 +4,14 @@
         <name>Helverify.VotingAuthority.Backend</name>
     </assembly>
     <members>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.Get(System.String,System.String)">
+            <summary>
+            TODO: refactor, only temporary for demo purposes
+            </summary>
+            <param name="electionId"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:Helverify.VotingAuthority.Backend.Controllers.ElectionsController">
             <summary>
             Controller for handling the election API

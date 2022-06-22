@@ -26,7 +26,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
         /// <summary>
         /// Contains the ballot options with their corresponding pairs of short codes.
         /// </summary>
-        public IList<PaperBallotOption> Options = new List<PaperBallotOption>();
+        public IList<PaperBallotOption> Options { get; } = new List<PaperBallotOption>();
 
         /// <summary>
         /// Constructor
@@ -44,6 +44,15 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
             BallotId = HashHelper.Hash(ballot1.Code, ballot2.Code);
 
             SetUpShortCodes(ballot1, ballot2);
+        }
+
+        /// <summary>
+        /// Constructor for deserialization
+        /// </summary>
+        public PaperBallot(string ballotId, IList<PaperBallotOption> options)
+        {
+            BallotId = ballotId;
+            Options = options;
         }
 
         /// <summary>

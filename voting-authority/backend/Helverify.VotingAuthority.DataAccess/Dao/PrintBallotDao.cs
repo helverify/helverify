@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Helverify.VotingAuthority.DataAccess.Dao
 {
-    [CollectionName("registration")]
+    [CollectionName("printballot")]
 
     public class PrintBallotDao : IEntity
     {
@@ -12,5 +12,8 @@ namespace Helverify.VotingAuthority.DataAccess.Dao
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
+        public string BallotId { get; set; }
+
+        public IList<PrintOptionDao> Options { get; set; } = new List<PrintOptionDao>();
     }
 }

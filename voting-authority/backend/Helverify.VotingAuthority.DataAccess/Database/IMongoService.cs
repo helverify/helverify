@@ -1,4 +1,5 @@
 ﻿using Helverify.VotingAuthority.DataAccess.Dao;
+using MongoDB.Driver;
 
 namespace Helverify.VotingAuthority.DataAccess.Database;
 
@@ -42,4 +43,9 @@ public interface IMongoService<T> where T : IEntity
     /// <param name="id">Unique identifier</param>
     /// <returns></returns>
     Task RemoveAsync(string id);
+
+    /// <summary>
+    /// Returns the whole collection for this type.
+    /// </summary>
+    IMongoCollection<T> Collection { get; }
 }

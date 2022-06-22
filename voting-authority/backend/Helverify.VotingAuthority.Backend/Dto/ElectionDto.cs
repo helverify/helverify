@@ -43,6 +43,6 @@
         /// <summary>
         /// Address of the smart contract for the election on the Ethereum blockchain.
         /// </summary>
-        public string ContractAddress { get; set; }
+        public string? ContractAddress { get; set; }
     }
 }
