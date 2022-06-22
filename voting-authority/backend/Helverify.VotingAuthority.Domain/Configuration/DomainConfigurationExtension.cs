@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using Helverify.VotingAuthority.DataAccess.Configuration;
+using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Repository;
 using Helverify.VotingAuthority.Domain.Repository.Mapping;
@@ -33,8 +34,10 @@ namespace Helverify.VotingAuthority.Domain.Configuration
             services.AddSingleton<IConsensusNodeService, ConsensusNodeService>();
             services.AddScoped<IRepository<Election>, ElectionRepository>();
             services.AddScoped<IRepository<Registration>, RegistrationRepository>();
+            //services.AddScoped<IRepository<PaperBallot>, PaperBallotRepository>();
             services.AddScoped<ICliRunner, CliRunner>();
             services.AddScoped<IBlockchainSetup, BlockchainSetup>();
+            services.AddScoped<IElectionContractRepository, ElectionContractRepository>();
 
             return services;
         }

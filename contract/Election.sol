@@ -90,4 +90,8 @@ contract Election {
 
         results[option] = Result(options[option], tally, tallyProofsIpfs);
     }
+
+    function getNumberOfBallots() public view returns (uint) {
+        return ballotIds.length;
+    }
 }

@@ -4,11 +4,49 @@
         <name>Helverify.ConsensusNode.Backend</name>
     </assembly>
     <members>
+        <member name="T:Helverify.ConsensusNode.Backend.Controllers.BlockchainController">
+            <summary>
+            Controller for configuring a Proof-of-Authority Ethereum Blockchain
+            </summary>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.BlockchainController.#ctor(Helverify.ConsensusNode.Domain.Model.ICliRunner,System.IO.Abstractions.IFileSystem)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="cliRunner">Service for running commands on the command line</param>
+            <param name="fileSystem">Service for accessing the file system</param>
+        </member>
         <member name="M:Helverify.ConsensusNode.Backend.Controllers.BlockchainController.PostAccount">
             <summary>
             Creates a new Ethereum account and returns its address
             </summary>
             <returns>Ethereum address of this consensus node</returns>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.BlockchainController.PostGenesis(Helverify.ConsensusNode.Backend.Dto.GenesisDto)">
+            <summary>
+            Initializes the specified genesis block.
+            </summary>
+            <param name="genesisDto">Genesis block of the Ethereum PoA chain.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.BlockchainController.PostPeer">
+            <summary>
+            Starts connects this consensus node to the Ethereum PoA blockchain.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.BlockchainController.PostNodes(Helverify.ConsensusNode.Backend.Dto.NodesDto)">
+            <summary>
+            Announces the other nodes in this Ethereum network to this consensus node.
+            </summary>
+            <param name="nodes">Enode identifiers of all sealer nodes in the Ethereum PoA network.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.BlockchainController.PostSealing">
+            <summary>
+            Start the sealing process on this consensus node.
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:Helverify.ConsensusNode.Backend.Controllers.DecryptionController">
             <summary>

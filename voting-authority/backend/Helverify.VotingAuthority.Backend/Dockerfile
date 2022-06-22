@@ -28,4 +28,5 @@ RUN dotnet publish "Helverify.VotingAuthority.Backend.csproj" -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
 ENTRYPOINT ["dotnet", "Helverify.VotingAuthority.Backend.dll"]

@@ -36,8 +36,12 @@ namespace Helverify.VotingAuthority.DataAccess.Ipfs
         /// <inheritdoc cref="IStorageClient.Retrieve{T}"/>
         public async Task<T> Retrieve<T>(string id)
         {
-            string? json = await _ipfsClient.FileSystem.ReadAllTextAsync(id);
+            CancellationToken token = default(CancellationToken);
 
+            Stream stream = await _ipfsClient.PostDownloadAsync("cat", token, id); // according to https://github.com/richardschneider/net-ipfs-http-client/issues/71
+
+            string? json = await new StreamReader(stream).ReadToEndAsync();
+            
             T obj = JsonConvert.DeserializeObject<T>(json);
 
             return obj;

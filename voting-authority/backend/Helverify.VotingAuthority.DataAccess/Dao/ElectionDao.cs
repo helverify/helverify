@@ -22,5 +22,7 @@ namespace Helverify.VotingAuthority.DataAccess.Dao
         public string G { get; set; } = string.Empty;
 
         public string? PublicKey { get; set; }
+
+        public string ContractAddress { get; set; }
     }
 }

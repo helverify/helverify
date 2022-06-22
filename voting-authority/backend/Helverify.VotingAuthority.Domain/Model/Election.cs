@@ -107,6 +107,11 @@ namespace Helverify.VotingAuthority.Domain.Model
         public DHParameters DhParameters => new (P, G);
 
         /// <summary>
+        /// Address of the smart contract for the election on the Ethereum blockchain.
+        /// </summary>
+        public string ContractAddress { get; set; }
+
+        /// <summary>
         /// Creates the ballot template for this election.
         /// </summary>
         /// <returns></returns>

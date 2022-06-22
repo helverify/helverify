@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.DataAccess.Dto;
+using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
 using Helverify.VotingAuthority.Domain.Repository;
@@ -23,6 +24,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         private readonly IConsensusNodeService _consensusNodeService;
         private readonly IMapper _mapper;
         private readonly IBlockchainSetup _blockchainSetup;
+        private readonly IWeb3Loader _web3Loader;
+        private readonly IElectionContractRepository _contractRepository;
 
         /// <summary>
         /// Constructor
@@ -33,13 +36,15 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <param name="mapper">Automapper</param>
         /// <param name="blockchainSetup">Service to set up the blockchain</param>
         public RegistrationsController(IRepository<Registration> registrationRepository, IRepository<Election> electionRepository, 
-            IConsensusNodeService consensusNodeService, IMapper mapper, IBlockchainSetup blockchainSetup)
+            IConsensusNodeService consensusNodeService, IMapper mapper, IBlockchainSetup blockchainSetup, IWeb3Loader web3Loader, IElectionContractRepository contractRepository)
         {
             _registrationRepository = registrationRepository;
             _electionRepository = electionRepository;
             _consensusNodeService = consensusNodeService;
             _mapper = mapper;
             _blockchainSetup = blockchainSetup;
+            _web3Loader = web3Loader;
+            _contractRepository = contractRepository;
         }
 
         /// <summary>
@@ -142,7 +147,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("blockchain-setup")]
-        public async Task Setup([FromRoute] string electionId)
+        public async Task<ActionResult<string>> Setup([FromRoute] string electionId)
         {
             Election election = await _electionRepository.GetAsync(electionId);
             
@@ -161,6 +166,16 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             await UpdateRegistrations(registrations);
 
             _blockchainSetup.RegisterRpcEndpoint(genesis, nodes);
+
+            _web3Loader.LoadInstance();
+
+            election.ContractAddress = await _contractRepository.DeployContract();
+
+            await _electionRepository.UpdateAsync(electionId, election);
+
+            await _contractRepository.SetUp(election);
+
+            return Ok(election.ContractAddress);
         }
 
         private async Task UpdateRegistrations(IList<Registration> registrations)
