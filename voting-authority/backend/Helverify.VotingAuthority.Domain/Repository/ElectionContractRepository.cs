@@ -75,7 +75,6 @@ namespace Helverify.VotingAuthority.Domain.Repository
 
             int numberOfBallots = await contract.QueryAsync<GetNumberOfBallotsFunction, int>(getNumberOfBallotsFunction);
 
-
             IList<string> ballotIds = new List<string>();
 
             for (int i = 0; i < numberOfBallots; i++)
@@ -91,6 +90,24 @@ namespace Helverify.VotingAuthority.Domain.Repository
             }
 
             return ballotIds;
+        }
+
+        public async Task<PaperBallot> GetBallot(Election election, string id)
+        {
+            Web3 web3 = _web3Loader.Web3Instance;
+
+            await UnlockAccount();
+
+            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
+
+            RetrieveBallotFunction retrieveBallotFunction = new RetrieveBallotFunction
+            {
+                BallotId = id
+            };
+
+            PaperBallot paperBallot = (await contract.QueryDeserializingToObjectAsync<RetrieveBallotFunction, RetrieveBallotOutputDTO>(retrieveBallotFunction)).ReturnValue1;
+
+            return paperBallot;
         }
 
         private async Task UnlockAccount(int seconds = 120)

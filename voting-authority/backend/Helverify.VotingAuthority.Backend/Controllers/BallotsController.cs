@@ -36,18 +36,31 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             _contractRepository = contractRepository;
         }
 
+        /// <summary>
+        /// TODO: refactor, only temporary for demo purposes
+        /// </summary>
+        /// <param name="electionId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<PaperBallotDao>> Retrieve()
+        [Consumes(ContentType)]
+        [Produces(ContentType)]
+        public async Task<ActionResult<IList<VirtualBallotDao>>> Get([FromRoute] string electionId, string id)
         {
-            PaperBallotDao paperBallot = await _storageClient.Retrieve<PaperBallotDao>("QmSn9QMnPyXnhUSxU8W6BQJ9gSeXj7AdyBWXHVP48u22tL");
+            Election election = await _electionRepository.GetAsync(electionId);
 
-            return paperBallot;
+            DataAccess.Ethereum.Contract.PaperBallot paperBallotDto = await _contractRepository.GetBallot(election, id);
+
+            VirtualBallotDao paperBallot1 = await _storageClient.Retrieve<VirtualBallotDao>(paperBallotDto.Ballot1Ipfs);
+            VirtualBallotDao paperBallot2 = await _storageClient.Retrieve<VirtualBallotDao>(paperBallotDto.Ballot2Ipfs);
+
+            return new List<VirtualBallotDao> { paperBallot1, paperBallot2 };
         }
 
         [HttpPost]
         [Consumes(ContentType)]
         [Produces(ContentType)]
-        public async Task<ActionResult> CreateBallots([FromRoute] string electionId, [FromBody] BallotGenerationDto ballotParameters)
+        public async Task<ActionResult> Post([FromRoute] string electionId, [FromBody] BallotGenerationDto ballotParameters)
         {
             Election election = await _electionRepository.GetAsync(electionId);
             
