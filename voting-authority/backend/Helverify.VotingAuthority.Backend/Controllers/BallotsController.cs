@@ -9,19 +9,17 @@ namespace Helverify.VotingAuthority.Backend.Controllers
     [ApiController]
     public class BallotsController : ControllerBase
     {
-        private readonly IpfsClient _ipfsClient;
+        private readonly IStorageClient _storageClient;
 
-        public BallotsController(IpfsClient ipfsClient)
+        public BallotsController(IStorageClient storageClient)
         {
-            _ipfsClient = ipfsClient;
+            _storageClient = storageClient;
         }
 
         [HttpGet]
         public async Task<ActionResult<PaperBallotDao>> Retrieve()
         {
-            StorageClient storageClient = new StorageClient(_ipfsClient);
-
-            PaperBallotDao paperBallot = await storageClient.Retrieve<PaperBallotDao>("QmSn9QMnPyXnhUSxU8W6BQJ9gSeXj7AdyBWXHVP48u22tL");
+            PaperBallotDao paperBallot = await _storageClient.Retrieve<PaperBallotDao>("QmSn9QMnPyXnhUSxU8W6BQJ9gSeXj7AdyBWXHVP48u22tL");
 
             return paperBallot;
 

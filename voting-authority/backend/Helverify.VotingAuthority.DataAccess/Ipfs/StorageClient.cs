@@ -5,15 +5,21 @@ using Newtonsoft.Json.Serialization;
 
 namespace Helverify.VotingAuthority.DataAccess.Ipfs
 {
-    public class StorageClient
+    /// <inheritdoc cref="IStorageClient"/>
+    public class StorageClient : IStorageClient
     {
         private readonly IpfsClient _ipfsClient;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="ipfsClient">IPFS connector</param>
         public StorageClient(IpfsClient ipfsClient)
         {
             _ipfsClient = ipfsClient;
         }
 
+        /// <inheritdoc cref="IStorageClient.Store{T}"/>
         public async Task<string> Store<T>(T obj)
         {
             string json = JsonConvert.SerializeObject(obj, new JsonSerializerSettings
@@ -27,6 +33,7 @@ namespace Helverify.VotingAuthority.DataAccess.Ipfs
             return fileSystemNode.Id.ToString();
         }
 
+        /// <inheritdoc cref="IStorageClient.Retrieve{T}"/>
         public async Task<T> Retrieve<T>(string id)
         {
             string? json = await _ipfsClient.FileSystem.ReadAllTextAsync(id);

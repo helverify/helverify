@@ -1,5 +1,6 @@
 ﻿using System.IO.Abstractions;
 using Helverify.VotingAuthority.DataAccess.Database;
+using Helverify.VotingAuthority.DataAccess.Ipfs;
 using Helverify.VotingAuthority.DataAccess.Rest;
 using Ipfs.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,7 @@ namespace Helverify.VotingAuthority.DataAccess.Configuration
 
             services.AddHttpClient();
             services.AddSingleton<IRestClient, RestClient>();
+            services.AddSingleton<IStorageClient, StorageClient>();
             services.AddSingleton(cfg => new IpfsClient(ipfsHost));
             services.AddScoped<IMongoClient>(_ => new MongoClient(connectionString));
             services.AddScoped(typeof(IMongoService<>), typeof(MongoService<>));
