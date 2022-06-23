@@ -9,6 +9,7 @@ namespace Helverify.VotingAuthority.DataAccess.Ipfs
     public class StorageClient : IStorageClient
     {
         private readonly IpfsClient _ipfsClient;
+        private readonly JsonSerializerSettings _serializerSettings;
 
         /// <summary>
         /// Constructor
@@ -17,16 +18,17 @@ namespace Helverify.VotingAuthority.DataAccess.Ipfs
         public StorageClient(IpfsClient ipfsClient)
         {
             _ipfsClient = ipfsClient;
+            _serializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                Formatting = Formatting.None
+            };
         }
 
         /// <inheritdoc cref="IStorageClient.Store{T}"/>
         public async Task<string> Store<T>(T obj)
         {
-            string json = JsonConvert.SerializeObject(obj, new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                Formatting = Formatting.Indented
-            });
+            string json = JsonConvert.SerializeObject(obj, _serializerSettings);
 
             IFileSystemNode fileSystemNode = await _ipfsClient.FileSystem.AddTextAsync(json);
             
@@ -40,9 +42,13 @@ namespace Helverify.VotingAuthority.DataAccess.Ipfs
 
             Stream stream = await _ipfsClient.PostDownloadAsync("cat", token, id); // according to https://github.com/richardschneider/net-ipfs-http-client/issues/71
 
-            string? json = await new StreamReader(stream).ReadToEndAsync();
-            
-            T obj = JsonConvert.DeserializeObject<T>(json);
+            // https://www.newtonsoft.com/json/help/html/Performance.htm
+            using StreamReader streamReader = new StreamReader(stream);
+            using JsonReader jR = new JsonTextReader(streamReader);
+
+            JsonSerializer jsonSerializer = new JsonSerializer();
+
+            T obj = jsonSerializer.Deserialize<T>(jR);
 
             return obj;
         }

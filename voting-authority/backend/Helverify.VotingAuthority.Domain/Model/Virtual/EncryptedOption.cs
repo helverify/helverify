@@ -39,7 +39,9 @@ public class EncryptedOption
             Values.Add(encryptedOptionValue);
         }
 
-        Hash = HashHelper.Hash(Values.Select(v => v.Cipher).ToArray());
+        HashHelper hashHelper = new HashHelper();
+
+        Hash = hashHelper.Hash(Values.Select(v => v.Cipher).ToArray());
 
         ShortCode = Hash.Substring(0, 2);
     }

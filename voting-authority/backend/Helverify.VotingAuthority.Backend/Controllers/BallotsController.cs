@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using AutoMapper;
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.DataAccess.Ipfs;
@@ -7,6 +10,7 @@ using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Helverify.VotingAuthority.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
@@ -76,9 +80,13 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             Election election = await _electionRepository.GetAsync(electionId);
             
             BallotTemplate ballotTemplate = election.GenerateBallotTemplate();
+            
+            ConcurrentQueue<DataAccess.Ethereum.Contract.PaperBallot> pbs = new ConcurrentQueue<DataAccess.Ethereum.Contract.PaperBallot>();
+            ConcurrentQueue<PaperBallot> paperBallots = new ConcurrentQueue<PaperBallot>();
 
-            for (int i = 0; i < ballotParameters.NumberOfBallots; i++)
+            Parallel.For(0, ballotParameters.NumberOfBallots, (_) =>
             {
+            
                 VirtualBallot ballot1 = CreateVirtualBallot(ballotTemplate);
                 VirtualBallot ballot2 = CreateVirtualBallot(ballotTemplate);
 
@@ -87,17 +95,35 @@ namespace Helverify.VotingAuthority.Backend.Controllers
                 VirtualBallotDao ballot1Dao = _mapper.Map<VirtualBallotDao>(ballot1);
                 VirtualBallotDao ballot2Dao = _mapper.Map<VirtualBallotDao>(ballot2);
 
-                string cid1 = await _storageClient.Store(ballot1Dao);
-                string cid2 = await _storageClient.Store(ballot2Dao);
+                string cid1 = _storageClient.Store(ballot1Dao).Result;
+                string cid2 = _storageClient.Store(ballot2Dao).Result;
 
-                await _contractRepository.StoreBallot(election, paperBallot.BallotId, ballot1.Code, cid1, ballot2.Code, cid2);
-                
-                await _ballotRepository.CreateAsync(paperBallot);
-            }
+                DataAccess.Ethereum.Contract.PaperBallot pb = new DataAccess.Ethereum.Contract.PaperBallot{
+                    Ballot1Code = ballot1.Code,
+                    Ballot1Ipfs = cid1,
+                    Ballot2Code = ballot2.Code,
+                    Ballot2Ipfs = cid2,
+                    BallotId = paperBallot.BallotId
+                };
+
+                paperBallots.Enqueue(paperBallot);
+                pbs.Enqueue(pb);
+            });
             
-            IList<string> ballotIds = await _contractRepository.GetBallotIds(election);
+            await (_ballotRepository as PaperBallotRepository)!.InsertMany(paperBallots.ToArray());
 
-            return Ok(ballotIds);
+            int partitionSize = 60;
+
+            for (int i = 0; i < pbs.Count; )
+            {
+                IList<DataAccess.Ethereum.Contract.PaperBallot> partition = pbs.Skip(i).Take(partitionSize).ToList();
+
+                await _contractRepository.StoreBallots(election, partition);
+
+                i += partitionSize;
+            }
+
+            return Ok(paperBallots.Count);
         }
 
         private VirtualBallot CreateVirtualBallot(BallotTemplate ballotTemplate)

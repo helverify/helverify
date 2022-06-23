@@ -2,6 +2,7 @@
 using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
 using Helverify.VotingAuthority.Domain.Model;
 using Nethereum.Contracts.ContractHandlers;
+using Nethereum.JsonRpc.Client;
 using Nethereum.Web3;
 
 namespace Helverify.VotingAuthority.Domain.Repository
@@ -9,6 +10,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
     public class ElectionContractRepository : IElectionContractRepository
     {
         private readonly IWeb3Loader _web3Loader;
+        private static SemaphoreSlim _semaphore = new (1, 1);
 
         public ElectionContractRepository(IWeb3Loader web3Loader)
         {
@@ -43,24 +45,29 @@ namespace Helverify.VotingAuthority.Domain.Repository
             await contract.SendRequestAndWaitForReceiptAsync(setUpFunction);
         }
 
-        public async Task StoreBallot(Election election, string ballotId, string ballot1Id, string ballot1Cid, string ballot2Id, string ballot2Cid)
+        public async Task StoreBallots(Election election, IList<PaperBallot> paperBallots)
         {
             Web3 web3 = _web3Loader.Web3Instance;
 
             await UnlockAccount();
 
-            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
+            //await _semaphore.WaitAsync();
 
-            StoreBallotFunction storeBallotFunction = new StoreBallotFunction
-            {
-                BallotId = ballotId,
-                BallotCode1 = ballot1Id,
-                Ballot1Ipfs = ballot1Cid,
-                BallotCode2 = ballot2Id,
-                Ballot2Ipfs = ballot2Cid
-            };
+            //try
+            //{
+                ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
 
-            await contract.SendRequestAndWaitForReceiptAsync(storeBallotFunction);
+                StoreBallotFunction storeBallotFunction = new StoreBallotFunction
+                {
+                    Ballots = paperBallots.ToList()
+                };
+
+                await contract.SendRequestAsync(storeBallotFunction);
+            //}
+            //finally
+            //{
+            //    _semaphore.Release();
+            //}
         }
 
         public async Task<IList<string>> GetBallotIds(Election election)

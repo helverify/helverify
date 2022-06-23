@@ -33,10 +33,19 @@ namespace Helverify.VotingAuthority.DataAccess.Configuration
             services.AddSingleton<IStorageClient, StorageClient>();
             services.AddSingleton(cfg => new IpfsClient(ipfsHost));
             services.AddSingleton<IFileSystem, FileSystem>();
-            services.AddSingleton<IWeb3Loader>(cfg => new Web3Loader(cfg.GetService<IFileSystem>(), web3ConnectionString, accountPassword));
+            services.AddSingleton<IWeb3Loader>(cfg =>
+            {
+                IWeb3Loader loader =
+                    new Web3Loader(cfg.GetService<IFileSystem>(), web3ConnectionString, accountPassword);
+
+                loader.LoadInstance();
+
+                return loader;
+            });
             services.AddScoped<IMongoClient>(_ => new MongoClient(connectionString));
             services.AddScoped(typeof(IMongoService<>), typeof(MongoService<>));
             
+
             return services;
         }
     }

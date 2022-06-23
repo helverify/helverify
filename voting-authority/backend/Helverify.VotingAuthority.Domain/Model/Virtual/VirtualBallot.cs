@@ -64,7 +64,9 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
 
             GenerateColumnProofs(publicKey);
 
-            Code = HashHelper.Hash(AllCiphers);
+            HashHelper hashHelper = new HashHelper();
+
+            Code = hashHelper.Hash(AllCiphers);
 
             // sort options by short code to hide positional information
             EncryptedOptions = EncryptedOptions.OrderBy(e => e.ShortCode).ToList();

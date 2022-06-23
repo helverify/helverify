@@ -7,7 +7,7 @@ using MongoDB.Driver;
 namespace Helverify.VotingAuthority.Domain.Repository
 {
     /// <inheritdoc cref="IRepository{T}"/>
-    internal class PaperBallotRepository: IRepository<PaperBallot>
+    public class PaperBallotRepository: IRepository<PaperBallot>
     {
         private readonly IMongoService<PrintBallotDao> _mongoService;
         private readonly IMapper _mapper;
@@ -73,6 +73,13 @@ namespace Helverify.VotingAuthority.Domain.Repository
             string mongoId = (await GetSinglePrintBallot(id)).Id;
             
             await _mongoService.RemoveAsync(mongoId);
+        }
+
+        public async Task InsertMany(PaperBallot[] ballots)
+        {
+            IList<PrintBallotDao> printBallotDaos = _mapper.Map<IList<PrintBallotDao>>(ballots);
+
+            await _mongoService.Collection.InsertManyAsync(printBallotDaos);
         }
 
         private async Task<PrintBallotDao> GetSinglePrintBallot(string id)

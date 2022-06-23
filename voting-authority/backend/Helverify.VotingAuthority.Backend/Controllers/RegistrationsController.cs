@@ -155,7 +155,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             string nodeAddress = await _blockchainSetup.CreateAccountsAsync(registrations);
 
-            Genesis genesis = await _blockchainSetup.PropagateGenesisBlockAsync(registrations, new Account(nodeAddress, "1000000000000000000000000000000000000000"));
+            Genesis genesis = await _blockchainSetup.PropagateGenesisBlockAsync(registrations, new Account(nodeAddress, "1000000000000000000000000000000000000000000000"));
 
             NodesDto nodes = await _blockchainSetup.StartPeersAsync(registrations);
 

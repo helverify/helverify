@@ -41,7 +41,9 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
             Ballots.Add(ballot1);
             Ballots.Add(ballot2);
 
-            BallotId = HashHelper.Hash(ballot1.Code, ballot2.Code);
+            HashHelper hashHelper = new HashHelper();
+
+            BallotId = hashHelper.Hash(ballot1.Code, ballot2.Code);
 
             SetUpShortCodes(ballot1, ballot2);
         }
