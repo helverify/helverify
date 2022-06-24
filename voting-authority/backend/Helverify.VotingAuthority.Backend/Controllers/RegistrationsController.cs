@@ -35,6 +35,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <param name="consensusNodeService">Accessor to consensus node service</param>
         /// <param name="mapper">Automapper</param>
         /// <param name="blockchainSetup">Service to set up the blockchain</param>
+        /// <param name="web3Loader">Web3 accessor</param>
+        /// <param name="contractRepository">Repository for Election smart contract interactions</param>
         public RegistrationsController(IRepository<Registration> registrationRepository, IRepository<Election> electionRepository, 
             IConsensusNodeService consensusNodeService, IMapper mapper, IBlockchainSetup blockchainSetup, IWeb3Loader web3Loader, IElectionContractRepository contractRepository)
         {
