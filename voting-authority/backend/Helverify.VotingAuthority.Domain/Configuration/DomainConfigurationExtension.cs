@@ -33,10 +33,10 @@ namespace Helverify.VotingAuthority.Domain.Configuration
             });
             services.AddDataAccessConfiguration();
             services.AddSingleton<IConsensusNodeService, ConsensusNodeService>();
+            services.AddSingleton<ICliRunner, CliRunner>();
             services.AddScoped<IRepository<Election>, ElectionRepository>();
             services.AddScoped<IRepository<Registration>, RegistrationRepository>();
             services.AddScoped<IRepository<PaperBallot>, PaperBallotRepository>();
-            services.AddScoped<ICliRunner, CliRunner>();
             services.AddScoped<IBlockchainSetup, BlockchainSetup>();
             services.AddScoped<IElectionContractRepository, ElectionContractRepository>();
 

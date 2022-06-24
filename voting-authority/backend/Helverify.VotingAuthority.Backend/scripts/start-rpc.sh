@@ -2,7 +2,13 @@
 
 ethdir=/home/eth
 
-pkill geth
+pkill -HUP geth
+
+echo y | geth removedb
+
+sleep 5
+
+rm -f $ethdir/data/geth.ipc
 
 geth --datadir $ethdir/data --networkid 13337 --port $PORT --syncmode full --nat extip:`dig +short host.docker.internal` --http --http.addr "0.0.0.0" --http.api personal,eth,net,web3 --http.corsdomain https://remix.ethereum.org --ws.origins "*" --unlock `cat $ethdir/address` --password $ethdir/password --allow-insecure-unlock --bootnodes= > $ethdir/eth.log 2>&1 &
 

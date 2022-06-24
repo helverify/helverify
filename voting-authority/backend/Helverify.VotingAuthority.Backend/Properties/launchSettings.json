@@ -35,10 +35,10 @@
         "BC_ACCOUNT_PWD": "test-va",
         "MongoDbConnectionString": "mongodb://root:voting-authority@host.docker.internal:27017",
         "IpfsHost": "http://host.docker.internal:5001",
-        "PORT": "30300",
-        "GethEndpoint":  "http://localhost:8545" 
+        "GethEndpoint": "http://localhost:8545",
+        "PORT": "30300"
       },
-      "DockerfileRunArguments": "-e BC_ACCOUNT_PWD=test1 -e PORT=30300 -p 8545:8545",
+      "DockerfileRunArguments": "-e BC_ACCOUNT_PWD=test1 -e PORT=30300 -p 8545:8545 -v va:/home",
       "publishAllPorts": true,
       "useSSL": false
     }

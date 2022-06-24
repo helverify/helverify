@@ -1,5 +1,4 @@
 ﻿using System.IO.Abstractions;
-using Nethereum.JsonRpc.Client;
 using Nethereum.JsonRpc.IpcClient;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
@@ -9,6 +8,7 @@ namespace Helverify.VotingAuthority.DataAccess.Ethereum
     public class Web3Loader : IWeb3Loader
     {
         private const string PrivateKeyPath = "/home/eth/private.key";
+        private const string IpcPath = "/home/eth/data/geth.ipc";
 
         private readonly IFileSystem _fileSystem;
         private readonly string _connectionString;
@@ -37,8 +37,7 @@ namespace Helverify.VotingAuthority.DataAccess.Ethereum
 
             Account = Account.LoadFromKeyStore(keyFilePath, Password, 13337);
 
-            //Web3 instance = new Web3(Account, _connectionString);
-            Web3 instance = new Web3(Account, new UnixIpcClient("/home/eth/data/geth.ipc"));
+            Web3 instance = new Web3(Account, new UnixIpcClient(IpcPath));
             
             instance.Eth.TransactionManager.UseLegacyAsDefault = true;
             

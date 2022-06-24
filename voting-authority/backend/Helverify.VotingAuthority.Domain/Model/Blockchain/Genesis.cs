@@ -42,6 +42,6 @@ public class Genesis
         Authorities = authorities;
         PrefundedAccounts = prefundedAccounts;
         CliqueEpoch = 30000;
-        CliquePeriod = 0;
+        CliquePeriod = 2;
     }
 }

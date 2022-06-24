@@ -10,7 +10,6 @@ using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Helverify.VotingAuthority.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {

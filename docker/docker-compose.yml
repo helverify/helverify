@@ -21,6 +21,8 @@ services:
             - PORT=30300
             - IpfsHost=http://host.docker.internal:5001
             - GethEndpoint=http://localhost:8545
+        volumes:
+            - ./va:/home
         build:
             context: ../voting-authority/backend/
             dockerfile: Helverify.VotingAuthority.Backend/Dockerfile    
