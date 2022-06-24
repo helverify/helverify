@@ -1,6 +1,6 @@
 ﻿namespace Helverify.VotingAuthority.DataAccess.Dao;
 
-public class ProofOfContainingOneDao
+public struct ProofOfContainingOneDao
 {
     public string U { get; set; }
     public string V { get; set; }

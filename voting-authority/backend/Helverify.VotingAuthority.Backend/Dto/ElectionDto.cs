@@ -39,5 +39,10 @@
         /// Election public key
         /// </summary>
         public string? PublicKey { get; set; }
+
+        /// <summary>
+        /// Address of the smart contract for the election on the Ethereum blockchain.
+        /// </summary>
+        public string? ContractAddress { get; set; }
     }
 }

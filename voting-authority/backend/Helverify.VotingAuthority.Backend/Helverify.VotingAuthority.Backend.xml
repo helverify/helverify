@@ -4,6 +4,14 @@
         <name>Helverify.VotingAuthority.Backend</name>
     </assembly>
     <members>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.Get(System.String,System.String)">
+            <summary>
+            TODO: refactor, only temporary for demo purposes
+            </summary>
+            <param name="electionId"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:Helverify.VotingAuthority.Backend.Controllers.ElectionsController">
             <summary>
             Controller for handling the election API
@@ -81,7 +89,7 @@
             Controller for handling the registration API.
             </summary>
         </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.#ctor(Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Registration},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Service.IConsensusNodeService,AutoMapper.IMapper,Helverify.VotingAuthority.Domain.Service.IBlockchainSetup)">
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.#ctor(Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Registration},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Service.IConsensusNodeService,AutoMapper.IMapper,Helverify.VotingAuthority.Domain.Service.IBlockchainSetup,Helverify.VotingAuthority.DataAccess.Ethereum.IWeb3Loader,Helverify.VotingAuthority.Domain.Repository.IElectionContractRepository)">
             <summary>
             Constructor
             </summary>
@@ -172,6 +180,11 @@
         <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionDto.PublicKey">
             <summary>
             Election public key
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionDto.ContractAddress">
+            <summary>
+            Address of the smart contract for the election on the Ethereum blockchain.
             </summary>
         </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.ElectionOptionDto">

@@ -1,5 +1,7 @@
+using System.IO.Abstractions;
 using Helverify.VotingAuthority.Backend.Mapping;
 using Helverify.VotingAuthority.Domain.Configuration;
+using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,9 +26,18 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<ElectionDtoProfile>();
     cfg.AddProfile<RegistrationDtoProfile>();
+    cfg.AddProfile<BallotProfile>();
 });
 
 var app = builder.Build();
+
+ICliRunner cliRunner = app.Services.GetService<ICliRunner>() ?? throw new InvalidOperationException();
+IFileSystem fileSystem = app.Services.GetService<IFileSystem>() ?? throw new InvalidOperationException();
+
+// start RPC endpoint in case chain has already been configured (restart)
+if(fileSystem.File.Exists("/home/eth/data/geth.ipc")){
+    cliRunner.Execute("/app/scripts/start-rpc.sh", "");
+}
 
 // Configure the HTTP request pipeline.
 

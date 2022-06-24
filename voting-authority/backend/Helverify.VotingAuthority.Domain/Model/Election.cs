@@ -9,7 +9,7 @@ namespace Helverify.VotingAuthority.Domain.Model
     /// <summary>
     /// Represents an election.
     /// </summary>
-    public class Election
+    public sealed class Election
     {
         private readonly IElGamal _elGamal;
 
@@ -105,6 +105,11 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// Builds Diffie-Hellman parameters from the ElGamal cryptosystem parameters.
         /// </summary>
         public DHParameters DhParameters => new (P, G);
+
+        /// <summary>
+        /// Address of the smart contract for the election on the Ethereum blockchain.
+        /// </summary>
+        public string ContractAddress { get; set; }
 
         /// <summary>
         /// Creates the ballot template for this election.

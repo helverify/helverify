@@ -2,7 +2,7 @@
 
 namespace Helverify.VotingAuthority.DataAccess.Dao;
 
-public class EncryptedOptionValueDao
+public struct EncryptedOptionValueDao
 {
     public CipherTextDto Cipher { get; set; }
 

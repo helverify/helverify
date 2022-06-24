@@ -7,16 +7,16 @@ namespace Helverify.VotingAuthority.Domain.Helper
     /// <summary>
     /// Encapsulates hash generation functionality
     /// </summary>
-    internal static class HashHelper
+    internal class HashHelper
     {
-        private static SHA256 _sha256 = SHA256.Create();
+        private SHA256 _sha256 = SHA256.Create();
 
         /// <summary>
         /// Generates a hash of all specified ciphertexts
         /// </summary>
         /// <param name="ciphers">ElGamal ciphertexts</param>
         /// <returns></returns>
-        internal static string Hash(params ElGamalCipher[] ciphers)
+        internal string Hash(params ElGamalCipher[] ciphers)
         {
             byte[] hashes = Array.Empty<byte>();
 
@@ -37,7 +37,7 @@ namespace Helverify.VotingAuthority.Domain.Helper
         /// </summary>
         /// <param name="strs">Strings to be hashed</param>
         /// <returns></returns>
-        internal static string Hash(params string[] strs)
+        internal string Hash(params string[] strs)
         {
             SHA256 sha256 = SHA256.Create();
 
@@ -58,7 +58,7 @@ namespace Helverify.VotingAuthority.Domain.Helper
         /// </summary>
         /// <param name="hash">Hash value</param>
         /// <returns>Hex string representation</returns>
-        private static string ConvertHashToHexString(byte[] hash)
+        private string ConvertHashToHexString(byte[] hash)
         {
             // Conversion according to: https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.hashalgorithm.computehash?view=net-6.0
 

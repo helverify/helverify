@@ -2,6 +2,8 @@
 
 ethdir=/home/eth
 
+pkill geth
+
 rm -rf $ethdir/data
 
 rm $ethdir/address

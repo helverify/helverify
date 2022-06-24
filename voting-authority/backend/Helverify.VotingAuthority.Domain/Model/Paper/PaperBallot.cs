@@ -6,7 +6,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
     /// <summary>
     /// Represents a paper ballot consisting of two virtual ballots.
     /// </summary>
-    public class PaperBallot
+    public sealed class PaperBallot
     {
         /// <summary>
         /// Election in for this paper ballot has been produced.
@@ -26,7 +26,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
         /// <summary>
         /// Contains the ballot options with their corresponding pairs of short codes.
         /// </summary>
-        public IList<PaperBallotOption> Options = new List<PaperBallotOption>();
+        public IList<PaperBallotOption> Options { get; } = new List<PaperBallotOption>();
 
         /// <summary>
         /// Constructor
@@ -41,9 +41,20 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
             Ballots.Add(ballot1);
             Ballots.Add(ballot2);
 
-            BallotId = HashHelper.Hash(ballot1.Code, ballot2.Code);
+            HashHelper hashHelper = new HashHelper();
+
+            BallotId = hashHelper.Hash(ballot1.Code, ballot2.Code);
 
             SetUpShortCodes(ballot1, ballot2);
+        }
+
+        /// <summary>
+        /// Constructor for deserialization
+        /// </summary>
+        public PaperBallot(string ballotId, IList<PaperBallotOption> options)
+        {
+            BallotId = ballotId;
+            Options = options;
         }
 
         /// <summary>

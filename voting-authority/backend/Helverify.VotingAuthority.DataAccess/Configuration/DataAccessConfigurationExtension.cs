@@ -1,5 +1,6 @@
 ﻿using System.IO.Abstractions;
 using Helverify.VotingAuthority.DataAccess.Database;
+using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.DataAccess.Ipfs;
 using Helverify.VotingAuthority.DataAccess.Rest;
 using Ipfs.Http;
@@ -23,16 +24,28 @@ namespace Helverify.VotingAuthority.DataAccess.Configuration
         {
             string connectionString = Environment.GetEnvironmentVariable("MongoDbConnectionString") ?? throw new InvalidOperationException();
             string ipfsHost = Environment.GetEnvironmentVariable("IpfsHost") ?? throw new InvalidOperationException();
-
+            string web3ConnectionString = Environment.GetEnvironmentVariable("GethEndpoint") ?? throw new ArgumentNullException("GethEndpoint");
+            string accountPassword = Environment.GetEnvironmentVariable("BC_ACCOUNT_PWD") ??
+                                     throw new ArgumentNullException("BC_ACCOUNT_PWD");
 
             services.AddHttpClient();
             services.AddSingleton<IRestClient, RestClient>();
             services.AddSingleton<IStorageClient, StorageClient>();
             services.AddSingleton(cfg => new IpfsClient(ipfsHost));
+            services.AddSingleton<IFileSystem, FileSystem>();
+            services.AddSingleton<IWeb3Loader>(cfg =>
+            {
+                IWeb3Loader loader =
+                    new Web3Loader(cfg.GetService<IFileSystem>(), accountPassword);
+
+                loader.LoadInstance();
+
+                return loader;
+            });
             services.AddScoped<IMongoClient>(_ => new MongoClient(connectionString));
             services.AddScoped(typeof(IMongoService<>), typeof(MongoService<>));
-            services.AddScoped<IFileSystem, FileSystem>();
             
+
             return services;
         }
     }

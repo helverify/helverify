@@ -57,34 +57,34 @@ namespace Helverify.VotingAuthority.Domain.Service
             });
         }
 
-        /// <inheritdoc cref="IConsensusNodeService.InitializeGenesisBlock"/>
-        public async Task InitializeGenesisBlock(Uri endpoint, Genesis genesis)
+        /// <inheritdoc cref="IConsensusNodeService.InitializeGenesisBlockAsync"/>
+        public async Task InitializeGenesisBlockAsync(Uri endpoint, Genesis genesis)
         {
             GenesisDto genesisDto = _mapper.Map<GenesisDto>(genesis);
 
             await _restClient.Call(HttpMethod.Post, new Uri(endpoint, BcGenesisRoute), genesisDto);
         }
 
-        /// <inheritdoc cref="IConsensusNodeService.CreateBcAccount"/>
-        public async Task<string> CreateBcAccount(Uri endpoint)
+        /// <inheritdoc cref="IConsensusNodeService.CreateBcAccountAsync"/>
+        public async Task<string> CreateBcAccountAsync(Uri endpoint)
         {
             return await _restClient.Call<string>(HttpMethod.Post, new Uri(endpoint, BcAddressRoute)) ?? string.Empty;
         }
 
-        /// <inheritdoc cref="IConsensusNodeService.StartPeers"/>
-        public async Task<string> StartPeers(Uri endpoint)
+        /// <inheritdoc cref="IConsensusNodeService.StartPeersAsync"/>
+        public async Task<string> StartPeersAsync(Uri endpoint)
         {
             return await _restClient.Call<string>(HttpMethod.Post, new Uri(endpoint, BcPeerRoute)) ?? string.Empty;
         }
 
-        /// <inheritdoc cref="IConsensusNodeService.InitializeNodes"/>
-        public async Task InitializeNodes(Uri endpoint, NodesDto nodesDto)
+        /// <inheritdoc cref="IConsensusNodeService.InitializeNodesAsync"/>
+        public async Task InitializeNodesAsync(Uri endpoint, NodesDto nodesDto)
         {
             await _restClient.Call(HttpMethod.Post, new Uri(endpoint, BcNodesRoute), nodesDto);
         }
 
-        /// <inheritdoc cref="IConsensusNodeService.StartSealing"/>
-        public async Task StartSealing(Uri endpoint)
+        /// <inheritdoc cref="IConsensusNodeService.StartSealingAsync"/>
+        public async Task StartSealingAsync(Uri endpoint)
         {
             await _restClient.Call(HttpMethod.Post, new Uri(endpoint, BcSealingRoute));
         }

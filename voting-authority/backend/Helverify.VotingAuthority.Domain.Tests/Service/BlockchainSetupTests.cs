@@ -90,8 +90,8 @@ namespace Helverify.VotingAuthority.Domain.Tests.Service
                 }
             };
 
-            _consensusNodeService.Setup(c => c.StartPeers(endpoint1)).ReturnsAsync(enode1);
-            _consensusNodeService.Setup(c => c.StartPeers(endpoint2)).ReturnsAsync(enode2);
+            _consensusNodeService.Setup(c => c.StartPeersAsync(endpoint1)).ReturnsAsync(enode1);
+            _consensusNodeService.Setup(c => c.StartPeersAsync(endpoint2)).ReturnsAsync(enode2);
 
             IBlockchainSetup setup = new BlockchainSetup(_consensusNodeService.Object, _cliRunner, _mapper, _fileSystem);
 
@@ -144,8 +144,8 @@ namespace Helverify.VotingAuthority.Domain.Tests.Service
                 }
             };
 
-            _consensusNodeService.Setup(c => c.CreateBcAccount(endpoint1)).ReturnsAsync(bcAddress1);
-            _consensusNodeService.Setup(c => c.CreateBcAccount(endpoint2)).ReturnsAsync(bcAddress2);
+            _consensusNodeService.Setup(c => c.CreateBcAccountAsync(endpoint1)).ReturnsAsync(bcAddress1);
+            _consensusNodeService.Setup(c => c.CreateBcAccountAsync(endpoint2)).ReturnsAsync(bcAddress2);
 
             BlockchainSetup setup = new BlockchainSetup(_consensusNodeService.Object, cliRunner.Object, _mapper, _fileSystem);
 

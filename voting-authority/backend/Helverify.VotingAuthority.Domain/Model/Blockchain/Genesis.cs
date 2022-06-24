@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents the genesis block of an Ethereum PoA (clique) blockchain.
 /// </summary>
-public class Genesis
+public sealed class Genesis
 {
     /// <summary>
     /// Chain identifier for the blockchain network. Here, usually 13337.
@@ -42,6 +42,6 @@ public class Genesis
         Authorities = authorities;
         PrefundedAccounts = prefundedAccounts;
         CliqueEpoch = 30000;
-        CliquePeriod = 0;
+        CliquePeriod = 2;
     }
 }

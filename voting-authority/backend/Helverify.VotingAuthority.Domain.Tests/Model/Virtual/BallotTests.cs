@@ -80,12 +80,13 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Virtual
 
             DHPublicKeyParameters publicKey = (keyPair.Public as DHPublicKeyParameters)!;
 
-            VirtualBallot virtualBallot = new VirtualBallot(new List<PlainTextOption>(), publicKey);
-
-            virtualBallot.EncryptedOptions = new List<EncryptedOption>
+            VirtualBallot virtualBallot = new VirtualBallot(new List<PlainTextOption>(), publicKey)
             {
-                new (publicKey, new List<int> { 0, 1 }){ShortCode = shortCode1},
-                new (publicKey, new List<int> { 1, 0 }){ShortCode = shortCode2}
+                EncryptedOptions = new List<EncryptedOption>
+                {
+                    new (publicKey, new List<int> { 0, 1 }){ShortCode = shortCode1},
+                    new (publicKey, new List<int> { 1, 0 }){ShortCode = shortCode2}
+                }
             };
 
             // act

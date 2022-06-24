@@ -4,11 +4,21 @@ using Helverify.VotingAuthority.Domain.Model.Blockchain;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 {
-    public class GenesisConverter : ITypeConverter<Genesis, GenesisDto>
+    /// <summary>
+    /// Converter for Genesis mapping
+    /// </summary>
+    internal class GenesisConverter : ITypeConverter<Genesis, GenesisDto>
     {
         private const string ExtradataPrefix = "0x0000000000000000000000000000000000000000000000000000000000000000";
         private const string ExtradataSuffix = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
+        /// <summary>
+        /// Converts a Genesis instance to a GenesisDto instance
+        /// </summary>
+        /// <param name="source">Genesis instance</param>
+        /// <param name="destination">GenesisDto instance</param>
+        /// <param name="context">Automapper context</param>
+        /// <returns></returns>
         public GenesisDto Convert(Genesis source, GenesisDto destination, ResolutionContext context)
         {
             destination = new GenesisDto();
@@ -38,8 +48,8 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
                 HomesteadBlock = 0,
                 PetersburgBlock = 0
             };
-            destination.GasLimit = "8000000";
-
+            destination.GasLimit = "50000000";
+            
             destination.Difficulty = "1";
 
             return destination;

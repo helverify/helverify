@@ -8,7 +8,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
     /// <summary>
     /// Represents a virtual ballot (as opposed to the physical paper ballot)
     /// </summary>
-    public class VirtualBallot
+    public sealed class VirtualBallot
     {
         /// <summary>
         /// Long ballot code, consisting of the hash of all encryptions.
@@ -64,7 +64,9 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
 
             GenerateColumnProofs(publicKey);
 
-            Code = HashHelper.Hash(AllCiphers);
+            HashHelper hashHelper = new HashHelper();
+
+            Code = hashHelper.Hash(AllCiphers);
 
             // sort options by short code to hide positional information
             EncryptedOptions = EncryptedOptions.OrderBy(e => e.ShortCode).ToList();

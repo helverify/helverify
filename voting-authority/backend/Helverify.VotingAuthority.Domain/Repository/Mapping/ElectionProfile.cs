@@ -5,8 +5,14 @@ using Helverify.VotingAuthority.Domain.Model;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 {
-    public class ElectionProfile: Profile
+    /// <summary>
+    /// Mapping profile for Elections
+    /// </summary>
+    internal class ElectionProfile: Profile
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ElectionProfile()
         {
             CreateElectionMapping();
@@ -21,6 +27,7 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
                 .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options))
                 .ForMember(dest => dest.P, opt => opt.MapFrom(src => src.P.ConvertToBigInteger()))
                 .ForMember(dest => dest.G, opt => opt.MapFrom(src => src.G.ConvertToBigInteger()))
+                .ForMember(dest => dest.ContractAddress, opt => opt.MapFrom(src => src.ContractAddress))
                 .ForMember(dest => dest.PublicKey, opt => opt.MapFrom(src => src.PublicKey.ConvertToBigInteger()));
 
             CreateMap<Election, ElectionDao>()
@@ -30,6 +37,7 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
                 .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options))
                 .ForMember(dest => dest.P, opt => opt.MapFrom(src => src.P.ConvertToHexString()))
                 .ForMember(dest => dest.G, opt => opt.MapFrom(src => src.G.ConvertToHexString()))
+                .ForMember(dest => dest.ContractAddress, opt => opt.MapFrom(src => src.ContractAddress))
                 .ForMember(dest => dest.PublicKey, opt => opt.MapFrom(src => src.PublicKey.ConvertToHexString()));
 
             CreateMap<ElectionOptionDao, ElectionOption>()

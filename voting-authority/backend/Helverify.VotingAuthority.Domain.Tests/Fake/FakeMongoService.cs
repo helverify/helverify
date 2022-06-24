@@ -1,5 +1,6 @@
 ﻿using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.DataAccess.Database;
+using MongoDB.Driver;
 
 namespace Helverify.VotingAuthority.Domain.Tests.Fake
 {
@@ -37,5 +38,7 @@ namespace Helverify.VotingAuthority.Domain.Tests.Fake
 
             Entities.Remove(e);
         }
+
+        public IMongoCollection<T> Collection => null;
     }
 }

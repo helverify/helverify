@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
+using Helverify.Cryptography.Common;
 using Helverify.Cryptography.Encryption;
+using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
-using Helverify.VotingAuthority.Domain.Repository;
 using Helverify.VotingAuthority.Domain.Repository.Mapping;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -24,7 +25,7 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Paper
                 "3fb32c9b73134d0b2e77506660edbd484ca7b18f21ef205407f4793a1a0ba12510dbc15077be463fff4fed4aac0bb555be3a6c1b0c6b47b1bc3773bf7e8c6f62901228f8c28cbb18a55ae31341000a650196f931c77a57f2ddf463e5e9ec144b777de62aaab8a8628ac376d282d6ed3864e67982428ebc831d14348f6f2f9193b5045af2767164e1dfc967c1fb3f2e55a4bd1bffe83b9c80d052b985d182ea0adb2a3b7313d3fe14c8484b1e052588b9b7d2bbd2df016199ecd06e1557cd0915b3353bbb64e0ec377fd028370df92b52c7891428cdc67eb6184b523d1db246c32f63078490f00ef8d647d148d47954515e2327cfef98c582664b4c0f6cc41659",
                 16);
 
-                IElGamal elGamal = new ExponentialElGamal();
+            IElGamal elGamal = new ExponentialElGamal();
             AsymmetricCipherKeyPair keyPair = elGamal.KeyGen(p, g);
             DHPublicKeyParameters publicKey = (keyPair.Public as DHPublicKeyParameters)!;
 
@@ -53,6 +54,64 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Paper
 
             // assert
             Assert.That(paperBallot, Is.Not.Null); // TODO: add more assertions
+        }
+
+
+        [Test]
+        public void TestPaperBallotPerformance()
+        {
+            // arrange
+            int testIterations = 100;
+
+            IMapper mapper = new Mapper(new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<BallotProfile>();
+            }));
+
+            DhGroup dhGroup = DhGroups.Get(DhGroups.Modp2048);
+
+            BigInteger p = dhGroup.P;
+            BigInteger g = dhGroup.G;
+
+            IElGamal elGamal = new ExponentialElGamal();
+            AsymmetricCipherKeyPair keyPair = elGamal.KeyGen(p, g);
+            DHPublicKeyParameters publicKey = (keyPair.Public as DHPublicKeyParameters)!;
+
+            Election election = new Election
+            {
+                Name = "Test",
+                Question = "Vote for whom?",
+                Options = new List<ElectionOption>
+                {
+                    new (){ Name = "Yes" },
+                    new (){ Name = "No"},
+                    new (){ Name = "Maybe" }
+                },
+                P = p,
+                G = g,
+                PublicKey = publicKey.Y
+            };
+
+            BallotTemplate ballotTemplate = new BallotTemplate(election);
+
+            PaperBallot[] ballots = new PaperBallot[testIterations];
+
+            Parallel.For(0, testIterations, (i) =>
+            {
+                VirtualBallot ballot1 = ballotTemplate.Encrypt();
+                VirtualBallot ballot2 = ballotTemplate.Encrypt();
+
+                VirtualBallotDao ballot1Dao = mapper.Map<VirtualBallotDao>(ballot1);
+                VirtualBallotDao ballot2Dao = mapper.Map<VirtualBallotDao>(ballot2);
+
+                // act
+                PaperBallot paperBallot = new PaperBallot(election, ballot1, ballot2);
+
+                ballots[i] = paperBallot;
+            });
+            
+            // assert
+            Assert.That(ballots.Count, Is.EqualTo(testIterations)); 
         }
     }
 }

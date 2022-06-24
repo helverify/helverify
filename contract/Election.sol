@@ -54,13 +54,18 @@ contract Election {
         electionId = id;
     }
 
-    function storeBallot(string memory ballotId, string memory ballotCode1, string memory ballot1Ipfs, string memory ballotCode2, string memory ballot2Ipfs) public {
+    function storeBallot(PaperBallot[] memory ballots) public {
         if(msg.sender != votingAuthority){
             revert("Only voting authority is allowed to store ballots.");
         }
 
-        paperBallots[ballotId] = PaperBallot(ballotId, ballotCode1, ballot1Ipfs, ballotCode2, ballot2Ipfs);
-        ballotIds.push(ballotId);
+        for(uint i = 0; i < ballots.length; i++){
+            string memory ballotId = ballots[i].ballotId;
+
+            paperBallots[ballotId] = ballots[i];
+            
+            ballotIds.push(ballotId);
+        }
     }
 
     function spoilBallot(string memory ballotId, string memory virtualBallotId, string memory spoiltBallotIpfs) public{
@@ -89,5 +94,9 @@ contract Election {
         }
 
         results[option] = Result(options[option], tally, tallyProofsIpfs);
+    }
+
+    function getNumberOfBallots() public view returns (uint) {
+        return ballotIds.length;
     }
 }

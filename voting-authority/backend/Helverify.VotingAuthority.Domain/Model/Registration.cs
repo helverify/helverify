@@ -10,7 +10,7 @@ namespace Helverify.VotingAuthority.Domain.Model
     /// <summary>
     /// Represents a registered consensus node.
     /// </summary>
-    public class Registration
+    public sealed class Registration
     {
         /// <summary>
         /// Unique identifier for the consensus node.
@@ -37,8 +37,14 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// </summary>
         public BigInteger? PublicKey { get; set; }
 
+        /// <summary>
+        /// Blockchain account of consensus node
+        /// </summary>
         public Account Account { get; set; }
 
+        /// <summary>
+        /// Enode Identifier of consensus node
+        /// </summary>
         public string Enode { get; set; }
 
         /// <summary>

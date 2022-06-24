@@ -26,9 +26,40 @@ public interface IConsensusNodeService
     /// <returns></returns>
     Task<DecryptionShareDto?> DecryptShareAsync(Uri endpoint, string c, string d);
 
-    Task InitializeGenesisBlock(Uri endpoint, Genesis genesis);
-    Task<string> CreateBcAccount(Uri endpoint);
-    Task<string> StartPeers(Uri endpoint);
-    Task InitializeNodes(Uri endpoint, NodesDto nodesDto);
-    Task StartSealing(Uri endpoint);
+    /// <summary>
+    /// Initializes the genesis block on a consensus node.
+    /// </summary>
+    /// <param name="endpoint">Consensus node's REST endpoint address</param>
+    /// <param name="genesis">Genesis block specification</param>
+    /// <returns></returns>
+    Task InitializeGenesisBlockAsync(Uri endpoint, Genesis genesis);
+
+    /// <summary>
+    /// Creates a new Blockchain account on the consensus node.
+    /// </summary>
+    /// <param name="endpoint">Consensus node's REST endpoint address</param>
+    /// <returns>Account address of the consensus node</returns>
+    Task<string> CreateBcAccountAsync(Uri endpoint);
+
+    /// <summary>
+    /// Starts geth on the consensus node.
+    /// </summary>
+    /// <param name="endpoint">Consensus node's REST endpoint address</param>
+    /// <returns>Enode id of the consensus node</returns>
+    Task<string> StartPeersAsync(Uri endpoint);
+
+    /// <summary>
+    /// Announces the other peers contained in nodesDto to the consensus node.
+    /// </summary>
+    /// <param name="endpoint">Consensus node's REST endpoint address</param>
+    /// <param name="nodesDto">List of peers (enode ids)</param>
+    /// <returns></returns>
+    Task InitializeNodesAsync(Uri endpoint, NodesDto nodesDto);
+
+    /// <summary>
+    /// Starts the sealing (PoA "mining") process on the consensus node.
+    /// </summary>
+    /// <param name="endpoint">Consensus node's REST endpoint address</param>
+    /// <returns></returns>
+    Task StartSealingAsync(Uri endpoint);
 }

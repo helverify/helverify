@@ -19,7 +19,10 @@ services:
             - MongoDbConnectionString=mongodb://root:voting-authority@host.docker.internal:27017
             - BC_ACCOUNT_PWD=test3
             - PORT=30300
-            - IpfsHost=http://localhost:5001
+            - IpfsHost=http://host.docker.internal:5001
+            - GethEndpoint=http://localhost:8545
+        volumes:
+            - ./va:/home
         build:
             context: ../voting-authority/backend/
             dockerfile: Helverify.VotingAuthority.Backend/Dockerfile    

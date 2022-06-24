@@ -6,7 +6,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual;
 /// <summary>
 /// Represents an encrypted option.
 /// </summary>
-public class EncryptedOption
+public sealed class EncryptedOption
 {
     /// <summary>
     /// List of encryptions and corresponding proofs
@@ -39,7 +39,9 @@ public class EncryptedOption
             Values.Add(encryptedOptionValue);
         }
 
-        Hash = HashHelper.Hash(Values.Select(v => v.Cipher).ToArray());
+        HashHelper hashHelper = new HashHelper();
+
+        Hash = hashHelper.Hash(Values.Select(v => v.Cipher).ToArray());
 
         ShortCode = Hash.Substring(0, 2);
     }

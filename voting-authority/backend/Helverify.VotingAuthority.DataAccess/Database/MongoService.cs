@@ -11,6 +11,8 @@ namespace Helverify.VotingAuthority.DataAccess.Database
     {
         private readonly IMongoCollection<T> _collection;
 
+        public IMongoCollection<T> Collection => _collection;
+
         /// <summary>
         /// Constructor
         /// </summary>

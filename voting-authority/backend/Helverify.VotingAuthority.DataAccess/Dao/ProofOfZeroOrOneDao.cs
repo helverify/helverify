@@ -1,6 +1,6 @@
 ﻿namespace Helverify.VotingAuthority.DataAccess.Dao;
 
-public class ProofOfZeroOrOneDao
+public struct ProofOfZeroOrOneDao
 {
     public string U0 { get; set; }
     public string U1 { get; set; }

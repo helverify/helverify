@@ -6,8 +6,14 @@ using Helverify.VotingAuthority.Domain.Model.Blockchain;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 {
-    public class RegistrationProfile: Profile
+    /// <summary>
+    /// Mapping profile for Registrations
+    /// </summary>
+    internal class RegistrationProfile: Profile
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public RegistrationProfile()
         {
             CreateRegistrationMapping();

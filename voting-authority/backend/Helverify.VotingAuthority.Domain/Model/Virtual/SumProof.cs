@@ -7,7 +7,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual;
 /// <summary>
 /// Represents a proof that a ciphertext (result of a sum of ciphertext) contains the value one.
 /// </summary>
-public class SumProof
+public sealed class SumProof
 {
     /// <summary>
     /// Proof that the ciphertext contains the value one.

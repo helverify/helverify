@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents an election option in plain text.
 /// </summary>
-public class PlainTextOption
+public sealed class PlainTextOption
 {
     /// <summary>
     /// Short code of this option. Consists of the hash value of all encryptions.
