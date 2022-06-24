@@ -26,9 +26,9 @@ public interface IConsensusNodeService
     /// <returns></returns>
     Task<DecryptionShareDto?> DecryptShareAsync(Uri endpoint, string c, string d);
 
-    Task InitializeGenesisBlock(Uri endpoint, Genesis genesis);
-    Task<string> CreateBcAccount(Uri endpoint);
-    Task<string> StartPeers(Uri endpoint);
-    Task InitializeNodes(Uri endpoint, NodesDto nodesDto);
-    Task StartSealing(Uri endpoint);
+    Task InitializeGenesisBlockAsync(Uri endpoint, Genesis genesis);
+    Task<string> CreateBcAccountAsync(Uri endpoint);
+    Task<string> StartPeersAsync(Uri endpoint);
+    Task InitializeNodesAsync(Uri endpoint, NodesDto nodesDto);
+    Task StartSealingAsync(Uri endpoint);
 }

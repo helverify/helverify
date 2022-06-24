@@ -59,7 +59,7 @@ namespace Helverify.VotingAuthority.Domain.Service
         {
             foreach (Registration registration in registrations)
             {
-                await _consensusNodeService.StartSealing(registration.Endpoint);
+                await _consensusNodeService.StartSealingAsync(registration.Endpoint);
             }
         }
 
@@ -68,7 +68,7 @@ namespace Helverify.VotingAuthority.Domain.Service
         {
             foreach (Registration registration in registrations)
             {
-                await _consensusNodeService.InitializeNodes(registration.Endpoint, nodes);
+                await _consensusNodeService.InitializeNodesAsync(registration.Endpoint, nodes);
             }
         }
 
@@ -77,7 +77,7 @@ namespace Helverify.VotingAuthority.Domain.Service
         {
             foreach (Registration registration in registrations)
             {
-                registration.Enode = await _consensusNodeService.StartPeers(registration.Endpoint);
+                registration.Enode = await _consensusNodeService.StartPeersAsync(registration.Endpoint);
             }
 
             NodesDto nodes = new NodesDto
@@ -101,7 +101,7 @@ namespace Helverify.VotingAuthority.Domain.Service
 
             foreach (Registration registration in registrations)
             {
-                await _consensusNodeService.InitializeGenesisBlock(registration.Endpoint, genesis);
+                await _consensusNodeService.InitializeGenesisBlockAsync(registration.Endpoint, genesis);
             }
 
             return genesis;
@@ -113,7 +113,7 @@ namespace Helverify.VotingAuthority.Domain.Service
             // init remote nodes
             foreach (Registration registration in registrations)
             {
-                string bcAddress = await _consensusNodeService.CreateBcAccount(registration.Endpoint);
+                string bcAddress = await _consensusNodeService.CreateBcAccountAsync(registration.Endpoint);
 
                 registration.Account = new Account(bcAddress, InitialFunds);
             }
