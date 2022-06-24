@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents an option / candidate in the paper ballot.
 /// </summary>
-public class PaperBallotOption
+public sealed class PaperBallotOption
 {
     /// <summary>
     /// Name of the option / candidate.

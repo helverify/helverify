@@ -4,8 +4,14 @@ using Helverify.VotingAuthority.Domain.Model.Paper;
 
 namespace Helverify.VotingAuthority.Backend.Mapping
 {
+    /// <summary>
+    /// Mapping profile for Ballots
+    /// </summary>
     public class BallotProfile: Profile
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public BallotProfile()
         {
             CreateBallotMap();

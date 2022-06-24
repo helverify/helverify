@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Immutable;
+﻿using System.Collections.Concurrent;
 using AutoMapper;
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.DataAccess.Dao;
@@ -13,6 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
+    /// <summary>
+    /// Controller for handling ballot life-cycle.
+    /// </summary>
     [Route("api/elections/{electionId}/ballots")]
     [ApiController]
     public class BallotsController : ControllerBase
@@ -25,6 +26,14 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         private readonly IMapper _mapper;
         private readonly IElectionContractRepository _contractRepository;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="storageClient">Provides access to IFPS</param>
+        /// <param name="electionRepository">Provides access to elections stored on the database.</param>
+        /// <param name="ballotRepository">Provides access to plain text ballots stored on the database.</param>
+        /// <param name="mapper">Automapper</param>
+        /// <param name="contractRepository">Provides access to the Election smart contract.</param>
         public BallotsController(IStorageClient storageClient, 
             IRepository<Election> electionRepository, 
             IRepository<PaperBallot> ballotRepository, 
@@ -60,6 +69,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return new List<VirtualBallotDao> { paperBallot1, paperBallot2 };
         }
 
+        /// <summary>
+        /// Shows the ballot data needed for printing a paper ballot.
+        /// </summary>
+        /// <param name="id">Ballot id</param>
+        /// <returns></returns>
         [HttpGet]
         [Produces(ContentType)]
         public async Task<ActionResult<PrintBallotDto>> GetPrint(string id)
@@ -71,6 +85,13 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return printBallot;
         }
 
+        /// <summary>
+        /// Generates new ballots, stores the encryptions on IPFS, publishes the evidence and the IPFS CIDs on the smart contract,
+        /// and persists the plaintext print ballots onto the database.
+        /// </summary>
+        /// <param name="electionId">Election ID</param>
+        /// <param name="ballotParameters">Contains the ballot generation parameters, such as number of ballots to be created.</param>
+        /// <returns></returns>
         [HttpPost]
         [Consumes(ContentType)]
         [Produces(ContentType)]
@@ -113,13 +134,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             int partitionSize = 60;
 
-            for (int i = 0; i < pbs.Count; )
+            for (int i = 0; i < pbs.Count; i += partitionSize)
             {
                 IList<DataAccess.Ethereum.Contract.PaperBallot> partition = pbs.Skip(i).Take(partitionSize).ToList();
 
                 await _contractRepository.StoreBallots(election, partition);
-
-                i += partitionSize;
             }
 
             return Ok(paperBallots.Count);

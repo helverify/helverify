@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a BC account.
     /// </summary>
-    public class Account
+    public sealed class Account
     {
         /// <summary>
         /// Account address

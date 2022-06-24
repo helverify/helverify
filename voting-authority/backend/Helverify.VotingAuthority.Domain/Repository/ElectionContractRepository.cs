@@ -2,21 +2,25 @@
 using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
 using Helverify.VotingAuthority.Domain.Model;
 using Nethereum.Contracts.ContractHandlers;
-using Nethereum.JsonRpc.Client;
 using Nethereum.Web3;
 
 namespace Helverify.VotingAuthority.Domain.Repository
 {
+    /// <inheritdoc cref="IElectionContractRepository"/>
     public class ElectionContractRepository : IElectionContractRepository
     {
         private readonly IWeb3Loader _web3Loader;
-        private static SemaphoreSlim _semaphore = new (1, 1);
-
+        
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="web3Loader">Web3 accessor</param>
         public ElectionContractRepository(IWeb3Loader web3Loader)
         {
             _web3Loader = web3Loader;
         }
 
+        /// <inheritdoc cref="IElectionContractRepository.DeployContract"/>
         public async Task<string> DeployContract()
         {
             ElectionDeployment electionDeployment = new ElectionDeployment();
@@ -28,6 +32,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             return (await web3.Eth.GetContractDeploymentHandler<ElectionDeployment>().SendRequestAndWaitForReceiptAsync(electionDeployment)).ContractAddress;
         }
 
+        /// <inheritdoc cref="IElectionContractRepository.SetUp"/>
         public async Task SetUp(Election election)
         {
             Web3 web3 = _web3Loader.Web3Instance;
@@ -45,31 +50,24 @@ namespace Helverify.VotingAuthority.Domain.Repository
             await contract.SendRequestAndWaitForReceiptAsync(setUpFunction);
         }
 
+        /// <inheritdoc cref="IElectionContractRepository.StoreBallots"/>
         public async Task StoreBallots(Election election, IList<PaperBallot> paperBallots)
         {
             Web3 web3 = _web3Loader.Web3Instance;
 
             await UnlockAccount();
 
-            //await _semaphore.WaitAsync();
+            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
 
-            //try
-            //{
-                ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
+            StoreBallotFunction storeBallotFunction = new StoreBallotFunction
+            {
+                Ballots = paperBallots.ToList()
+            };
 
-                StoreBallotFunction storeBallotFunction = new StoreBallotFunction
-                {
-                    Ballots = paperBallots.ToList()
-                };
-
-                await contract.SendRequestAsync(storeBallotFunction);
-            //}
-            //finally
-            //{
-            //    _semaphore.Release();
-            //}
+            await contract.SendRequestAsync(storeBallotFunction);
         }
 
+        /// <inheritdoc cref="IElectionContractRepository.GetBallotIds"/>
         public async Task<IList<string>> GetBallotIds(Election election)
         {
             Web3 web3 = _web3Loader.Web3Instance;
@@ -99,6 +97,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             return ballotIds;
         }
 
+        /// <inheritdoc cref="IElectionContractRepository.GetBallot"/>
         public async Task<PaperBallot> GetBallot(Election election, string id)
         {
             Web3 web3 = _web3Loader.Web3Instance;

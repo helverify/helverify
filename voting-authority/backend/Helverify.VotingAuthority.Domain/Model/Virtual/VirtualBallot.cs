@@ -8,7 +8,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
     /// <summary>
     /// Represents a virtual ballot (as opposed to the physical paper ballot)
     /// </summary>
-    public class VirtualBallot
+    public sealed class VirtualBallot
     {
         /// <summary>
         /// Long ballot code, consisting of the hash of all encryptions.

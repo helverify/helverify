@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Helverify.VotingAuthority.Domain.Service;
+﻿namespace Helverify.VotingAuthority.Domain.Service;
 
 /// <summary>
 /// Allows to run commands on the system command line.

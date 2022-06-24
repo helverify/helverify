@@ -36,7 +36,7 @@ namespace Helverify.VotingAuthority.DataAccess.Configuration
             services.AddSingleton<IWeb3Loader>(cfg =>
             {
                 IWeb3Loader loader =
-                    new Web3Loader(cfg.GetService<IFileSystem>(), web3ConnectionString, accountPassword);
+                    new Web3Loader(cfg.GetService<IFileSystem>(), accountPassword);
 
                 loader.LoadInstance();
 

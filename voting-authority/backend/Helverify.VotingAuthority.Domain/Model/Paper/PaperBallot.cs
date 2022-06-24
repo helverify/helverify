@@ -6,7 +6,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
     /// <summary>
     /// Represents a paper ballot consisting of two virtual ballots.
     /// </summary>
-    public class PaperBallot
+    public sealed class PaperBallot
     {
         /// <summary>
         /// Election in for this paper ballot has been produced.

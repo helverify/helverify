@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a single option in an election or vote.
     /// </summary>
-    public class ElectionOption
+    public sealed class ElectionOption
     {
         /// <summary>
         /// Candidate/Option name

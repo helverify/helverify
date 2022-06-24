@@ -5,7 +5,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
     /// <summary>
     /// Template containing all options of the ballot for an election. Defined once per election.
     /// </summary>
-    public class BallotTemplate
+    public sealed class BallotTemplate
     {
         /// <summary>
         /// Election for which the options are valid.

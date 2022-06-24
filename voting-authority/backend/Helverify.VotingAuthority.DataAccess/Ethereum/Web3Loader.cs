@@ -5,27 +5,35 @@ using Nethereum.Web3.Accounts;
 
 namespace Helverify.VotingAuthority.DataAccess.Ethereum
 {
+    /// <inheritdoc cref="IWeb3Loader"/>
     public class Web3Loader : IWeb3Loader
     {
         private const string PrivateKeyPath = "/home/eth/private.key";
         private const string IpcPath = "/home/eth/data/geth.ipc";
 
         private readonly IFileSystem _fileSystem;
-        private readonly string _connectionString;
 
+        /// <inheritdoc cref="IWeb3Loader.Account"/>
         public Account Account { get; private set; }
 
+        /// <inheritdoc cref="IWeb3Loader.Password"/>
         public string Password { get; }
 
+        /// <inheritdoc cref="IWeb3Loader.Web3Instance"/>
         public Web3 Web3Instance { get; private set; }
 
-        public Web3Loader(IFileSystem fileSystem, string connectionString, string password)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="fileSystem">File system abstraction</param>
+        /// <param name="password">Password to the Blockchain account</param>
+        public Web3Loader(IFileSystem fileSystem, string password)
         {
             Password = password;
             _fileSystem = fileSystem;
-            _connectionString = connectionString;
         }
 
+        /// <inheritdoc cref="IWeb3Loader.LoadInstance"/>
         public void LoadInstance()
         {
             if (!_fileSystem.File.Exists(PrivateKeyPath))

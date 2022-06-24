@@ -8,7 +8,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual;
 /// <summary>
 /// Represents one encrypted value of an option.
 /// </summary>
-public class EncryptedOptionValue
+public sealed class EncryptedOptionValue
 {
     /// <summary>
     /// ElGamal ciphertext

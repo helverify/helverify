@@ -5,8 +5,14 @@ using Helverify.VotingAuthority.Domain.Model;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 {
-    public class ElectionProfile: Profile
+    /// <summary>
+    /// Mapping profile for Elections
+    /// </summary>
+    internal class ElectionProfile: Profile
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ElectionProfile()
         {
             CreateElectionMapping();

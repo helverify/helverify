@@ -9,7 +9,7 @@ namespace Helverify.VotingAuthority.Domain.Model
     /// <summary>
     /// Represents an election.
     /// </summary>
-    public class Election
+    public sealed class Election
     {
         private readonly IElGamal _elGamal;
 

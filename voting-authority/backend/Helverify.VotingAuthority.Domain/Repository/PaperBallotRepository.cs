@@ -75,6 +75,11 @@ namespace Helverify.VotingAuthority.Domain.Repository
             await _mongoService.RemoveAsync(mongoId);
         }
 
+        /// <summary>
+        /// Bulk insert for mass ballot insertion.
+        /// </summary>
+        /// <param name="ballots">Paper ballots</param>
+        /// <returns></returns>
         public async Task InsertMany(PaperBallot[] ballots)
         {
             IList<PrintBallotDao> printBallotDaos = _mapper.Map<IList<PrintBallotDao>>(ballots);

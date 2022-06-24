@@ -6,7 +6,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual;
 /// <summary>
 /// Represents an encrypted option.
 /// </summary>
-public class EncryptedOption
+public sealed class EncryptedOption
 {
     /// <summary>
     /// List of encryptions and corresponding proofs

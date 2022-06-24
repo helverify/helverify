@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using AutoMapper;
 using Helverify.VotingAuthority.DataAccess.Dto;
-using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
 using Newtonsoft.Json;

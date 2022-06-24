@@ -5,8 +5,14 @@ using Helverify.VotingAuthority.Domain.Model.Paper;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 {
-    public class PrintBallotProfile: Profile
+    /// <summary>
+    /// Mapping profile for PrintBallots
+    /// </summary>
+    internal class PrintBallotProfile: Profile
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public PrintBallotProfile()
         {
             CreatePrintBallotMap();

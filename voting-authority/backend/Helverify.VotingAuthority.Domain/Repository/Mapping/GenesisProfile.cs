@@ -4,8 +4,14 @@ using Helverify.VotingAuthority.Domain.Model.Blockchain;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 {
+    /// <summary>
+    /// Mapping profile for Genesis
+    /// </summary>
     internal class GenesisProfile: Profile
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public GenesisProfile()
         {
             CreateGenesisDtoMap();
