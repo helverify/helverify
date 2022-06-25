@@ -15,7 +15,7 @@ import {useState} from "react";
 import {Add, DeleteForever, Output, PlusOne} from "@mui/icons-material";
 import {dhGroups, DiffieHellmanGroup, SetupStepProps} from "./electionSetupStep";
 
-export function ElectionForm(props: SetupStepProps) {
+export const ElectionForm = (props: SetupStepProps) => {
 
     const styleVariant = "standard";
     const stylingParams = {minWidth: 200};
@@ -104,13 +104,13 @@ export function ElectionForm(props: SetupStepProps) {
         setElection((oldElection) => ({...oldElection, ...newElection}));
     }
 
-    const saveElection = async() => {
+    const saveElection = () => {
         const client = new Api({
             baseUrl: "http://localhost:5000"
         });
 
-        await client.api.electionsCreate(election).then((result) => {
-            props.next();
+        client.api.electionsCreate(election).then((result) => {
+            props.next(result.data);
         });
     }
 
@@ -170,7 +170,7 @@ export function ElectionForm(props: SetupStepProps) {
                                            value={election.g ?? ""} disabled/>
                             </FormControl>
                             <FormControl>
-                                <Button variant="contained" onClick={async() => await saveElection()}>Next</Button>
+                                <Button variant="contained" onClick={saveElection}>Save Election</Button>
                             </FormControl>
                         </Stack>
                     </Card>
@@ -195,4 +195,4 @@ export function ElectionForm(props: SetupStepProps) {
             </Grid>
         </>
     );
-}
+};

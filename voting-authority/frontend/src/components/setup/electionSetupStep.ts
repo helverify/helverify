@@ -1,3 +1,5 @@
+import {ElectionDto} from "../../Api";
+
 export class ElectionSetupStep {
     /**
      * Name of this step.
@@ -28,10 +30,12 @@ export class DiffieHellmanGroup {
 }
 
 export class SetupStepProps {
-    next: () => void
+    election: ElectionDto;
+    next: (election: ElectionDto) => void;
 
-    constructor(next: () => void) {
+    constructor(next: (election: ElectionDto) => void, election: ElectionDto) {
         this.next = next;
+        this.election = election;
     }
 }
 

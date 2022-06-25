@@ -1,64 +1,101 @@
-import {Box, Button, Step, StepLabel, Stepper} from "@mui/material";
-import React, {useState} from "react";
+import {Box, Button, Grid, Step, StepLabel, Stepper} from "@mui/material";
+import React, {useEffect, useState} from "react";
 import {ElectionSetupStep} from "./electionSetupStep";
-import {Ballot, CurrencyBitcoin, HowToReg, Key} from "@mui/icons-material";
-import { ElectionForm } from "./ElectionForm";
+import {ElectionForm} from "./ElectionForm";
+import {Api, ElectionDto} from "../../Api";
+import {ConsensusNodeRegistrationForm} from "./ConsensusNodeRegistrationForm";
+import {PublicKeyForm} from "./PublicKeyForm";
+import {BlockchainSetupForm} from "./BlockchainSetupForm";
+import {useNavigate} from "react-router-dom";
+import {ElectionInfo} from "./ElectionInfo";
 
-export function ElectionSetup(props: {steps: ElectionSetupStep[]}) {
+export function ElectionSetup(props: { steps: ElectionSetupStep[] }) {
+
+    const navigate = useNavigate();
 
     const steps = props.steps;
 
     const [step, setStep] = useState(0);
+    const [election, setElection] = useState<ElectionDto>({});
 
-    const goToNextStep = () => {
+    useEffect(() => {
+        if (step === steps.length) {
+            navigate("/elections");
+        }
+    })
+
+    const goToNextStep = (election: ElectionDto) => {
         if (step < steps.length) {
             setStep(step + 1)
+            setElection(election);
         }
     };
 
-    const goToPreviousStep = () => {
-        if (step > 0) {
-            setStep(step - 1)
-        }
-    }
-
     const stepComponent = () => {
+        loadElection();
         let comp;
-        if(step < steps.length){
-           comp = React.cloneElement(steps[step].component, {next: goToNextStep});
+        if (step < steps.length) {
+            comp = React.cloneElement(steps[step].component, {next: goToNextStep, election: election});
         } else {
             comp = <></>;
         }
         return comp;
     }
 
+    const loadElection = () => {
+        if(election.id === undefined || election.id === null || election.id === ""){
+            return;
+        }
+
+        const client = new Api({
+            baseUrl: "http://localhost:5000"
+        });
+
+        client.api.electionsDetail(election.id).then((result)=>{
+            setElection(result.data);
+        });
+    }
+
+    const electionInfo = election.id !== "" ? <ElectionInfo election={election}/> : <></>;
+
     return (
         <>
-            <>
-                <Button onClick={goToPreviousStep}>Previous</Button>
-                <Button onClick={goToNextStep}>Next</Button>
-            </>
             <Box>
-                {stepComponent()}
+                <Stepper activeStep={step}>
+                    {steps.map((s, index) => {
+                        return (
+                            <Step key={s.caption}>
+                                <StepLabel>{s.caption}</StepLabel>
+                            </Step>
+                        );
+                    })}
+                </Stepper>
+                <Grid container>
+                    <Grid item xs={9}>
+                        <Box sx={{m: 2}}>
+                            {stepComponent()}
+                        </Box>
+                    </Grid>
+                    <Grid item xs={3}>
+                        {electionInfo}
+                    </Grid>
+                </Grid>
+
+
+
             </Box>
 
-
-            <Stepper activeStep={step}>
-                {steps.map((s, index) => {
-                    return (
-                        <Step key={s.caption}>
-                            <StepLabel>{s.caption}</StepLabel>
-                        </Step>
-                    );
-                })}
-            </Stepper>
         </>
     );
 }
 
 export const setupSteps: ElectionSetupStep[] = [
-    new ElectionSetupStep("Election", <ElectionForm next={() => {}}/>),
-    new ElectionSetupStep("Consensus Nodes", <HowToReg />),
-    new ElectionSetupStep("Public Key", <Key/>),
-    new ElectionSetupStep("Blockchain", <CurrencyBitcoin/>)
+    new ElectionSetupStep("Election", <ElectionForm next={() => {
+    }} election={{}}/>),
+    new ElectionSetupStep("Consensus Nodes", <ConsensusNodeRegistrationForm next={() => {
+    }} election={{}}/>),
+    new ElectionSetupStep("Public Key", <PublicKeyForm next={() => {
+    }} election={{}}/>),
+    new ElectionSetupStep("Blockchain", <BlockchainSetupForm next={() => {
+    }} election={{}}/>)
 ];
