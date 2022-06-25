@@ -2,6 +2,7 @@ import {Box, Button, Step, StepLabel, Stepper} from "@mui/material";
 import React, {useState} from "react";
 import {ElectionSetupStep} from "./electionSetupStep";
 import {Ballot, CurrencyBitcoin, HowToReg, Key} from "@mui/icons-material";
+import { ElectionForm } from "./ElectionForm";
 
 export function ElectionSetup(props: {steps: ElectionSetupStep[]}) {
 
@@ -24,7 +25,7 @@ export function ElectionSetup(props: {steps: ElectionSetupStep[]}) {
     const stepComponent = () => {
         let comp;
         if(step < steps.length){
-           comp = steps[step].component;
+           comp = React.cloneElement(steps[step].component, {next: goToNextStep});
         } else {
             comp = <></>;
         }
@@ -56,8 +57,8 @@ export function ElectionSetup(props: {steps: ElectionSetupStep[]}) {
 }
 
 export const setupSteps: ElectionSetupStep[] = [
-    new ElectionSetupStep("Election", <Ballot/>),
-    new ElectionSetupStep("Consensus Nodes", <HowToReg/>),
+    new ElectionSetupStep("Election", <ElectionForm next={() => {}}/>),
+    new ElectionSetupStep("Consensus Nodes", <HowToReg />),
     new ElectionSetupStep("Public Key", <Key/>),
     new ElectionSetupStep("Blockchain", <CurrencyBitcoin/>)
 ];
