@@ -43,6 +43,14 @@
             <param name="ballotParameters">Contains the ballot generation parameters, such as number of ballots to be created.</param>
             <returns></returns>
         </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.GeneratePdf(System.String,System.String)">
+            <summary>
+            Generates a PDF for the specified ballot.
+            </summary>
+            <param name="electionId">Current election id</param>
+            <param name="ballotId">Id of ballot to be printed</param>
+            <returns></returns>
+        </member>
         <member name="T:Helverify.VotingAuthority.Backend.Controllers.ElectionsController">
             <summary>
             Controller for handling the election API
@@ -359,6 +367,34 @@
             <summary>
             Constructor
             </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate">
+            <summary>
+            According to this tutorial: https://www.questpdf.com/documentation/getting-started.html
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate.Election">
+            <summary>
+            Current election.
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate.PaperBallot">
+            <summary>
+            Paper ballot containing options in plain text.
+            </summary>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate.#ctor(Helverify.VotingAuthority.Domain.Model.Election,Helverify.VotingAuthority.Domain.Model.Paper.PaperBallot)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="election">Election</param>
+            <param name="paperBallot">Paper ballot to be printed</param>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate.GetMetadata">
+            <inheritdoc cref="M:QuestPDF.Infrastructure.IDocument.GetMetadata"/>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate.Compose(QuestPDF.Infrastructure.IDocumentContainer)">
+            <inheritdoc cref="M:QuestPDF.Infrastructure.IDocument.Compose(QuestPDF.Infrastructure.IDocumentContainer)"/>
         </member>
     </members>
 </doc>

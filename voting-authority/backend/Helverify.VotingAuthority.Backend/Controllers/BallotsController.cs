@@ -1,8 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using System.Drawing;
 using AutoMapper;
-using HarfBuzzSharp;
 using Helverify.VotingAuthority.Backend.Dto;
+using Helverify.VotingAuthority.Backend.Template;
 using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.DataAccess.Ipfs;
 using Helverify.VotingAuthority.Domain.Model;
@@ -11,7 +10,6 @@ using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Helverify.VotingAuthority.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
 using QuestPDF.Fluent;
-using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
@@ -23,7 +21,9 @@ namespace Helverify.VotingAuthority.Backend.Controllers
     [ApiController]
     public class BallotsController : ControllerBase
     {
-        private const string ContentType = "application/json";
+        private const string ContentTypeJson = "application/json";
+        private const string ContentTypePdf = "application/pdf";
+        private const string FileExtensionPdf = ".pdf";
 
         private readonly IStorageClient _storageClient;
         private readonly IRepository<Election> _electionRepository;
@@ -59,8 +59,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Consumes(ContentType)]
-        [Produces(ContentType)]
+        [Consumes(ContentTypeJson)]
+        [Produces(ContentTypeJson)]
         [Route("encrypted")]
         public async Task<ActionResult<IList<VirtualBallotDao>>> Get([FromRoute] string electionId, string id)
         {
@@ -80,7 +80,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <param name="id">Ballot id</param>
         /// <returns></returns>
         [HttpGet]
-        [Produces(ContentType)]
+        [Produces(ContentTypeJson)]
         public async Task<ActionResult<PrintBallotDto>> GetPrint(string id)
         {
             PaperBallot paperBallot = await _ballotRepository.GetAsync(id);
@@ -98,8 +98,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <param name="ballotParameters">Contains the ballot generation parameters, such as number of ballots to be created.</param>
         /// <returns></returns>
         [HttpPost]
-        [Consumes(ContentType)]
-        [Produces(ContentType)]
+        [Consumes(ContentTypeJson)]
+        [Produces(ContentTypeJson)]
         public async Task<ActionResult> Post([FromRoute] string electionId, [FromBody] BallotGenerationDto ballotParameters)
         {
             Election election = await _electionRepository.GetAsync(electionId);
@@ -149,36 +149,28 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return Ok(paperBallots.Count);
         }
 
+        /// <summary>
+        /// Generates a PDF for the specified ballot.
+        /// </summary>
+        /// <param name="electionId">Current election id</param>
+        /// <param name="ballotId">Id of ballot to be printed</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("pdf")]
-        public async Task<ActionResult> GeneratePdf([FromQuery]string ballotId)
+        [Produces(ContentTypePdf)]
+        public async Task<ActionResult> GeneratePdf([FromRoute] string electionId, [FromQuery]string ballotId)
         {
-            //await _ballotRepository.GetAsync(ballotId);
+            Election election = await _electionRepository.GetAsync(electionId);
 
-            byte[] pdfBytes = Document.Create(container =>
-            {
-                container.Page(page =>
-                {
-                    page.Size(PageSizes.A4);
-                    page.Margin(1, Unit.Centimetre);
-                    page.PageColor(Colors.White);
-                    page.DefaultTextStyle(s => s.FontSize(14).FontFamily("FreeSans"));
+            PaperBallot paperBallot = await _ballotRepository.GetAsync(ballotId);
 
-                    page.Header()
-                        .Text("Test Header");
+            IDocument paperBallotTemplate = new PaperBallotTemplate(election, paperBallot);
 
-                    page.Content()
-                        .Column(c =>
-                        {
-                            c.Item().Text("ASDF JKLÖ");
-                            //c.Item().Image();
-                        });
-                });
-            }).GeneratePdf();
-
+            byte[] pdfBytes = paperBallotTemplate.GeneratePdf();
+            
             Stream stream = new MemoryStream(pdfBytes);
             
-            return File(stream, "application/pdf", $"{ballotId}.pdf");
+            return File(stream, ContentTypePdf, $"{ballotId}{FileExtensionPdf}");
         }
 
         private VirtualBallot CreateVirtualBallot(BallotTemplate ballotTemplate)
