@@ -1,5 +1,7 @@
+using System.IO.Abstractions;
 using Helverify.ConsensusNode.Backend.Mapping;
 using Helverify.ConsensusNode.Domain.Configuration;
+using Helverify.ConsensusNode.Domain.Model;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +32,16 @@ builder.Services.AddAutoMapper( cfg =>
 builder.Services.AddDomainConfiguration();
 
 var app = builder.Build();
+
+ICliRunner cliRunner = app.Services.GetService<ICliRunner>() ?? throw new InvalidOperationException();
+IFileSystem fileSystem = app.Services.GetService<IFileSystem>() ?? throw new InvalidOperationException();
+
+// start RPC endpoint in case chain has already been configured (restart)
+if (fileSystem.File.Exists("/home/eth/data/geth.ipc"))
+{
+    cliRunner.Execute("/app/scripts/start-consensusnode.sh", "");
+    cliRunner.Execute("/app/scripts/start-mining.sh", "");
+}
 
 // Configure the HTTP request pipeline.
 
