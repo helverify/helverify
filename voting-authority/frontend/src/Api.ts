@@ -48,6 +48,18 @@ export interface BigInteger {
   signValue?: number;
 }
 
+export interface Blockchain {
+  id?: string | null;
+  name?: string | null;
+  registrations?: Registration[] | null;
+}
+
+export interface BlockchainDto {
+  id?: string | null;
+  name?: string | null;
+  registrations?: RegistrationDto[] | null;
+}
+
 /**
  * Represents the ciphertext of an ElGamal cryptosystem
  */
@@ -91,7 +103,7 @@ export interface Election {
   p?: BigInteger;
   g?: BigInteger;
   publicKey?: BigInteger;
-  registrations?: Registration[] | null;
+  blockchain?: Blockchain;
   dhParameters?: DHParameters;
   contractAddress?: string | null;
 }
@@ -117,6 +129,9 @@ export interface ElectionDto {
 
   /** Generator g of the ElGamal cryptosystem. */
   g?: string | null;
+
+  /** Blockchain Identifier */
+  blockchainId?: string | null;
 
   /** Election public key */
   publicKey?: string | null;
@@ -201,13 +216,10 @@ export interface ProofOfZeroOrOneDao {
 }
 
 export interface Registration {
-  id?: string | null;
   name?: string | null;
 
   /** @format uri */
   endpoint?: string | null;
-  electionId?: string | null;
-  publicKey?: BigInteger;
   account?: Account;
   enode?: string | null;
 }
@@ -216,9 +228,6 @@ export interface Registration {
  * Represents a registered consensus node.
  */
 export interface RegistrationDto {
-  /** Unique identifier for the consensus node. */
-  id?: string | null;
-
   /** Name of the consensus node. */
   name?: string | null;
 
@@ -228,11 +237,8 @@ export interface RegistrationDto {
    */
   endpoint?: string | null;
 
-  /** Identifier of the corresponding election for which the registration is valid. */
-  electionId?: string | null;
-
   /** Public key of the consensus node. */
-  publicKey?: string | null;
+  publicKeys?: string[] | null;
 }
 
 export interface SumProofDao {
@@ -516,6 +522,56 @@ and persists the plaintext print ballots onto the database.
     /**
      * No description
      *
+     * @tags Ballots
+     * @name ElectionsBallotsPdfDetail
+     * @summary Generates a PDF for the specified ballot.
+     * @request GET:/api/elections/{electionId}/ballots/pdf
+     */
+    electionsBallotsPdfDetail: (electionId: string, query?: { ballotId?: string }, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/elections/${electionId}/ballots/pdf`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Blockchain
+     * @name BlockchainCreate
+     * @summary Initializes the Proof-of-Authority blockchain using the consensus nodes registered.
+     * @request POST:/api/blockchain
+     */
+    blockchainCreate: (data: BlockchainDto, params: RequestParams = {}) =>
+      this.request<BlockchainDto, any>({
+        path: `/api/blockchain`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Blockchain
+     * @name BlockchainList
+     * @summary Returns the blockchain instance. Exists only once.
+     * @request GET:/api/blockchain
+     */
+    blockchainList: (params: RequestParams = {}) =>
+      this.request<BlockchainDto, any>({
+        path: `/api/blockchain`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags Elections
      * @name ElectionsCreate
      * @summary Create a new election.
@@ -616,6 +672,21 @@ and persists the plaintext print ballots onto the database.
      * No description
      *
      * @tags Elections
+     * @name ElectionsContractCreate
+     * @request POST:/api/elections/{id}/contract
+     */
+    electionsContractCreate: (id: string, params: RequestParams = {}) =>
+      this.request<ElectionDto, any>({
+        path: `/api/elections/${id}/contract`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Elections
      * @name ElectionsEncryptCreate
      * @summary For testing purposes
      * @request POST:/api/elections/{id}/encrypt
@@ -644,107 +715,6 @@ and persists the plaintext print ballots onto the database.
         method: "POST",
         body: data,
         type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Registrations
-     * @name ElectionsRegistrationsCreate
-     * @summary Register a new consensus node.
-     * @request POST:/api/elections/{electionId}/registrations
-     */
-    electionsRegistrationsCreate: (electionId: string, data: RegistrationDto, params: RequestParams = {}) =>
-      this.request<RegistrationDto, any>({
-        path: `/api/elections/${electionId}/registrations`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Registrations
-     * @name ElectionsRegistrationsDetail
-     * @summary Provides a list of all registered consensus nodes.
-     * @request GET:/api/elections/{electionId}/registrations
-     */
-    electionsRegistrationsDetail: (electionId: string, params: RequestParams = {}) =>
-      this.request<RegistrationDto[], any>({
-        path: `/api/elections/${electionId}/registrations`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Registrations
-     * @name ElectionsRegistrationsDetail2
-     * @summary Provides the details of a specific consensus node registration.
-     * @request GET:/api/elections/{electionId}/registrations/{id}
-     * @originalName electionsRegistrationsDetail
-     * @duplicate
-     */
-    electionsRegistrationsDetail2: (id: string, electionId: string, params: RequestParams = {}) =>
-      this.request<RegistrationDto, any>({
-        path: `/api/elections/${electionId}/registrations/${id}`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Registrations
-     * @name ElectionsRegistrationsUpdate
-     * @summary Updates a consensus node registration.
-     * @request PUT:/api/elections/{electionId}/registrations/{id}
-     */
-    electionsRegistrationsUpdate: (id: string, electionId: string, data: RegistrationDto, params: RequestParams = {}) =>
-      this.request<RegistrationDto, any>({
-        path: `/api/elections/${electionId}/registrations/${id}`,
-        method: "PUT",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Registrations
-     * @name ElectionsRegistrationsDelete
-     * @summary Removes a consensus node registration.
-     * @request DELETE:/api/elections/{electionId}/registrations/{id}
-     */
-    electionsRegistrationsDelete: (id: string, electionId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/api/elections/${electionId}/registrations/${id}`,
-        method: "DELETE",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Registrations
-     * @name ElectionsRegistrationsBlockchainSetupCreate
-     * @summary Initializes the Proof-of-Authority blockchain using the consensus nodes registered for the election.
-     * @request POST:/api/elections/{electionId}/registrations/blockchain-setup
-     */
-    electionsRegistrationsBlockchainSetupCreate: (electionId: string, params: RequestParams = {}) =>
-      this.request<string, any>({
-        path: `/api/elections/${electionId}/registrations/blockchain-setup`,
-        method: "POST",
         format: "json",
         ...params,
       }),

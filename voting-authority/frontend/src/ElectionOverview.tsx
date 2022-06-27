@@ -1,9 +1,10 @@
 import {useEffect, useState} from "react";
-import {Api, ElectionDto} from "./Api";
+import {ElectionDto} from "./Api";
 import {SpeedDial, SpeedDialAction, Stack} from "@mui/material";
 import {ElectionInfo} from "./components/setup/ElectionInfo";
 import {Ballot, MoreHoriz, Print} from "@mui/icons-material";
 import {useNavigate} from "react-router-dom";
+import {apiClient} from "./api/apiClient";
 
 export const ElectionOverview = () => {
     const [elections, setElections] = useState<ElectionDto[]>([]);
@@ -11,11 +12,7 @@ export const ElectionOverview = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const client = new Api({
-            baseUrl: "http://localhost:5000"
-        });
-
-        client.api.electionsList().then((result) => {
+        apiClient().api.electionsList().then((result) => {
             setElections(result.data);
         });
 

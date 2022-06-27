@@ -1,4 +1,4 @@
-import {ElectionDto} from "../../Api";
+import {BlockchainDto, ElectionDto} from "../../Api";
 
 export class ElectionSetupStep {
     /**
@@ -31,11 +31,13 @@ export class DiffieHellmanGroup {
 
 export class SetupStepProps {
     election: ElectionDto;
-    next: (election: ElectionDto) => void;
+    blockchain: BlockchainDto;
+    next: (election: ElectionDto, blockchain: BlockchainDto) => void;
 
-    constructor(next: (election: ElectionDto) => void, election: ElectionDto) {
+    constructor(next: (election: ElectionDto, blockchain: BlockchainDto) => void, election: ElectionDto, blockchain: BlockchainDto) {
         this.next = next;
         this.election = election;
+        this.blockchain = blockchain;
     }
 }
 

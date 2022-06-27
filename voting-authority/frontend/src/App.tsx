@@ -2,8 +2,8 @@ import React from 'react';
 import './App.css';
 import {Elections} from "./components/Elections";
 import {BottomNavigation, BottomNavigationAction, Box, createTheme, CssBaseline, Paper} from "@mui/material";
-import {Add, HowToVote, PieChart} from "@mui/icons-material";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {Add, HowToVote, PieChart, Link} from "@mui/icons-material";
+import {Route, Routes} from "react-router-dom";
 import {ElectionSetup, setupSteps} from "./components/setup/ElectionSetup";
 import {ThemeProvider} from "@mui/material";
 import {useNavigate } from "react-router-dom";
@@ -38,6 +38,7 @@ function App() {
                             <BottomNavigationAction label="Elections" icon={<HowToVote/>} onClick={() => navigate("/elections")}/>
                             <BottomNavigationAction label="Setup" icon={<Add/>} onClick={() => navigate("/elections/create")}/>
                             <BottomNavigationAction label="Tallying" icon={<PieChart/>}/>
+                            <BottomNavigationAction label="Blockchain" icon={<Link/>} onClick={() => navigate("/blockchain")}/>
                         </BottomNavigation>
                     </Paper>
                 </Box>
