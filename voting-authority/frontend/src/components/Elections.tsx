@@ -1,11 +1,12 @@
 import React from "react";
-import {ElectionList} from "./ElectionList";
+import {ElectionOverview} from "../ElectionOverview";
 
 
 export function Elections() {
     return (
 
-            <ElectionList />
+        <ElectionOverview/>
+            // <ElectionList />
 
     );
 }
