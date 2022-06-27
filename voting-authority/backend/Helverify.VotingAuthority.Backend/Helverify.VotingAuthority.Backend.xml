@@ -4,12 +4,43 @@
         <name>Helverify.VotingAuthority.Backend</name>
     </assembly>
     <members>
+        <member name="T:Helverify.VotingAuthority.Backend.Controllers.BallotsController">
+            <summary>
+            Controller for handling ballot life-cycle.
+            </summary>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.#ctor(Helverify.VotingAuthority.DataAccess.Ipfs.IStorageClient,Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Paper.PaperBallot},AutoMapper.IMapper,Helverify.VotingAuthority.Domain.Repository.IElectionContractRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="storageClient">Provides access to IFPS</param>
+            <param name="electionRepository">Provides access to elections stored on the database.</param>
+            <param name="ballotRepository">Provides access to plain text ballots stored on the database.</param>
+            <param name="mapper">Automapper</param>
+            <param name="contractRepository">Provides access to the Election smart contract.</param>
+        </member>
         <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.Get(System.String,System.String)">
             <summary>
             TODO: refactor, only temporary for demo purposes
             </summary>
             <param name="electionId"></param>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.GetPrint(System.String)">
+            <summary>
+            Shows the ballot data needed for printing a paper ballot.
+            </summary>
+            <param name="id">Ballot id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.Post(System.String,Helverify.VotingAuthority.Backend.Dto.BallotGenerationDto)">
+            <summary>
+            Generates new ballots, stores the encryptions on IPFS, publishes the evidence and the IPFS CIDs on the smart contract,
+            and persists the plaintext print ballots onto the database.
+            </summary>
+            <param name="electionId">Election ID</param>
+            <param name="ballotParameters">Contains the ballot generation parameters, such as number of ballots to be created.</param>
             <returns></returns>
         </member>
         <member name="T:Helverify.VotingAuthority.Backend.Controllers.ElectionsController">
@@ -98,6 +129,8 @@
             <param name="consensusNodeService">Accessor to consensus node service</param>
             <param name="mapper">Automapper</param>
             <param name="blockchainSetup">Service to set up the blockchain</param>
+            <param name="web3Loader">Web3 accessor</param>
+            <param name="contractRepository">Repository for Election smart contract interactions</param>
         </member>
         <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.Post(System.String,Helverify.VotingAuthority.Backend.Dto.RegistrationDto)">
             <summary>
@@ -141,6 +174,16 @@
             </summary>
             <param name="electionId">Election identifier</param>
             <returns></returns>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Dto.BallotGenerationDto">
+            <summary>
+            Contains the parameters for ballot generation
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.BallotGenerationDto.NumberOfBallots">
+            <summary>
+            Number of ballots to be generated at once.
+            </summary>
         </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.ElectionDto">
             <summary>
@@ -197,6 +240,66 @@
             Candidate/Option name
             </summary>
         </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Dto.Message">
+            <summary>
+            Represents a plaintext message
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.Message.M">
+            <summary>
+            Numeric message
+            </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Dto.Cipher">
+            <summary>
+            Represents the ciphertext of an ElGamal cryptosystem
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.Cipher.C">
+            <summary>
+            First parameter of an ElGamal ciphertext
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.Cipher.D">
+            <summary>
+            Second parameter of an ElGamal ciphertext
+            </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Dto.PrintBallotDto">
+            <summary>
+            Contains the data needed for printing a ballot on paper.
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.PrintBallotDto.BallotId">
+            <summary>
+            Ballot identifier
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.PrintBallotDto.Options">
+            <summary>
+            Selectable election options / candidates.
+            </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Dto.PrintOptionDto">
+            <summary>
+            Represents one selectable option / candidate
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.PrintOptionDto.Name">
+            <summary>
+            Name of the option / candidate
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.PrintOptionDto.ShortCode1">
+            <summary>
+            First short code (from first virtual ballot)
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.PrintOptionDto.ShortCode2">
+            <summary>
+            Second short code (from second virtual ballot)
+            </summary>
+        </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.RegistrationDto">
             <summary>
             Represents a registered consensus node.
@@ -225,6 +328,16 @@
         <member name="P:Helverify.VotingAuthority.Backend.Dto.RegistrationDto.PublicKey">
             <summary>
             Public key of the consensus node.
+            </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Mapping.BallotProfile">
+            <summary>
+            Mapping profile for Ballots
+            </summary>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Mapping.BallotProfile.#ctor">
+            <summary>
+            Constructor
             </summary>
         </member>
         <member name="T:Helverify.VotingAuthority.Backend.Mapping.ElectionDtoProfile">

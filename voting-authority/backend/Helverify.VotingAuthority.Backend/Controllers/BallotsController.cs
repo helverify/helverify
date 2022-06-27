@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using System.Drawing;
 using AutoMapper;
+using HarfBuzzSharp;
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.DataAccess.Ipfs;
@@ -8,6 +10,9 @@ using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Helverify.VotingAuthority.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
@@ -142,6 +147,38 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             }
 
             return Ok(paperBallots.Count);
+        }
+
+        [HttpGet]
+        [Route("pdf")]
+        public async Task<ActionResult> GeneratePdf([FromQuery]string ballotId)
+        {
+            //await _ballotRepository.GetAsync(ballotId);
+
+            byte[] pdfBytes = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(1, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(s => s.FontSize(14).FontFamily("FreeSans"));
+
+                    page.Header()
+                        .Text("Test Header");
+
+                    page.Content()
+                        .Column(c =>
+                        {
+                            c.Item().Text("ASDF JKLÖ");
+                            //c.Item().Image();
+                        });
+                });
+            }).GeneratePdf();
+
+            Stream stream = new MemoryStream(pdfBytes);
+            
+            return File(stream, "application/pdf", $"{ballotId}.pdf");
         }
 
         private VirtualBallot CreateVirtualBallot(BallotTemplate ballotTemplate)
