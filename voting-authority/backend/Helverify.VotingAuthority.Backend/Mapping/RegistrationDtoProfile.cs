@@ -21,18 +21,14 @@ namespace Helverify.VotingAuthority.Backend.Mapping
         private void CreateRegistrationDtoMapping()
         {
             CreateMap<Registration, RegistrationDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Endpoint, opt => opt.MapFrom(src => src.Endpoint))
-                .ForMember(dest => dest.ElectionId, opt => opt.MapFrom(src => src.ElectionId))
-                .ForMember(dest => dest.PublicKey, opt => opt.MapFrom(src => src.PublicKey.ConvertToHexString()));
+                .ForMember(dest => dest.PublicKeys, opt => opt.MapFrom(src => src.PublicKeys));
 
             CreateMap<RegistrationDto, Registration>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Endpoint, opt => opt.MapFrom(src => src.Endpoint))
-                .ForMember(dest => dest.ElectionId, opt => opt.MapFrom(src => src.ElectionId))
-                .ForMember(dest => dest.PublicKey, opt => opt.MapFrom(src => src.PublicKey.ConvertToBigInteger()));
+                .ForMember(dest => dest.PublicKeys, opt => opt.MapFrom(src => src.PublicKeys));
         }
     }
 }

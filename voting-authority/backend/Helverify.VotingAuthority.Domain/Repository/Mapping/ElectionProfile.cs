@@ -2,6 +2,7 @@
 using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.Domain.Extensions;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Blockchain;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 {
@@ -28,7 +29,8 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
                 .ForMember(dest => dest.P, opt => opt.MapFrom(src => src.P.ConvertToBigInteger()))
                 .ForMember(dest => dest.G, opt => opt.MapFrom(src => src.G.ConvertToBigInteger()))
                 .ForMember(dest => dest.ContractAddress, opt => opt.MapFrom(src => src.ContractAddress))
-                .ForMember(dest => dest.PublicKey, opt => opt.MapFrom(src => src.PublicKey.ConvertToBigInteger()));
+                .ForMember(dest => dest.PublicKey, opt => opt.MapFrom(src => src.PublicKey.ConvertToBigInteger()))
+                .ForMember(dest => dest.Blockchain, opt => opt.MapFrom(src => new Blockchain{Id = src.BlockchainId}));
 
             CreateMap<Election, ElectionDao>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
@@ -38,7 +40,8 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
                 .ForMember(dest => dest.P, opt => opt.MapFrom(src => src.P.ConvertToHexString()))
                 .ForMember(dest => dest.G, opt => opt.MapFrom(src => src.G.ConvertToHexString()))
                 .ForMember(dest => dest.ContractAddress, opt => opt.MapFrom(src => src.ContractAddress))
-                .ForMember(dest => dest.PublicKey, opt => opt.MapFrom(src => src.PublicKey.ConvertToHexString()));
+                .ForMember(dest => dest.PublicKey, opt => opt.MapFrom(src => src.PublicKey.ConvertToHexString()))
+                .ForMember(dest => dest.BlockchainId, opt => opt.MapFrom(src => src.Blockchain.Id));
 
             CreateMap<ElectionOptionDao, ElectionOption>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))

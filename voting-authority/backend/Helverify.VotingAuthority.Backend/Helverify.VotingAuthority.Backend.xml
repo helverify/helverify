@@ -51,18 +51,32 @@
             <param name="ballotId">Id of ballot to be printed</param>
             <returns></returns>
         </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BlockchainController.Post(Helverify.VotingAuthority.Backend.Dto.BlockchainDto)">
+            <summary>
+            Initializes the Proof-of-Authority blockchain using the consensus nodes registered.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BlockchainController.Get">
+            <summary>
+            Returns the blockchain instance. Exists only once.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Helverify.VotingAuthority.Backend.Controllers.ElectionsController">
             <summary>
             Controller for handling the election API
             </summary>
         </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.ElectionsController.#ctor(Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Registration},Helverify.VotingAuthority.Domain.Service.IConsensusNodeService,AutoMapper.IMapper)">
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.ElectionsController.#ctor(Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Service.IConsensusNodeService,Helverify.VotingAuthority.Domain.Repository.IElectionContractRepository,Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Blockchain.Blockchain},Helverify.VotingAuthority.DataAccess.Ethereum.IWeb3Loader,AutoMapper.IMapper)">
             <summary>
             Constructor
             </summary>
             <param name="electionRepository">Repository for elections</param>
-            <param name="registrationRepository">Repository for registrations</param>
             <param name="consensusNodeService">Accessor to consensus node service</param>
+            <param name="contractRepository">Smart contract accessor</param>
+            <param name="bcRepository">Blockchain repository</param>
+            <param name="web3Loader">Web3 instance loader</param>
             <param name="mapper">Automapper</param>
         </member>
         <member name="M:Helverify.VotingAuthority.Backend.Controllers.ElectionsController.Post(Helverify.VotingAuthority.Backend.Dto.ElectionDto)">
@@ -123,66 +137,6 @@
             <param name="cipher"></param>
             <returns></returns>
         </member>
-        <member name="T:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController">
-            <summary>
-            Controller for handling the registration API.
-            </summary>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.#ctor(Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Registration},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Service.IConsensusNodeService,AutoMapper.IMapper,Helverify.VotingAuthority.Domain.Service.IBlockchainSetup,Helverify.VotingAuthority.DataAccess.Ethereum.IWeb3Loader,Helverify.VotingAuthority.Domain.Repository.IElectionContractRepository)">
-            <summary>
-            Constructor
-            </summary>
-            <param name="registrationRepository">Repository for registrations</param>
-            <param name="electionRepository">Repository for elections</param>
-            <param name="consensusNodeService">Accessor to consensus node service</param>
-            <param name="mapper">Automapper</param>
-            <param name="blockchainSetup">Service to set up the blockchain</param>
-            <param name="web3Loader">Web3 accessor</param>
-            <param name="contractRepository">Repository for Election smart contract interactions</param>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.Post(System.String,Helverify.VotingAuthority.Backend.Dto.RegistrationDto)">
-            <summary>
-            Register a new consensus node.
-            </summary>
-            <param name="electionId">Election identifier</param>
-            <param name="registrationDto">Consensus node registration details</param>
-            <returns>Newly created registration details</returns>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.Get">
-            <summary>
-            Provides a list of all registered consensus nodes.
-            </summary>
-            <returns>List of registered consensus nodes</returns>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.Get(System.String)">
-            <summary>
-            Provides the details of a specific consensus node registration.
-            </summary>
-            <param name="id">Registration identifier</param>
-            <returns>Details of a registered consensus node.</returns>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.Put(System.String,Helverify.VotingAuthority.Backend.Dto.RegistrationDto)">
-            <summary>
-            Updates a consensus node registration.
-            </summary>
-            <param name="id">Registration identifier</param>
-            <param name="registrationDto">Registration details</param>
-            <returns>Updated consensus node registration</returns>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.Delete(System.String)">
-            <summary>
-            Removes a consensus node registration.
-            </summary>
-            <param name="id">Registration identifier</param>
-            <returns></returns>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.RegistrationsController.Setup(System.String)">
-            <summary>
-            Initializes the Proof-of-Authority blockchain using the consensus nodes registered for the election.
-            </summary>
-            <param name="electionId">Election identifier</param>
-            <returns></returns>
-        </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.BallotGenerationDto">
             <summary>
             Contains the parameters for ballot generation
@@ -226,6 +180,11 @@
         <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionDto.G">
             <summary>
             Generator g of the ElGamal cryptosystem.
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionDto.BlockchainId">
+            <summary>
+            Blockchain Identifier
             </summary>
         </member>
         <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionDto.PublicKey">
@@ -313,11 +272,6 @@
             Represents a registered consensus node.
             </summary>
         </member>
-        <member name="P:Helverify.VotingAuthority.Backend.Dto.RegistrationDto.Id">
-            <summary>
-            Unique identifier for the consensus node.
-            </summary>
-        </member>
         <member name="P:Helverify.VotingAuthority.Backend.Dto.RegistrationDto.Name">
             <summary>
             Name of the consensus node.
@@ -328,12 +282,7 @@
             API Endpoint for calling the consensus node.
             </summary>
         </member>
-        <member name="P:Helverify.VotingAuthority.Backend.Dto.RegistrationDto.ElectionId">
-            <summary>
-            Identifier of the corresponding election for which the registration is valid.
-            </summary>
-        </member>
-        <member name="P:Helverify.VotingAuthority.Backend.Dto.RegistrationDto.PublicKey">
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.RegistrationDto.PublicKeys">
             <summary>
             Public key of the consensus node.
             </summary>

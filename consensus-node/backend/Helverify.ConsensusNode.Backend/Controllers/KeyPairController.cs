@@ -41,24 +41,26 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         {
             BigInteger p = new BigInteger(requestDto.P, 16);
             BigInteger g = new BigInteger(requestDto.G, 16);
+            string electionId = requestDto.ElectionId;
 
             AsymmetricCipherKeyPair keyPair = _keyPairHandler.CreateKeyPair(p, g);
 
-            _keyPairHandler.SaveToDisk(keyPair);
+            _keyPairHandler.SaveToDisk(keyPair, electionId);
             
-            return Get();
+            return Get(electionId);
         }
 
         /// <summary>
         /// Returns the current public key of this consensus node.
         /// </summary>
+        /// <param name="electionId">Election identifier</param>
         /// <returns>The public key of this consensus node</returns>
         [HttpGet]
         [Route("public-key")]
         [Produces("application/json")]
-        public ActionResult<PublicKeyDto> Get()
+        public ActionResult<PublicKeyDto> Get([FromQuery] string electionId)
         {
-            AsymmetricCipherKeyPair keyPair = _keyPairHandler.LoadFromDisk();
+            AsymmetricCipherKeyPair keyPair = _keyPairHandler.LoadFromDisk(electionId);
 
             ProofOfPrivateKeyOwnership proof = _keyPairHandler.GeneratePrivateKeyProof(keyPair);
 

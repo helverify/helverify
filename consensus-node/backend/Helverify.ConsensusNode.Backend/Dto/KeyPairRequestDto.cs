@@ -14,5 +14,10 @@
         /// Generator g of an ElGamal cryptosystem
         /// </summary>
         public string G { get; set; }
+
+        /// <summary>
+        /// Election identifier
+        /// </summary>
+        public string ElectionId { get; set; }
     }
 }
