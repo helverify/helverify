@@ -29,6 +29,11 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<BallotProfile>();
 });
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("DEV", policy => policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
+});
+
 var app = builder.Build();
 
 ICliRunner cliRunner = app.Services.GetService<ICliRunner>() ?? throw new InvalidOperationException();
@@ -38,6 +43,8 @@ IFileSystem fileSystem = app.Services.GetService<IFileSystem>() ?? throw new Inv
 if(fileSystem.File.Exists("/home/eth/data/geth.ipc")){
     cliRunner.Execute("/app/scripts/start-rpc.sh", "");
 }
+
+
 
 // Configure the HTTP request pipeline.
 
@@ -49,5 +56,7 @@ app.UseSwaggerUI();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("DEV");
 
 app.Run();
