@@ -23,6 +23,8 @@ namespace Helverify.VotingAuthority.DataAccess.Dao
 
         public string? PublicKey { get; set; }
 
+        public string? BlockchainId { get; set; }
+
         public string ContractAddress { get; set; }
     }
 }

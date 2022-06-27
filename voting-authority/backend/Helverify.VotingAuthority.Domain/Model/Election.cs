@@ -55,19 +55,17 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// Election public key
         /// </summary>
         public BigInteger? PublicKey { get; set; }
-
+        
         /// <summary>
-        /// Registered consensus nodes
+        /// Blockchain
         /// </summary>
-        public IList<Registration> Registrations { get; set; } = new List<Registration>();
+        public Blockchain.Blockchain Blockchain { get; set; }
 
         /// <summary>
         /// Combines the public keys of the registered consensus nodes into a composite election public key.
         /// </summary>
-        public void CombinePublicKeys()
+        public void CombinePublicKeys(IList<BigInteger> publicKeys)
         {
-            IList<BigInteger> publicKeys = Registrations.Select(r => r.PublicKey!).ToList();
-
             List<DHPublicKeyParameters> dhPublicKeys = publicKeys.Select(pk => new DHPublicKeyParameters(pk, DhParameters)).ToList();
 
             DHPublicKeyParameters electionPublicKey = _elGamal.CombinePublicKeys(dhPublicKeys, DhParameters);

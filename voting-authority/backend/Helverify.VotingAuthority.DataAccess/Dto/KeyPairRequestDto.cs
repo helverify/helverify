@@ -4,5 +4,6 @@
     {
         public string P { get; set; }
         public string G { get; set; }
+        public string ElectionId { get; set; }
     }
 }

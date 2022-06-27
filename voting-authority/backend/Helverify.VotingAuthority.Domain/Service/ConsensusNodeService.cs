@@ -40,7 +40,7 @@ namespace Helverify.VotingAuthority.Domain.Service
             }
 
             return await _restClient.Call<PublicKeyDto>(HttpMethod.Post, new Uri(endpoint, KeyPairRoute),
-                new KeyPairRequestDto { P = election.P.ConvertToHexString(), G = election.G.ConvertToHexString() });
+                new KeyPairRequestDto { ElectionId = election.Id, P = election.P.ConvertToHexString(), G = election.G.ConvertToHexString() });
         }
 
         /// <inheritdoc cref="IConsensusNodeService.DecryptShareAsync"/>

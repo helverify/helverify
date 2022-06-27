@@ -69,29 +69,32 @@ namespace Helverify.ConsensusNode.Domain.Tests.Model
         public void TestSaveToDisk()
         {
             // arrange
+            string electionId = "12fa92810";
             AsymmetricCipherKeyPair keyPair = _keyPairHandler.CreateKeyPair(_p, _g);
 
             // act
-            _keyPairHandler.SaveToDisk(keyPair);
+            _keyPairHandler.SaveToDisk(keyPair, electionId);
 
             // assert
-            Assert.That(_fileSystem.File.Exists(_fileSystem.Path.Combine(KeyPairHandler.KeyPath, KeyPairHandler.PrivateKeyFileName)), Is.True);
-            Assert.That(_fileSystem.File.Exists(_fileSystem.Path.Combine(KeyPairHandler.KeyPath, KeyPairHandler.PublicKeyFileName)), Is.True);
+            char slash = '/';
+            Assert.That(_fileSystem.File.Exists($"{KeyPairHandler.KeyPath}{slash}{electionId}{slash}{KeyPairHandler.PrivateKeyFileName}"), Is.True);
+            Assert.That(_fileSystem.File.Exists($"{KeyPairHandler.KeyPath}{slash}{electionId}{slash}{KeyPairHandler.PublicKeyFileName}"), Is.True);
         }
 
         [Test]
         public void TestLoadFromDisk()
         {
             // arrange
+            string electionId = "12fa92810";
             AsymmetricCipherKeyPair originalKeyPair = _keyPairHandler.CreateKeyPair(_p, _g);
             
             BigInteger originalPublicKey = (originalKeyPair.Public as DHPublicKeyParameters).Y;
             BigInteger originalPrivateKey = (originalKeyPair.Private as DHPrivateKeyParameters).X;
             
-            _keyPairHandler.SaveToDisk(originalKeyPair);
+            _keyPairHandler.SaveToDisk(originalKeyPair, electionId);
             
             // act
-            AsymmetricCipherKeyPair restoredKeyPair = _keyPairHandler.LoadFromDisk();
+            AsymmetricCipherKeyPair restoredKeyPair = _keyPairHandler.LoadFromDisk(electionId);
 
             // assert
             BigInteger restoredPublicKey = (restoredKeyPair.Public as DHPublicKeyParameters).Y;
