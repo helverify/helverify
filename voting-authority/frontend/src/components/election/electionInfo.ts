@@ -1,4 +1,4 @@
-import {ElectionDto} from "../../Api";
+import {ElectionDto} from "../../api/Api";
 
 export class ElectionInfoProps {
     election: ElectionDto;

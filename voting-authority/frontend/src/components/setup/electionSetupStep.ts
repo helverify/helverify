@@ -1,4 +1,4 @@
-import {BlockchainDto, ElectionDto} from "../../Api";
+import {BlockchainDto, ElectionDto} from "../../api/Api";
 
 export class ElectionSetupStep {
     /**

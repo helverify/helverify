@@ -13,7 +13,7 @@ import {
     TextField
 } from "@mui/material";
 import {Add, DeleteForever} from "@mui/icons-material";
-import {BlockchainDto, RegistrationDto} from "../../Api";
+import {BlockchainDto, RegistrationDto} from "../../api/Api";
 import {useEffect, useState} from "react";
 import {apiClient} from "../../api/apiClient";
 

@@ -7,7 +7,7 @@ import {
     ListItemText, ListSubheader, MenuItem, Select, SelectChangeEvent,
     Stack, TextField
 } from "@mui/material";
-import {ElectionDto, ElectionOption, ElectionOptionDto} from "../../Api";
+import {ElectionDto, ElectionOption, ElectionOptionDto} from "../../api/Api";
 import {useState} from "react";
 import {Add, DeleteForever} from "@mui/icons-material";
 import {dhGroups, DiffieHellmanGroup, SetupStepProps} from "./electionSetupStep";

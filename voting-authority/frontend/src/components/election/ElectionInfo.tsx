@@ -1,6 +1,6 @@
 import {ElectionInfoProps} from "./electionInfo";
 import {Box, Card, CardContent, Stack, Typography} from "@mui/material";
-import {ElectionOptionDto} from "../../Api";
+import {ElectionOptionDto} from "../../api/Api";
 
 export const ElectionInfo = (props: ElectionInfoProps) => {
 

@@ -2,12 +2,12 @@ import {Box, Grid, Step, StepLabel, Stepper} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {ElectionSetupStep} from "./electionSetupStep";
 import {ElectionForm} from "./ElectionForm";
-import {BlockchainDto, ElectionDto} from "../../Api";
+import {BlockchainDto, ElectionDto} from "../../api/Api";
 import {BlockchainForm} from "./BlockchainForm";
 import {PublicKeyForm} from "./PublicKeyForm";
 import {useNavigate} from "react-router-dom";
-import {ElectionInfo} from "./ElectionInfo";
 import {ContractDeploymentForm} from "./ContractDeploymentForm";
+import {ElectionInfo} from "../election/ElectionInfo";
 
 export function ElectionSetup(props: { steps: ElectionSetupStep[] }) {
 

@@ -1,12 +1,13 @@
 import {useEffect, useState} from "react";
-import {ElectionDto} from "./Api";
 import {SpeedDial, SpeedDialAction, Stack} from "@mui/material";
-import {ElectionInfo} from "./components/setup/ElectionInfo";
 import {Ballot, MoreHoriz, Print} from "@mui/icons-material";
 import {useNavigate} from "react-router-dom";
-import {apiClient} from "./api/apiClient";
+import {apiClient} from "../../api/apiClient";
+import {ElectionDto} from "../../api/Api";
+import {ElectionInfo} from "./ElectionInfo";
 
-export const ElectionOverview = () => {
+
+export function Elections() {
     const [elections, setElections] = useState<ElectionDto[]>([]);
 
     const navigate = useNavigate();
@@ -21,28 +22,28 @@ export const ElectionOverview = () => {
     return(
         <Stack>
             {elections.map((election, index) => {
-               return(
-                   <Stack key={index} direction="row">
+                return(
+                    <Stack key={index} direction="row">
                         <ElectionInfo election={election}/>
                         <SpeedDial
-                                ariaLabel={"Election Actions"}
-                                icon={<MoreHoriz/>}
+                            ariaLabel={"Election Actions"}
+                            icon={<MoreHoriz/>}
                         >
                             <SpeedDialAction
                                 icon={<Ballot/>}
                                 tooltipTitle={"Create Ballots"}
-                                onClick={() => navigate(`/elections/${election.id}/create`)}
+                                onClick={() => navigate(`/elections/${election.id}/ballots/create`)}
                             />
                             <SpeedDialAction
                                 icon={<Print/>}
                                 tooltipTitle={"Print Ballots"}
-                                onClick={() => navigate(`/elections/${election.id}/print`)}
+                                onClick={() => navigate(`/elections/${election.id}/ballots/print`)}
                             />
                         </SpeedDial>
 
 
-                   </Stack>
-               );
+                    </Stack>
+                );
             })}
         </Stack>
     );
