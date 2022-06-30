@@ -1,6 +1,6 @@
 import {ElectionInfoProps} from "./electionInfo";
-import {Box, Breadcrumbs, Card, CardContent, Chip, Stack, Typography} from "@mui/material";
-import {ElectionOptionDto} from "../../Api";
+import {Box, Card, CardContent, Stack, Typography} from "@mui/material";
+import {ElectionOptionDto} from "../../api/Api";
 
 export const ElectionInfo = (props: ElectionInfoProps) => {
 
@@ -54,7 +54,7 @@ export const ElectionInfo = (props: ElectionInfoProps) => {
                         {isPropertySet(props.election.publicKey) && (
                             <div>
                                 <Typography variant="h5">Public Key</Typography>
-                                <Typography color="text.secondary">{props.election.publicKey ?? notAvailable}</Typography>
+                                <Typography color="text.secondary" style={{wordBreak: "break-all"}}>{props.election.publicKey ?? notAvailable}</Typography>
                             </div>
                         )}
                         {isPropertySet(props.election.contractAddress) && (

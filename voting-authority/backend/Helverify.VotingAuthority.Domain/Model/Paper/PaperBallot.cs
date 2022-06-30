@@ -28,6 +28,8 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
         /// </summary>
         public IList<PaperBallotOption> Options { get; } = new List<PaperBallotOption>();
 
+        public bool Printed { get; set; }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -46,6 +48,8 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
             BallotId = hashHelper.Hash(ballot1.Code, ballot2.Code);
 
             SetUpShortCodes(ballot1, ballot2);
+
+            Printed = false;
         }
 
         /// <summary>

@@ -36,6 +36,11 @@
         public string G { get; set; } = string.Empty;
 
         /// <summary>
+        /// Blockchain Identifier
+        /// </summary>
+        public string BlockchainId { get; set; }
+
+        /// <summary>
         /// Election public key
         /// </summary>
         public string? PublicKey { get; set; }

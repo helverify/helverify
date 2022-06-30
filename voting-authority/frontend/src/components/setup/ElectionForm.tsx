@@ -1,19 +1,17 @@
 import {
-    Box,
     Button,
     Card, FormControl, FormHelperText,
     Grid, IconButton, InputLabel,
     List,
     ListItem,
-    ListItemText, ListSubheader, MenuItem, OutlinedInput,
-    Select, SelectChangeEvent,
-    Stack, TextareaAutosize,
-    TextField
+    ListItemText, ListSubheader, MenuItem, Select, SelectChangeEvent,
+    Stack, TextField
 } from "@mui/material";
-import {Api, ElectionDto, ElectionOption, ElectionOptionDto} from "../../Api";
+import {ElectionDto, ElectionOption, ElectionOptionDto} from "../../api/Api";
 import {useState} from "react";
-import {Add, DeleteForever, Output, PlusOne} from "@mui/icons-material";
+import {Add, DeleteForever} from "@mui/icons-material";
 import {dhGroups, DiffieHellmanGroup, SetupStepProps} from "./electionSetupStep";
+import {apiClient} from "../../api/apiClient";
 
 export const ElectionForm = (props: SetupStepProps) => {
 
@@ -25,7 +23,8 @@ export const ElectionForm = (props: SetupStepProps) => {
         question: "",
         p: "",
         g: "",
-        options: []
+        options: [],
+        blockchainId: props.blockchain.id
     });
 
     const [currentOption, setCurrentOption] = useState<ElectionOptionDto>({name: ""});
@@ -78,7 +77,7 @@ export const ElectionForm = (props: SetupStepProps) => {
     };
 
     const handleCurrentOptionChange = (evnt: any) => {
-        const {name, value} = evnt.target;
+        const value = evnt.target.value;
 
         let newOption: ElectionOption = {name: value};
 
@@ -90,7 +89,7 @@ export const ElectionForm = (props: SetupStepProps) => {
 
         let newElection: ElectionDto = {...election};
 
-        let dhGroup: DiffieHellmanGroup = dhGroups.find(group => group.name == groupName) ?? {name: "", p: "", g: ""};
+        let dhGroup: DiffieHellmanGroup = dhGroups.find(group => group.name === groupName) ?? {name: "", p: "", g: ""};
 
         if (dhGroup.name === "") {
             return;
@@ -105,12 +104,8 @@ export const ElectionForm = (props: SetupStepProps) => {
     }
 
     const saveElection = () => {
-        const client = new Api({
-            baseUrl: "http://localhost:5000"
-        });
-
-        client.api.electionsCreate(election).then((result) => {
-            props.next(result.data);
+        apiClient().api.electionsCreate(election).then((result) => {
+            props.next(result.data, props.blockchain);
         });
     }
 

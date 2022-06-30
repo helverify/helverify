@@ -37,7 +37,7 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         [Produces("application/json")]
         public ActionResult<DecryptionShareDto> Post(EncryptedShareRequestDto requestDto)
         {
-            AsymmetricCipherKeyPair keyPair = _keyPairHandler.LoadFromDisk();
+            AsymmetricCipherKeyPair keyPair = _keyPairHandler.LoadFromDisk(requestDto.ElectionId);
             
             CipherText cipherText = _mapper.Map<CipherText>(requestDto);
 

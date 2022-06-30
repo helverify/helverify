@@ -13,11 +13,6 @@ namespace Helverify.VotingAuthority.Domain.Model
     public sealed class Registration
     {
         /// <summary>
-        /// Unique identifier for the consensus node.
-        /// </summary>
-        public string? Id { get; set; }
-
-        /// <summary>
         /// Name of the consensus node.
         /// </summary>
         public string Name { get; set; }
@@ -26,17 +21,7 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// API Endpoint for calling the consensus node.
         /// </summary>
         public Uri Endpoint { get; set; }
-
-        /// <summary>
-        /// Identifier of the corresponding election for which the registration is valid.
-        /// </summary>
-        public string? ElectionId { get; set; }
-
-        /// <summary>
-        /// Public key of the consensus node.
-        /// </summary>
-        public BigInteger? PublicKey { get; set; }
-
+        
         /// <summary>
         /// Blockchain account of consensus node
         /// </summary>
@@ -46,6 +31,12 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// Enode Identifier of consensus node
         /// </summary>
         public string Enode { get; set; }
+        
+        /// <summary>
+        /// Public key for each election.
+        /// </summary>
+
+        public Dictionary<string, BigInteger> PublicKeys = new();
 
         /// <summary>
         /// Updates the registration with the public key of the consensus node.
@@ -54,19 +45,26 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// <param name="publicKeyDto"></param>
         /// <param name="election"></param>
         /// <exception cref="Exception"></exception>
-        public void SetPublicKey(PublicKeyDto? publicKeyDto, Election election)
+        public void SetPublicKey(PublicKeyDto publicKeyDto, Election election)
         {
+            if (election.Id == null)
+            {
+                throw new ArgumentNullException(nameof(election));
+            }
+
             ProofOfPrivateKeyOwnership proof = new ProofOfPrivateKeyOwnership(
                 publicKeyDto.ProofOfPrivateKey.C.ConvertToBigInteger(), publicKeyDto.ProofOfPrivateKey.D.ConvertToBigInteger());
 
-            bool isValid = proof.Verify(publicKeyDto.PublicKey.ConvertToBigInteger(), election.P, election.G);
+            BigInteger publicKey = publicKeyDto.PublicKey.ConvertToBigInteger();
+
+            bool isValid = proof.Verify(publicKey, election.P, election.G);
 
             if (!isValid)
             {
                 throw new Exception("Consensus node has no private key matching the specified public key");
             }
 
-            PublicKey = publicKeyDto.PublicKey.ConvertToBigInteger();
+            PublicKeys[election.Id] = publicKey;
         }
     }
 }

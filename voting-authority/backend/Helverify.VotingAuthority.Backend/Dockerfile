@@ -6,7 +6,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0.6-alpine3.16-amd64 AS base
 RUN apk add geth
 RUN apk add bind-tools
 RUN apk add jq
+RUN apk add fontconfig
+RUN apk add ttf-freefont
 
+COPY Helverify.VotingAuthority.Backend/fonts /usr/share/fonts/TTF
 
 WORKDIR /app
 EXPOSE 80

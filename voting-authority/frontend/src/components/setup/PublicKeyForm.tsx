@@ -1,6 +1,6 @@
 import {SetupStepProps} from "./electionSetupStep";
 import {Button, Card, FormControl, Grid, Stack} from "@mui/material";
-import {Api} from "../../Api";
+import {apiClient} from "../../api/apiClient";
 
 export const PublicKeyForm = (props: SetupStepProps) => {
 
@@ -9,13 +9,9 @@ export const PublicKeyForm = (props: SetupStepProps) => {
             return;
         }
 
-        const client = new Api({
-            baseUrl: "http://localhost:5000"
-        });
-
         const electionId: string = props.election.id;
 
-        client.api.electionsPublicKeyUpdate(electionId).then(() => props.next(props.election));
+        apiClient().api.electionsPublicKeyUpdate(electionId).then((result) => props.next(result.data, props.blockchain));
     };
 
     return(

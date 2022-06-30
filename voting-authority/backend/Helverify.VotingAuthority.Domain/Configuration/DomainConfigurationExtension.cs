@@ -1,6 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using Helverify.VotingAuthority.DataAccess.Configuration;
+using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Blockchain;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Repository;
 using Helverify.VotingAuthority.Domain.Repository.Mapping;
@@ -25,17 +27,19 @@ namespace Helverify.VotingAuthority.Domain.Configuration
             services.AddTransient<GenesisConverter>();
             services.AddAutoMapper(cfg =>
             {
+                cfg.AddProfile<BigIntegerProfile>();
                 cfg.AddProfile<ElectionProfile>();
                 cfg.AddProfile<RegistrationProfile>();
                 cfg.AddProfile<GenesisProfile>();
                 cfg.AddProfile<BallotProfile>();
                 cfg.AddProfile<PrintBallotProfile>();
+                cfg.AddProfile<BlockchainProfile>();
             });
             services.AddDataAccessConfiguration();
             services.AddSingleton<IConsensusNodeService, ConsensusNodeService>();
             services.AddSingleton<ICliRunner, CliRunner>();
-            services.AddScoped<IRepository<Election>, ElectionRepository>();
-            services.AddScoped<IRepository<Registration>, RegistrationRepository>();
+            services.AddScoped<IRepository<Election>, GenericRepository<Election, ElectionDao>>();
+            services.AddScoped<IRepository<Blockchain>, GenericRepository<Blockchain, BlockchainDao>>();
             services.AddScoped<IRepository<PaperBallot>, PaperBallotRepository>();
             services.AddScoped<IBlockchainSetup, BlockchainSetup>();
             services.AddScoped<IElectionContractRepository, ElectionContractRepository>();

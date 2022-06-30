@@ -28,11 +28,13 @@ public interface IKeyPairHandler
     /// Saves the specified key pair to disk in PEM format.
     /// </summary>
     /// <param name="keyPair">ElGamal key pair</param>
-    void SaveToDisk(AsymmetricCipherKeyPair keyPair);
+    /// <param name="electionId">Election identifier</param>
+    void SaveToDisk(AsymmetricCipherKeyPair keyPair, string electionId);
 
     /// <summary>
     /// Loads the stored ElGamal key pair from disk.
     /// </summary>
+    /// <param name="electionId">Election identifier</param>
     /// <returns>ElGamal key pair</returns>
-    AsymmetricCipherKeyPair LoadFromDisk();
+    AsymmetricCipherKeyPair LoadFromDisk(string electionId);
 }

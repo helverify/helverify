@@ -1,6 +1,7 @@
 import {SetupStepProps} from "./electionSetupStep";
 import {
-    Button, Card,
+    Backdrop,
+    Button, Card, CircularProgress,
     FormControl,
     Grid,
     IconButton,
@@ -12,12 +13,19 @@ import {
     TextField
 } from "@mui/material";
 import {Add, DeleteForever} from "@mui/icons-material";
-import {Api, RegistrationDto} from "../../Api";
-import {useState} from "react";
+import {BlockchainDto, RegistrationDto} from "../../api/Api";
+import {useEffect, useState} from "react";
+import {apiClient} from "../../api/apiClient";
 
-export const ConsensusNodeRegistrationForm = (props: SetupStepProps) => {
+export const BlockchainForm = (props: SetupStepProps) => {
     const styleVariant = "standard";
     const stylingParams = {minWidth: 200};
+
+    const [isBlockchainDefined, setIsBlockchainDefined] = useState<boolean>(false);
+
+    const [isLoading, setLoading] = useState<boolean>(false);
+
+    const [blockchain, setBlockchain] = useState<BlockchainDto>({ name: "", registrations: []});
 
     const [currentRegistration, setCurrentRegistration] = useState<RegistrationDto>({name: "", endpoint: ""});
 
@@ -33,9 +41,28 @@ export const ConsensusNodeRegistrationForm = (props: SetupStepProps) => {
         setCurrentRegistration((oldRegistration) => ({...oldRegistration, ...newRegistration}));
     }
 
+    const handleBlockchainChange = (evt: any) => {
+        const {name, value} = evt.target;
+
+        let newBlockchain: BlockchainDto = {};
+
+        newBlockchain[name as keyof BlockchainDto] = value;
+
+        setBlockchain((oldBlockchain) => ({...oldBlockchain, ...newBlockchain}));
+    }
+
     const addRegistration = () => {
-        setRegistrations((oldRegistrations) => [...oldRegistrations, currentRegistration]);
+        let newRegistrations = ([...registrations, currentRegistration]);
+        setRegistrations(newRegistrations);
         setCurrentRegistration({name: "", endpoint: ""});
+
+        updateBlockchain(newRegistrations);
+    }
+
+    const updateBlockchain = (newRegistrations: RegistrationDto[]) => {
+        let newBlockchain: BlockchainDto = { registrations: newRegistrations};
+
+        setBlockchain((oldBlockchain) => ({...oldBlockchain, ...newBlockchain}));
     }
 
     const removeRegistration = (index: number) => {
@@ -50,35 +77,54 @@ export const ConsensusNodeRegistrationForm = (props: SetupStepProps) => {
         registrationsClone.splice(index, 1);
 
         setRegistrations(registrationsClone);
+
+        updateBlockchain(registrationsClone);
     }
 
     const registerNodes = () => {
-        if (props.election.id === undefined || props.election.id === null) {
-            return;
+        if(isBlockchainDefined){
+            console.log(blockchain);
+            props.next({}, blockchain);
         }
 
-        const client = new Api({
-            baseUrl: "http://localhost:5000"
+        setLoading(true);
+
+        apiClient().api.blockchainCreate(blockchain).then((result) => {
+            setLoading(false);
+
+            props.next({}, result.data);
         });
-
-        const electionId: string = props.election.id;
-
-        // https://stackoverflow.com/questions/46027244/wait-for-promise-in-a-foreach-loop
-
-        let promises = registrations.map((registration, index) => {
-            return client.api.electionsRegistrationsCreate(electionId, registration);
-        })
-
-        Promise.all(promises).then(() => props.next(props.election));
     }
+
+    useEffect(() => {
+        apiClient().api.blockchainList().then((result) => {
+            if(result.data.id !== undefined && result.data.id !== null){
+                setBlockchain(result.data);
+                setRegistrations(result.data.registrations ?? []);
+                setIsBlockchainDefined(true);
+            }
+        })
+    }, []);
 
     return (
         <>
+            <Backdrop open={isLoading}>
+                <CircularProgress />
+            </Backdrop>
             <Grid container spacing={1}>
                 <Grid item xs={6}>
                     <Card>
                         <Stack direction="column" spacing={1} sx={{m: 2}}>
                             <FormControl>
+                                <FormControl>
+                                    <TextField fullWidth id="blockchain-name"
+                                               name="name"
+                                               variant={styleVariant}
+                                               value={blockchain.name}
+                                               onChange={handleBlockchainChange}
+                                               disabled={isBlockchainDefined}
+                                    />
+                                </FormControl>
                                 <Stack direction="row" spacing={1} sx={{m: 2}}>
                                     <FormControl variant={styleVariant} sx={stylingParams}>
                                         <TextField fullWidth id="consensus-node-name"
@@ -87,6 +133,7 @@ export const ConsensusNodeRegistrationForm = (props: SetupStepProps) => {
                                                    variant={styleVariant}
                                                    value={currentRegistration.name}
                                                    onChange={handleChange}
+                                                   disabled={isBlockchainDefined}
                                         />
                                     </FormControl>
                                     <FormControl variant={styleVariant} sx={stylingParams}>
@@ -98,16 +145,18 @@ export const ConsensusNodeRegistrationForm = (props: SetupStepProps) => {
                                             variant={styleVariant}
                                             value={currentRegistration.endpoint}
                                             onChange={handleChange}
+                                            disabled={isBlockchainDefined}
                                         />
                                     </FormControl>
                                     <FormControl variant={styleVariant}>
                                         <Button id="consensus-node-add"
                                                 variant="outlined"
                                                 onClick={addRegistration}
+                                                disabled={isBlockchainDefined}
                                         ><Add/></Button>
                                     </FormControl>
                                 </Stack>
-                                <Button variant="contained" onClick={registerNodes}>Register Consensus Nodes</Button>
+                                <Button variant="contained" onClick={registerNodes}>Next</Button>
                             </FormControl>
                         </Stack>
                     </Card>
@@ -120,6 +169,7 @@ export const ConsensusNodeRegistrationForm = (props: SetupStepProps) => {
                                 return (
                                     <ListItem key={index}
                                               secondaryAction={<IconButton
+                                                  disabled={isBlockchainDefined}
                                                   onClick={() => removeRegistration(index)}>
                                                   <DeleteForever/>
                                               </IconButton>}

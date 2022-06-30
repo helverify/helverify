@@ -86,10 +86,11 @@
             <param name="requestDto">Public parameters of the ElGamal cryptosystem</param>
             <returns>The public key of this consensus node</returns>
         </member>
-        <member name="M:Helverify.ConsensusNode.Backend.Controllers.KeyPairController.Get">
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.KeyPairController.Get(System.String)">
             <summary>
             Returns the current public key of this consensus node.
             </summary>
+            <param name="electionId">Election identifier</param>
             <returns>The public key of this consensus node</returns>
         </member>
         <member name="T:Helverify.ConsensusNode.Backend.Dto.CipherTextDto">
@@ -132,6 +133,11 @@
             ElGamal ciphertext
             </summary>
         </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.EncryptedShareRequestDto.ElectionId">
+            <summary>
+            Election identifier
+            </summary>
+        </member>
         <member name="T:Helverify.ConsensusNode.Backend.Dto.KeyPairRequestDto">
             <summary>
             Represents the public parameters of an ElGamal cryptosystem for key generation.
@@ -145,6 +151,11 @@
         <member name="P:Helverify.ConsensusNode.Backend.Dto.KeyPairRequestDto.G">
             <summary>
             Generator g of an ElGamal cryptosystem
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.KeyPairRequestDto.ElectionId">
+            <summary>
+            Election identifier
             </summary>
         </member>
         <member name="T:Helverify.ConsensusNode.Backend.Dto.ProofOfDecryptionDto">

@@ -9,5 +9,10 @@
         /// ElGamal ciphertext
         /// </summary>
         public CipherTextDto Cipher { get; set; }
+
+        /// <summary>
+        /// Election identifier
+        /// </summary>
+        public string ElectionId { get; set; }
     }
 }

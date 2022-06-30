@@ -47,24 +47,24 @@ namespace Helverify.ConsensusNode.Domain.Model
         }
 
         /// <inheritdoc cref="IKeyPairHandler.LoadFromDisk"/>
-        public AsymmetricCipherKeyPair LoadFromDisk()
+        public AsymmetricCipherKeyPair LoadFromDisk(string electionId)
         {
-            AsymmetricKeyParameter publicKey = LoadFromDisk(PublicKeyFileName);
-            AsymmetricKeyParameter privateKey = LoadFromDisk(PrivateKeyFileName);
+            AsymmetricKeyParameter publicKey = LoadFromDisk(electionId, PublicKeyFileName);
+            AsymmetricKeyParameter privateKey = LoadFromDisk(electionId, PrivateKeyFileName);
 
             return new AsymmetricCipherKeyPair(publicKey, privateKey);
         }
         
         /// <inheritdoc cref="IKeyPairHandler.SaveToDisk"/>
-        public void SaveToDisk(AsymmetricCipherKeyPair keyPair)
+        public void SaveToDisk(AsymmetricCipherKeyPair keyPair, string electionId)
         {
-            SaveToDisk(keyPair.Public, "public.pem");
-            SaveToDisk(keyPair.Private, "private.pem");
+            SaveToDisk(keyPair.Public, electionId, PublicKeyFileName);
+            SaveToDisk(keyPair.Private, electionId, PrivateKeyFileName);
         }
 
-        private AsymmetricKeyParameter LoadFromDisk(string fileName)
+        private AsymmetricKeyParameter LoadFromDisk(string electionId, string fileName)
         {
-            using StreamReader streamReader = _fileSystem.File.OpenText(_fileSystem.Path.Combine(KeyPath, fileName));
+            using StreamReader streamReader = _fileSystem.File.OpenText(GetKeyPath(electionId, fileName));
 
             PemReader pemReader = new PemReader(streamReader);
 
@@ -73,14 +73,16 @@ namespace Helverify.ConsensusNode.Domain.Model
             return key;
         }
 
-        private void SaveToDisk(AsymmetricKeyParameter key, string fileName)
+        private void SaveToDisk(AsymmetricKeyParameter key, string electionId, string fileName)
         {
-            if (!_fileSystem.Directory.Exists(KeyPath))
+            string electionKeyPath = $"{KeyPath}/{electionId}";
+
+            if (!_fileSystem.Directory.Exists(electionKeyPath))
             {
-                _fileSystem.Directory.CreateDirectory(KeyPath);
+                _fileSystem.Directory.CreateDirectory(electionKeyPath);
             }
 
-            using TextWriter writer = _fileSystem.File.CreateText(_fileSystem.Path.Combine(KeyPath, fileName));
+            using TextWriter writer = _fileSystem.File.CreateText(GetKeyPath(electionId, fileName));
 
             PemWriter pemWriter = new PemWriter(writer);
 
@@ -88,6 +90,17 @@ namespace Helverify.ConsensusNode.Domain.Model
 
             pemWriter.Writer.Flush();
         }
-        
+
+        private string GetKeyPath(string electionId, string fileName)
+        {
+            string keyPath = $"{GetElectionDirectory(electionId)}/{fileName}";
+
+            return keyPath;
+        }
+
+        private string GetElectionDirectory(string electionId)
+        {
+            return $"{KeyPath}/{electionId}";
+        }
     }
 }
