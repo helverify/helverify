@@ -9,7 +9,7 @@ RUN apk add jq
 RUN apk add fontconfig
 RUN apk add ttf-freefont
 
-COPY fonts /usr/share/fonts/TTF
+COPY Helverify.VotingAuthority.Backend/fonts /usr/share/fonts/TTF
 
 WORKDIR /app
 EXPOSE 80

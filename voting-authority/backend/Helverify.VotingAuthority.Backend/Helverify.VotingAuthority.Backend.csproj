@@ -36,6 +36,9 @@
   </ItemGroup>
     
   <ItemGroup>
+    <None Update="graphics\square.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Helverify.Cryptography.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
