@@ -1,4 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using System.IO.Compression;
+using System.IO.MemoryMappedFiles;
 using AutoMapper;
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.Backend.Template;
@@ -9,6 +11,7 @@ using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Helverify.VotingAuthority.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver.Linq;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
@@ -39,10 +42,10 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <param name="ballotRepository">Provides access to plain text ballots stored on the database.</param>
         /// <param name="mapper">Automapper</param>
         /// <param name="contractRepository">Provides access to the Election smart contract.</param>
-        public BallotsController(IStorageClient storageClient, 
-            IRepository<Election> electionRepository, 
-            IRepository<PaperBallot> ballotRepository, 
-            IMapper mapper, 
+        public BallotsController(IStorageClient storageClient,
+            IRepository<Election> electionRepository,
+            IRepository<PaperBallot> ballotRepository,
+            IMapper mapper,
             IElectionContractRepository contractRepository)
         {
             _storageClient = storageClient;
@@ -103,15 +106,15 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         public async Task<ActionResult> Post([FromRoute] string electionId, [FromBody] BallotGenerationDto ballotParameters)
         {
             Election election = await _electionRepository.GetAsync(electionId);
-            
+
             BallotTemplate ballotTemplate = election.GenerateBallotTemplate();
-            
+
             ConcurrentQueue<DataAccess.Ethereum.Contract.PaperBallot> pbs = new ConcurrentQueue<DataAccess.Ethereum.Contract.PaperBallot>();
             ConcurrentQueue<PaperBallot> paperBallots = new ConcurrentQueue<PaperBallot>();
 
             Parallel.For(0, ballotParameters.NumberOfBallots, (_) =>
             {
-            
+
                 VirtualBallot ballot1 = CreateVirtualBallot(ballotTemplate);
                 VirtualBallot ballot2 = CreateVirtualBallot(ballotTemplate);
 
@@ -123,7 +126,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
                 string cid1 = _storageClient.Store(ballot1Dao).Result;
                 string cid2 = _storageClient.Store(ballot2Dao).Result;
 
-                DataAccess.Ethereum.Contract.PaperBallot pb = new DataAccess.Ethereum.Contract.PaperBallot{
+                DataAccess.Ethereum.Contract.PaperBallot pb = new DataAccess.Ethereum.Contract.PaperBallot
+                {
                     Ballot1Code = ballot1.Code,
                     Ballot1Ipfs = cid1,
                     Ballot2Code = ballot2.Code,
@@ -134,7 +138,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
                 paperBallots.Enqueue(paperBallot);
                 pbs.Enqueue(pb);
             });
-            
+
             await (_ballotRepository as PaperBallotRepository)!.InsertMany(paperBallots.ToArray());
 
             int partitionSize = 60;
@@ -158,7 +162,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [HttpGet]
         [Route("pdf")]
         [Produces(ContentTypePdf)]
-        public async Task<ActionResult> GeneratePdf([FromRoute] string electionId, [FromQuery]string ballotId)
+        public async Task<ActionResult> GeneratePdf([FromRoute] string electionId, [FromQuery] string ballotId)
         {
             Election election = await _electionRepository.GetAsync(electionId);
 
@@ -167,10 +171,53 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             IDocument paperBallotTemplate = new PaperBallotTemplate(election, paperBallot);
 
             byte[] pdfBytes = paperBallotTemplate.GeneratePdf();
-            
+
             Stream stream = new MemoryStream(pdfBytes);
-            
+
             return File(stream, ContentTypePdf, $"{ballotId}{FileExtensionPdf}");
+        }
+
+
+        [HttpGet]
+        [Route("pdf/all")]
+        public async Task<ActionResult> GenerateAllPdfs([FromRoute] string electionId, int numberOfBallots)
+        {
+            Election election = await _electionRepository.GetAsync(electionId);
+
+            IList<PaperBallot> paperBallots = (await _ballotRepository.GetAsync()).Where(b => !b.Printed).Take(numberOfBallots).ToList();
+
+            if (!paperBallots.Any())
+            {
+                return NoContent();
+            }
+
+            // inspired by https://stackoverflow.com/questions/51740673/building-a-corrupted-zip-file-using-asp-net-core-and-angular-6
+            await using (MemoryStream zipStream = new MemoryStream())
+            {
+                using (ZipArchive zipFile = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+                {
+                    foreach (PaperBallot paperBallot in paperBallots)
+                    {
+                        IDocument paperBallotTemplate = new PaperBallotTemplate(election, paperBallot);
+
+                        byte[] pdfBytes = paperBallotTemplate.GeneratePdf();
+
+                        ZipArchiveEntry archiveEntry = zipFile.CreateEntry($"{paperBallot.BallotId}.pdf");
+
+                        await using (Stream fileStream = new MemoryStream(pdfBytes))
+                        await using (Stream entryStream = archiveEntry.Open())
+                        {
+                            fileStream.CopyTo(entryStream);
+                        }
+
+                        paperBallot.Printed = true;
+
+                        await _ballotRepository.UpdateAsync(paperBallot.BallotId, paperBallot);
+                    }
+                }
+
+                return File(zipStream.ToArray(), "application/zip", $"ballots_{election.Id}.zip");
+            }
         }
 
         private VirtualBallot CreateVirtualBallot(BallotTemplate ballotTemplate)

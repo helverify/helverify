@@ -1,4 +1,5 @@
-﻿using Helverify.VotingAuthority.Backend.Dto;
+﻿using System.Drawing;
+using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Newtonsoft.Json;
@@ -15,7 +16,9 @@ namespace Helverify.VotingAuthority.Backend.Template
     /// </summary>
     public class PaperBallotTemplate : IDocument
     {
-        private const string BallotChoiceSymbol = "□";
+        private const string BallotChoiceSymbolPath = "/app/graphics/square.png";
+        private const float BallotChoiceSize = 0.4f;
+        private static byte[] BallotChoiceSymbol;
 
         /// <summary>
         /// Current election.
@@ -26,6 +29,12 @@ namespace Helverify.VotingAuthority.Backend.Template
         /// Paper ballot containing options in plain text.
         /// </summary>
         public PaperBallot PaperBallot { get; }
+
+
+        static PaperBallotTemplate()
+        {
+            BallotChoiceSymbol = File.ReadAllBytes(BallotChoiceSymbolPath);
+        }
 
         /// <summary>
         /// Constructor
@@ -46,10 +55,10 @@ namespace Helverify.VotingAuthority.Backend.Template
         {
             container.Page(page =>
             {
-                page.Size(PageSizes.A4);
+                page.Size(PageSizes.A5.Landscape());
                 page.Margin(1, Unit.Centimetre);
                 page.PageColor(Colors.White);
-                page.DefaultTextStyle(s => s.FontSize(14).FontFamily("FreeSans"));
+                page.DefaultTextStyle(s => s.FontSize(14).FontFamily("Karla"));
 
                 page.Header().Element(ComposeHeader);
 
@@ -96,27 +105,37 @@ namespace Helverify.VotingAuthority.Backend.Template
 
                 t.Header(h =>
                 {
-                    h.Cell().Element(CellStyle);
-                    h.Cell().Element(CellStyle);
-                    h.Cell().Element(CellStyle).Text(BallotChoiceSymbol);
-                    h.Cell().Element(CellStyle).Text(BallotChoiceSymbol);
+                    h.Cell().Element(HeaderStyleRegular);
+                    h.Cell().Element(HeaderStyleRegular);
+                    h.Cell().Element(HeaderStyleBallotChoice).Width(BallotChoiceSize, Unit.Centimetre).Height(BallotChoiceSize, Unit.Centimetre).Image(BallotChoiceSymbol);
+                    h.Cell().Element(HeaderStyleBallotChoice).Width(BallotChoiceSize, Unit.Centimetre).Height(BallotChoiceSize, Unit.Centimetre).Image(BallotChoiceSymbol);
 
-                    static IContainer CellStyle(IContainer container)
+                    static IContainer HeaderStyleRegular(IContainer container)
                     {
                         return container.BorderBottom(1);
+                    }
+
+                    static IContainer HeaderStyleBallotChoice(IContainer container)
+                    {
+                        return container.BorderBottom(1).PaddingBottom(0.1f, Unit.Centimetre).PaddingLeft(0.1f, Unit.Centimetre).PaddingRight(0.1f, Unit.Centimetre);
                     }
                 });
 
                 foreach (PaperBallotOption option in PaperBallot.Options)
                 {
-                    t.Cell().Element(CellStyle).Text(option.Name);
-                    t.Cell().Element(CellStyle).Text(BallotChoiceSymbol);
-                    t.Cell().Element(CellStyle).Text(option.ShortCode1);
-                    t.Cell().Element(CellStyle).Text(option.ShortCode2);
+                    t.Cell().Element(CellStyleRegular).Text(option.Name);
+                    t.Cell().Element(CellStyleBallotChoice).Width(BallotChoiceSize, Unit.Centimetre).Height(BallotChoiceSize, Unit.Centimetre).Image(BallotChoiceSymbol);
+                    t.Cell().Element(CellStyleRegular).Text(option.ShortCode1);
+                    t.Cell().Element(CellStyleRegular).Text(option.ShortCode2);
 
-                    static IContainer CellStyle(IContainer container)
+                    static IContainer CellStyleRegular(IContainer container)
                     {
                         return container.BorderBottom(1);
+                    }
+
+                    static IContainer CellStyleBallotChoice(IContainer container)
+                    {
+                        return container.BorderBottom(1).PaddingTop(0.2f, Unit.Centimetre).PaddingBottom(0.2f, Unit.Centimetre);
                     }
                 }
             });
@@ -124,7 +143,7 @@ namespace Helverify.VotingAuthority.Backend.Template
 
         private void ComposeBallotCode(IContainer container)
         {
-            container.PaddingVertical(1, Unit.Centimetre).DefaultTextStyle(s => s.FontSize(10).FontFamily("FreeMono").FontColor("#484848")).Text(PaperBallot.BallotId);
+            container.PaddingVertical(1, Unit.Centimetre).DefaultTextStyle(s => s.FontSize(10).FontFamily("Karla").FontColor("#484848")).Text(PaperBallot.BallotId);
         }
 
         private byte[] GenerateQrCode()
@@ -139,7 +158,7 @@ namespace Helverify.VotingAuthority.Backend.Template
 
             BitmapByteQRCode qr = new BitmapByteQRCode(data);
 
-            return qr.GetGraphic(20);
+            return qr.GetGraphic(1);
         }
     }
 }

@@ -39,6 +39,7 @@ IFileSystem fileSystem = app.Services.GetService<IFileSystem>() ?? throw new Inv
 // start RPC endpoint in case chain has already been configured (restart)
 if (fileSystem.File.Exists("/home/eth/data/geth.ipc"))
 {
+    cliRunner.Execute("/app/scripts/init-genesis.sh", "");
     cliRunner.Execute("/app/scripts/start-consensusnode.sh", "");
     cliRunner.Execute("/app/scripts/start-mining.sh", "");
 }

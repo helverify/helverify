@@ -62,6 +62,8 @@ namespace Helverify.VotingAuthority.Domain.Repository
 
             string mongoId = (await GetSinglePrintBallot(id)).Id;
 
+            printBallotDao.Id = mongoId;
+
             await _mongoService.UpdateAsync(mongoId, printBallotDao);
 
             return _mapper.Map<PaperBallot>(printBallotDao);
