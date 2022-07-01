@@ -342,7 +342,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
                             ProofOfDecryption = new ProofOfDecryption(new BigInteger(decryptedShare.ProofOfDecryption.D, 16),
                                 new BigInteger(decryptedShare.ProofOfDecryption.U, 16),
                                 new BigInteger(decryptedShare.ProofOfDecryption.V, 16),
-                                new BigInteger(decryptedShare.ProofOfDecryption.S, 16))
+                                new BigInteger(decryptedShare.ProofOfDecryption.S, 16)),
+                            PublicKeyShare = consensusNode.PublicKeys[electionId]
                         };
 
                         shares.Add(share);

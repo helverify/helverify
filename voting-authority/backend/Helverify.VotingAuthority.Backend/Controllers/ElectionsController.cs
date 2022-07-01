@@ -167,6 +167,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
                 registration.SetPublicKey(publicKey, election);
             }
 
+            await _bcRepository.UpdateAsync(election.Blockchain.Id, election.Blockchain);
+
             election.CombinePublicKeys(registrations.Select(r => r.PublicKeys[election.Id]).ToList());
 
             election = await _electionRepository.UpdateAsync(id, election);

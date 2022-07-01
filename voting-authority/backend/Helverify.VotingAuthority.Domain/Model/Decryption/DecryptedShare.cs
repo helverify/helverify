@@ -1,5 +1,7 @@
-﻿using Helverify.Cryptography.ZeroKnowledge;
+﻿using Helverify.Cryptography.Encryption;
+using Helverify.Cryptography.ZeroKnowledge;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
+using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Model.Decryption
@@ -9,6 +11,8 @@ namespace Helverify.VotingAuthority.Domain.Model.Decryption
         public BigInteger Share { get; set; }
 
         public ProofOfDecryption ProofOfDecryption { get; set; }
+
+        public BigInteger PublicKeyShare { get; set; }
     }
 
     public class OptionShare
@@ -37,11 +41,19 @@ namespace Helverify.VotingAuthority.Domain.Model.Decryption
                 {
                     EncryptedOptionValue encryptedOptionValue = encryptedOption.Values[i];
 
-                    BigInteger d = encryptedOptionValue.Cipher.D;
+                    ElGamalCipher cipher = encryptedOptionValue.Cipher;
+
+                    BigInteger d = cipher.D;
 
                     IList<OptionShare> os = OptionShares.Where(s => s.ShortCode == encryptedOption.ShortCode).ToList();
 
                     IList<DecryptedShare> decryptedShares = os.Select(o => o.Shares[i]).ToList(); // decrypted shares of one option vector element
+
+                    if (!decryptedShares.All(d => d.ProofOfDecryption.Verify(cipher.C, cipher.D,
+                            new DHPublicKeyParameters(d.PublicKeyShare, election.DhParameters))))
+                    {
+                        throw new Exception("Proof of decryption is invalid");
+                    }
 
                     int plainTextValue = election.CombineShares(decryptedShares, d);
 
