@@ -9,7 +9,7 @@
             Controller for handling ballot life-cycle.
             </summary>
         </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.#ctor(Helverify.VotingAuthority.DataAccess.Ipfs.IStorageClient,Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Paper.PaperBallot},AutoMapper.IMapper,Helverify.VotingAuthority.Domain.Repository.IElectionContractRepository)">
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.#ctor(Helverify.VotingAuthority.DataAccess.Ipfs.IStorageClient,Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Paper.PaperBallot},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Blockchain.Blockchain},Helverify.VotingAuthority.Domain.Service.IConsensusNodeService,Helverify.VotingAuthority.Domain.Repository.IElectionContractRepository,AutoMapper.IMapper)">
             <summary>
             Constructor
             </summary>
@@ -49,6 +49,15 @@
             </summary>
             <param name="electionId">Current election id</param>
             <param name="ballotId">Id of ballot to be printed</param>
+            <returns></returns>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.Post(System.String,System.String,Helverify.VotingAuthority.Backend.Dto.EvidenceDto)">
+            <summary>
+            Publishes the evidence of a casted ballot, consisting of the selected short codes and the ballot to be spoiled.
+            </summary>
+            <param name="electionId"></param>
+            <param name="id"></param>
+            <param name="evidenceDto"></param>
             <returns></returns>
         </member>
         <member name="M:Helverify.VotingAuthority.Backend.Controllers.BlockchainController.Post(Helverify.VotingAuthority.Backend.Dto.BlockchainDto)">
@@ -205,6 +214,11 @@
         <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionOptionDto.Name">
             <summary>
             Candidate/Option name
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.EvidenceDto.SpoiltBallotIndex">
+            <summary>
+            Column to be spoiled (0 or 1)
             </summary>
         </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.Message">

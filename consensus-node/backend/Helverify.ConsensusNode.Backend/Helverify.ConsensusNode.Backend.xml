@@ -53,7 +53,7 @@
             Controller for cooperative decryption
             </summary>
         </member>
-        <member name="M:Helverify.ConsensusNode.Backend.Controllers.DecryptionController.#ctor(Helverify.ConsensusNode.Domain.Model.IKeyPairHandler,AutoMapper.IMapper)">
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.DecryptionController.#ctor(Helverify.ConsensusNode.Domain.Model.IKeyPairHandler,Helverify.ConsensusNode.Domain.Repository.IBallotRepository,AutoMapper.IMapper)">
             <summary>
             Constructor
             </summary>
@@ -61,6 +61,13 @@
             <param name="mapper">Automapper</param>
         </member>
         <member name="M:Helverify.ConsensusNode.Backend.Controllers.DecryptionController.Post(Helverify.ConsensusNode.Backend.Dto.EncryptedShareRequestDto)">
+            <summary>
+            Decrypts this node's share of the specified ciphertext.
+            </summary>
+            <param name="requestDto">CipherText of an ElGamal cryptosystem</param>
+            <returns>Decrypted share</returns>
+        </member>
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.DecryptionController.PostBallotDecryption(Helverify.ConsensusNode.Backend.Controllers.EncryptedBallotDto)">
             <summary>
             Decrypts this node's share of the specified ciphertext.
             </summary>

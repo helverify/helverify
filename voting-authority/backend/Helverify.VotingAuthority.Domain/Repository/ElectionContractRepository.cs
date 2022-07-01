@@ -1,6 +1,9 @@
-﻿using Helverify.VotingAuthority.DataAccess.Ethereum;
+﻿using AutoMapper;
+using Helverify.VotingAuthority.DataAccess.Dao;
+using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Nethereum.Contracts.ContractHandlers;
 using Nethereum.Web3;
 
@@ -10,14 +13,17 @@ namespace Helverify.VotingAuthority.Domain.Repository
     public class ElectionContractRepository : IElectionContractRepository
     {
         private readonly IWeb3Loader _web3Loader;
-        
+        private readonly IMapper _mapper;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="web3Loader">Web3 accessor</param>
-        public ElectionContractRepository(IWeb3Loader web3Loader)
+        /// <param name="mapper">Automapper</param>
+        public ElectionContractRepository(IWeb3Loader web3Loader, IMapper mapper)
         {
             _web3Loader = web3Loader;
+            _mapper = mapper;
         }
 
         /// <inheritdoc cref="IElectionContractRepository.DeployContract"/>
@@ -114,6 +120,43 @@ namespace Helverify.VotingAuthority.Domain.Repository
             PaperBallot paperBallot = (await contract.QueryDeserializingToObjectAsync<RetrieveBallotFunction, RetrieveBallotOutputDTO>(retrieveBallotFunction)).ReturnValue1;
 
             return paperBallot;
+        }
+
+        /// <inheritdoc cref="IElectionContractRepository.PublishShortCodes"/>
+        public async Task PublishShortCodes(Election election, string id, IList<string> shortCodes)
+        {
+            Web3 web3 = _web3Loader.Web3Instance;
+
+            await UnlockAccount();
+
+            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
+
+            PublishShortCodesFunction publishShortCodesFunction = new PublishShortCodesFunction
+            {
+                BallotId = id,
+                ShortCodes = shortCodes.ToList()
+            };
+
+            await contract.SendRequestAsync(publishShortCodesFunction);
+        }
+
+        /// <inheritdoc cref="IElectionContractRepository.SpoilBallot"/>
+        public async Task SpoilBallot(string ballotId, string virtualBallotId, Election election, string ipfsCid)
+        {
+            Web3 web3 = _web3Loader.Web3Instance;
+
+            await UnlockAccount();
+
+            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
+
+            SpoilBallotFunction spoilBallotFunction = new SpoilBallotFunction
+            {
+                BallotId = ballotId,
+                VirtualBallotId = virtualBallotId,
+                SpoiltBallotIpfs = ipfsCid
+            };
+
+            await contract.SendRequestAsync(spoilBallotFunction);
         }
 
         private async Task UnlockAccount(int seconds = 120)

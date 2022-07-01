@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.Domain.Model.Paper;
+using Org.BouncyCastle.Math;
 
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
@@ -24,10 +25,18 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
             CreateMap<PaperBallotOption, PrintOptionDao>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.ShortCode1, opt => opt.MapFrom(src => src.ShortCode1))
-                .ForMember(dest => dest.ShortCode2, opt => opt.MapFrom(src => src.ShortCode2));
+                .ForMember(dest => dest.ShortCode2, opt => opt.MapFrom(src => src.ShortCode2))
+                .ForMember(dest => dest.Randomness1, opt => opt.MapFrom(src => src.RandomValues1))
+                .ForMember(dest => dest.Randomness2, opt => opt.MapFrom(src => src.RandomValues2));
                 
             CreateMap<PrintOptionDao, PaperBallotOption>()
-                .ConstructUsing(x => new PaperBallotOption(x.Name, x.ShortCode1, x.ShortCode2));
+                .ConstructUsing((x, ctx) =>
+                {
+                    IList<BigInteger> randomness1 = ctx.Mapper.Map<IList<BigInteger>>(x.Randomness1);
+                    IList<BigInteger> randomness2 = ctx.Mapper.Map<IList<BigInteger>>(x.Randomness2);
+
+                    return new PaperBallotOption(x.Name, x.ShortCode1, x.ShortCode2, randomness1, randomness2);
+                });
         }
 
         private void CreatePrintBallotMap()

@@ -13,12 +13,18 @@ public sealed class EncryptedOptionValue
     /// <summary>
     /// ElGamal ciphertext
     /// </summary>
-    public ElGamalCipher Cipher { get; }
+    public ElGamalCipher Cipher { get; internal set; }
     
     /// <summary>
     /// Proof that the ciphertext either contains the value zero or one.
     /// </summary>
-    public ProofOfZeroOrOne ProofOfZeroOrOne { get; }
+    public ProofOfZeroOrOne ProofOfZeroOrOne { get; internal set; }
+
+
+    public EncryptedOptionValue()
+    {
+        
+    }
 
     /// <summary>
     /// Constructor

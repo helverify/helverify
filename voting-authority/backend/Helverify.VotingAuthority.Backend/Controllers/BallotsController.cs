@@ -2,16 +2,21 @@
 using System.IO.Compression;
 using System.IO.MemoryMappedFiles;
 using AutoMapper;
+using Helverify.Cryptography.ZeroKnowledge;
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.Backend.Template;
 using Helverify.VotingAuthority.DataAccess.Dao;
+using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.DataAccess.Ipfs;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Blockchain;
+using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Helverify.VotingAuthority.Domain.Repository;
+using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver.Linq;
+using Org.BouncyCastle.Math;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
@@ -31,6 +36,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         private readonly IStorageClient _storageClient;
         private readonly IRepository<Election> _electionRepository;
         private readonly IRepository<PaperBallot> _ballotRepository;
+        private readonly IRepository<Blockchain> _bcRepository;
+        private readonly IConsensusNodeService _consensusNodeService;
         private readonly IMapper _mapper;
         private readonly IElectionContractRepository _contractRepository;
 
@@ -45,12 +52,16 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         public BallotsController(IStorageClient storageClient,
             IRepository<Election> electionRepository,
             IRepository<PaperBallot> ballotRepository,
-            IMapper mapper,
-            IElectionContractRepository contractRepository)
+            IRepository<Blockchain> bcRepository,
+            IConsensusNodeService consensusNodeService,
+            IElectionContractRepository contractRepository,
+            IMapper mapper)
         {
             _storageClient = storageClient;
             _electionRepository = electionRepository;
             _ballotRepository = ballotRepository;
+            _bcRepository = bcRepository;
+            _consensusNodeService = consensusNodeService;
             _mapper = mapper;
             _contractRepository = contractRepository;
         }
@@ -212,12 +223,129 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
                         paperBallot.Printed = true;
 
+                        paperBallot.ClearConfidential();
+
                         await _ballotRepository.UpdateAsync(paperBallot.BallotId, paperBallot);
                     }
                 }
 
                 return File(zipStream.ToArray(), "application/zip", $"ballots_{election.Id}.zip");
             }
+        }
+
+        /// <summary>
+        /// Publishes the evidence of a casted ballot, consisting of the selected short codes and the ballot to be spoiled.
+        /// </summary>
+        /// <param name="electionId"></param>
+        /// <param name="id"></param>
+        /// <param name="evidenceDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("{id}/evidence")]
+        public async Task<IActionResult> Post([FromRoute] string electionId, [FromRoute] string id,
+            [FromBody] EvidenceDto evidenceDto)
+        {
+            int spoiltBallotIndex = evidenceDto.SpoiltBallotIndex;
+
+            if (spoiltBallotIndex != 0 && spoiltBallotIndex != 1)
+            {
+                return BadRequest("Ballot index to be spoilt is invalid (allowed values: 0 or 1)");
+            }
+
+            Election election = await _electionRepository.GetAsync(electionId);
+
+            IList<string> selection = evidenceDto.SelectedOptions;
+
+            selection = selection.OrderBy(s => s).ToList();
+
+            PaperBallot paperBallot = await _ballotRepository.GetAsync(id);
+
+            if (!paperBallot.HasShortCodes(selection))
+            {
+                return BadRequest("Selection does not exist on this ballot. Please check that you supplied valid short codes.");
+            }
+            
+            // Publish short codes of the selection options on the smart contract
+            await _contractRepository.PublishShortCodes(election, id, selection);
+
+            // decrypt spoilt ballot
+
+            DataAccess.Ethereum.Contract.PaperBallot paperBallotDto = await _contractRepository.GetBallot(election, id);
+
+            string ipfsCid = string.Empty;
+
+            if (spoiltBallotIndex == 0)
+            {
+                ipfsCid = paperBallotDto.Ballot1Ipfs;
+            }
+
+            if (spoiltBallotIndex == 1)
+            {
+                ipfsCid = paperBallotDto.Ballot2Ipfs;
+            }
+
+            VirtualBallotDao encryption = await _storageClient.Retrieve<VirtualBallotDao>(ipfsCid);
+
+            VirtualBallot virtualBallot = _mapper.Map<VirtualBallot>(encryption);
+
+            virtualBallot = await DecryptBallot(virtualBallot, electionId, ipfsCid);
+
+            // publish spoiled ballot on ipfs
+            SpoiltBallotDao spoiltBallot = _mapper.Map<SpoiltBallotDao>(virtualBallot);
+
+            string cid = await _storageClient.Store(spoiltBallot);
+
+            // call spoilBallot on contract
+            await _contractRepository.SpoilBallot(id, virtualBallot.Code, election, cid);
+            
+            return Ok();
+        }
+
+        private async Task<VirtualBallot> DecryptBallot(VirtualBallot ballot, string electionId, string ipfsCid)
+        {
+            Election election = await _electionRepository.GetAsync(electionId);
+
+            election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
+
+            IList<OptionShare> optionShares = new List<OptionShare>();
+
+            foreach (Registration consensusNode in election.Blockchain.Registrations)
+            {
+                DecryptedBallotShareDto? decryptedBallot = await _consensusNodeService.DecryptBallot(consensusNode.Endpoint, ballot, electionId, ipfsCid);
+
+                foreach (string key in decryptedBallot.DecryptedShares.Keys)
+                {
+                    IList<DecryptionShareDto> decryptedBallotDecryptedShare = decryptedBallot.DecryptedShares[key];
+
+                    IList<DecryptedShare> shares = new List<DecryptedShare>();
+
+                    foreach (DecryptionShareDto decryptedShare in decryptedBallotDecryptedShare)
+                    {
+                        DecryptedShare share = new DecryptedShare
+                        {
+                            Share = new BigInteger(decryptedShare.DecryptedShare, 16),
+                            ProofOfDecryption = new ProofOfDecryption(new BigInteger(decryptedShare.ProofOfDecryption.D, 16),
+                                new BigInteger(decryptedShare.ProofOfDecryption.U, 16),
+                                new BigInteger(decryptedShare.ProofOfDecryption.V, 16),
+                                new BigInteger(decryptedShare.ProofOfDecryption.S, 16))
+                        };
+
+                        shares.Add(share);
+                    }
+
+                    optionShares.Add(new OptionShare
+                    {
+                        ShortCode = key,
+                        Shares = shares,
+                    });
+                }
+            }
+
+            BallotShares ballotShares = new BallotShares(optionShares);
+
+            ballot = ballotShares.CombineShares(election, ballot);
+
+            return ballot;
         }
 
         private VirtualBallot CreateVirtualBallot(BallotTemplate ballotTemplate)

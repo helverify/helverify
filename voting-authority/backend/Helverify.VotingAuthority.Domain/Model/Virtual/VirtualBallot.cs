@@ -2,6 +2,7 @@
 using Helverify.Cryptography.ZeroKnowledge;
 using Helverify.VotingAuthority.Domain.Helper;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Model.Virtual
 {
@@ -13,7 +14,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
         /// <summary>
         /// Long ballot code, consisting of the hash of all encryptions.
         /// </summary>
-        public string Code { get; }
+        public string Code { get; internal set; }
 
         /// <summary>
         /// Options / candidates represented as ciphertext
@@ -34,6 +35,14 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
         /// Proofs which show that each column sums up to one.
         /// </summary>
         public IList<SumProof> ColumnProofs { get; }
+
+        public VirtualBallot()
+        {
+            EncryptedOptions = new List<EncryptedOption>();
+            PlainTextOptions = new List<PlainTextOption>();
+            RowProofs = new List<SumProof>();
+            ColumnProofs = new List<SumProof>();
+        }
 
         /// <summary>
         /// Constructor
@@ -142,6 +151,27 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
             }
 
             return sum;
+        }
+
+        public IDictionary<string, IList<BigInteger>> GetRandomness()
+        {
+            IDictionary<string, IList<BigInteger>> randomness = new Dictionary<string, IList<BigInteger>>();
+
+            foreach (EncryptedOption encryptedOption in EncryptedOptions)
+            {
+                string shortCode = encryptedOption.ShortCode;
+
+                IList<BigInteger> randomValues = new List<BigInteger>();
+                foreach (EncryptedOptionValue encryptedOptionValue in encryptedOption.Values)
+                {
+                    BigInteger r = encryptedOptionValue.Cipher.R;
+                    randomValues.Add(r);
+                }
+
+                randomness[shortCode] = randomValues;
+            }
+
+            return randomness;
         }
 
         /// <summary>

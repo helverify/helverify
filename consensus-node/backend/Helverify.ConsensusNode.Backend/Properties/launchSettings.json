@@ -33,7 +33,8 @@
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
         "BC_ACCOUNT_PWD": "test1",
-        "PORT": "30303"
+        "PORT": "30303",
+        "IpfsHost": "http://host.docker.internal:5001"
       },
       "publishAllPorts": true,
       "useSSL": false

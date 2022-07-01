@@ -23,6 +23,11 @@ public sealed class EncryptedOption
     /// </summary>
     public string Hash { get; }
 
+    public EncryptedOption()
+    {
+        Values = new List<EncryptedOptionValue>();
+    }
+
     /// <summary>
     /// Constructor
     /// </summary>

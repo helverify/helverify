@@ -40,7 +40,8 @@
       },
       "DockerfileRunArguments": "-e BC_ACCOUNT_PWD=test1 -e PORT=30300 -p 8545:8545 -v va:/home",
       "publishAllPorts": true,
-      "useSSL": false
+      "useSSL": false,
+      "httpPort": 5000 
     }
   }
 }

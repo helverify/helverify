@@ -1,5 +1,6 @@
 ﻿using Helverify.VotingAuthority.Domain.Helper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
+using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Model.Paper
 {
@@ -26,7 +27,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
         /// <summary>
         /// Contains the ballot options with their corresponding pairs of short codes.
         /// </summary>
-        public IList<PaperBallotOption> Options { get; } = new List<PaperBallotOption>();
+        public IList<PaperBallotOption> Options { get; private set; } = new List<PaperBallotOption>();
 
         public bool Printed { get; set; }
 
@@ -69,6 +70,9 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
         /// <exception cref="Exception">Throws if the supplied ballots contain different options, i.e., they are incompatible.</exception>
         private void SetUpShortCodes(VirtualBallot ballot1, VirtualBallot ballot2)
         {
+            IDictionary<string, IList<BigInteger>> randomness1 = ballot1.GetRandomness();
+            IDictionary<string, IList<BigInteger>> randomness2 = ballot2.GetRandomness();
+
             for (int i = 0; i < ballot1.PlainTextOptions.Count; i++)
             {
                 PlainTextOption option1 = ballot1.PlainTextOptions[i];
@@ -76,13 +80,36 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
 
                 string shortCode1 = option1.ShortCode;
                 string shortCode2 = option2.ShortCode;
+                
+                IList<BigInteger> randomValues1 = randomness1[shortCode1];
+                IList<BigInteger> randomValues2 = randomness2[shortCode2];
 
                 string name = option1.Name == option2.Name
                     ? option1.Name
                     : throw new Exception("VirtualBallot options do not match.");
 
-                Options.Add(new PaperBallotOption(name, shortCode1, shortCode2));
+                Options.Add(new PaperBallotOption(name, shortCode1, shortCode2, randomValues1, randomValues2));
             }
+        }
+
+        public bool HasShortCodes(IList<string> selection)
+        {
+            // inspired by https://stackoverflow.com/questions/332973/check-whether-an-array-is-a-subset-of-another
+            bool areShortCodesOfBallot1 = selection.All(s => Options.Select(s => s.ShortCode1).Contains(s));
+            
+            bool areShortCodesOfBallot2 = selection.All(s => Options.Select(s => s.ShortCode2).Contains(s));
+
+            return areShortCodesOfBallot1 ^ areShortCodesOfBallot2;
+        }
+
+        public void ClearConfidential()
+        {
+            foreach (PaperBallotOption paperBallotOption in Options)
+            {
+                paperBallotOption.ClearConfidential();
+            }
+
+            Options = Options.OrderBy(o => o.ShortCode1).ToList();
         }
     }
 }

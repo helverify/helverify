@@ -1,5 +1,6 @@
 ﻿using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Virtual;
 
 namespace Helverify.VotingAuthority.Domain.Repository;
 
@@ -43,4 +44,24 @@ public interface IElectionContractRepository
     /// <param name="id">Ballot ID</param>
     /// <returns></returns>
     Task<PaperBallot> GetBallot(Election election, string id);
+
+    /// <summary>
+    /// Publishes the short codes of the selected options of one ballot.
+    /// </summary>
+    /// <param name="election">Election</param>
+    /// <param name="id">Ballot ID</param>
+    /// <param name="shortCodes">Selected short codes of the non-spoilt ballot.</param>
+    /// <returns></returns>
+    Task PublishShortCodes(Election election, string id, IList<string> shortCodes);
+
+
+    /// <summary>
+    /// Marks a ballot as spoilt on the SC and publishes the IPFS cid to the spoilt ballot.
+    /// </summary>
+    /// <param name="ballotId">ID of the corresponding Paper Ballot</param>
+    /// <param name="virtualBallotId">Code of the ballot to be spoilt</param>
+    /// <param name="election">Election</param>
+    /// <param name="ipfsCid">IPFS Cid</param>
+    /// <returns></returns>
+    Task SpoilBallot(string ballotId, string virtualBallotId, Election election, string ipfsCid);
 }

@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>7fd263e8-21fe-40ea-b0e6-de4f71ea6c80</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileContext>.</DockerfileContext>
+    <DockerfileContext>..</DockerfileContext>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<DocumentationFile>Helverify.VotingAuthority.Backend.xml</DocumentationFile>
   </PropertyGroup>
