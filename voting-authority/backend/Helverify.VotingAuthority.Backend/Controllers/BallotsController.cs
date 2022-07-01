@@ -273,15 +273,28 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             DataAccess.Ethereum.Contract.PaperBallot paperBallotDto = await _contractRepository.GetBallot(election, id);
 
             string ipfsCid = string.Empty;
+            
+            IDictionary<string, IList<BigInteger>> randomness = new Dictionary<string, IList<BigInteger>>();
+
 
             if (spoiltBallotIndex == 0)
             {
                 ipfsCid = paperBallotDto.Ballot1Ipfs;
+
+                foreach (PaperBallotOption ballotOption in paperBallot.Options)
+                {
+                    randomness[ballotOption.ShortCode1] = ballotOption.RandomValues1;
+                }
             }
 
             if (spoiltBallotIndex == 1)
             {
                 ipfsCid = paperBallotDto.Ballot2Ipfs;
+
+                foreach (PaperBallotOption ballotOption in paperBallot.Options)
+                {
+                    randomness[ballotOption.ShortCode2] = ballotOption.RandomValues2;
+                }
             }
 
             VirtualBallotDao encryption = await _storageClient.Retrieve<VirtualBallotDao>(ipfsCid);
@@ -293,6 +306,8 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             // publish spoiled ballot on ipfs
             SpoiltBallotDao spoiltBallot = _mapper.Map<SpoiltBallotDao>(virtualBallot);
 
+            spoiltBallot.SetRandomness(randomness);
+            
             string cid = await _storageClient.Store(spoiltBallot);
 
             // call spoilBallot on contract
