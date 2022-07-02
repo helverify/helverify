@@ -39,7 +39,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <param name="mapper">Automapper</param>
         /// <param name="consensusNodeService"></param>
         /// <param name="contractRepository">Provides access to the Election smart contract.</param>
-        /// <param name="bcRepository"></param>
+        /// <param name="bcRepository">Provides access to the blockchain settings</param>
         public BallotsController(
             IRepository<Election> electionRepository,
             IRepository<PaperBallot> ballotRepository,
@@ -106,9 +106,9 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <summary>
         /// Publishes the evidence of a casted ballot, consisting of the selected short codes and the ballot to be spoiled.
         /// </summary>
-        /// <param name="electionId"></param>
-        /// <param name="id"></param>
-        /// <param name="evidenceDto"></param>
+        /// <param name="electionId">Election identifier</param>
+        /// <param name="ballotId">Ballot identifier</param>
+        /// <param name="evidenceDto">Evidence parameters</param>
         /// <returns></returns>
         [HttpPost]
         [Route("{ballotId}/evidence")]
@@ -147,7 +147,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             VirtualBallot virtualBallot = _publishedBallotRepository.RetrieveVirtualBallot(publishedBallot.IpfsCid);
 
-            virtualBallot = await CoopDecryptBallot(virtualBallot, election.Id, publishedBallot.IpfsCid);
+            virtualBallot = await CoopDecryptBallot(virtualBallot, election.Id!, publishedBallot.IpfsCid);
 
             return virtualBallot;
         }
@@ -158,7 +158,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             if (!paperBallot.HasShortCodes(selection))
             {
-                throw new ArgumentNullException("Selection is not valid", nameof(evidenceDto.SelectedOptions));
+                throw new ArgumentNullException(nameof(evidenceDto.SelectedOptions), "Selection is not valid");
             }
             
             await _contractRepository.PublishShortCodes(paperBallot.Election, paperBallot.BallotId, selection);
@@ -186,14 +186,14 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             foreach (Registration consensusNode in election.Blockchain.Registrations)
             {
                 DecryptedBallotShareDto? decryptedBallot =
-                    await _consensusNodeService.DecryptBallot(consensusNode.Endpoint, ballot, election.Id, ipfsCid);
+                    await _consensusNodeService.DecryptBallot(consensusNode.Endpoint, ballot, election.Id!, ipfsCid);
 
                 if (decryptedBallot == null)
                 {
                     throw new NullReferenceException("Decrypted ballot share must not be null.");
                 }
 
-                decryptedBallot.PublicKey = consensusNode.PublicKeys[election.Id];
+                decryptedBallot.PublicKey = consensusNode.PublicKeys[election.Id!];
 
                 IList<OptionShare> optionSharesPart = _mapper.Map<IList<OptionShare>>(decryptedBallot);
 

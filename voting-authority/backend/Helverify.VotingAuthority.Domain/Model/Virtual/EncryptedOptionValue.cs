@@ -20,11 +20,10 @@ public sealed class EncryptedOptionValue
     /// </summary>
     public ProofOfZeroOrOne ProofOfZeroOrOne { get; internal set; }
 
-
-    public EncryptedOptionValue()
-    {
-        
-    }
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    public EncryptedOptionValue() {}
 
     /// <summary>
     /// Constructor

@@ -6,17 +6,24 @@ using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Repository
 {
+    /// <inheritdoc cref="IPublishedBallotRepository"/>
     internal class PublishedBallotRepository : IPublishedBallotRepository
     {
         private readonly IMapper _mapper;
         private readonly IStorageClient _storageClient;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mapper">Automapper instance</param>
+        /// <param name="storageClient">IPFS Storage Client</param>
         public PublishedBallotRepository(IMapper mapper, IStorageClient storageClient)
         {
             _mapper = mapper;
             _storageClient = storageClient;
         }
 
+        /// <inheritdoc cref="IPublishedBallotRepository.StoreVirtualBallot"/>
         public VirtualBallot StoreVirtualBallot(VirtualBallot ballot)
         {
             VirtualBallotDao ballotDao = _mapper.Map<VirtualBallotDao>(ballot);
@@ -28,6 +35,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             return ballot;
         }
 
+        /// <inheritdoc cref="IPublishedBallotRepository.StoreSpoiltBallot"/>
         public string StoreSpoiltBallot(VirtualBallot virtualBallot, IDictionary<string, IList<BigInteger>> randomness)
         {
             SpoiltBallotDao spoiltBallot = _mapper.Map<SpoiltBallotDao>(virtualBallot);
@@ -39,6 +47,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             return cid;
         }
 
+        /// <inheritdoc cref="IPublishedBallotRepository.RetrieveVirtualBallot"/>
         public VirtualBallot RetrieveVirtualBallot(string ipfsCid)
         {
             VirtualBallotDao encryption = _storageClient.Retrieve<VirtualBallotDao>(ipfsCid).Result;

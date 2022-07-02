@@ -23,6 +23,9 @@ public sealed class EncryptedOption
     /// </summary>
     public string Hash { get; }
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
     public EncryptedOption()
     {
         Values = new List<EncryptedOptionValue>();

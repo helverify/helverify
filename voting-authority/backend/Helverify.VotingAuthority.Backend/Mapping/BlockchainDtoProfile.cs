@@ -1,12 +1,17 @@
 ﻿using AutoMapper;
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
-using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Backend.Mapping
 {
+    /// <summary>
+    /// Mapping profile for Blockchain configuration
+    /// </summary>
     public class BlockchainDtoProfile: Profile
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public BlockchainDtoProfile()
         {
             CreateBlockchainDtoProfile();

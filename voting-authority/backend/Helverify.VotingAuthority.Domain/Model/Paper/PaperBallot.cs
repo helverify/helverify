@@ -64,6 +64,11 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
             Options = options;
         }
 
+        /// <summary>
+        /// Retrieves the random values used to encrypt the ballot.
+        /// </summary>
+        /// <param name="ballotIndex">Index of the desired ballot (0 or 1)</param>
+        /// <returns></returns>
         public IDictionary<string, IList<BigInteger>> GetRandomness(int ballotIndex)
         {
             IDictionary<string, IList<BigInteger>> randomness = new Dictionary<string, IList<BigInteger>>();
@@ -76,6 +81,11 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
             return randomness;
         }
 
+        /// <summary>
+        /// Generates a PDF of this ballot.
+        /// </summary>
+        /// <param name="pdfTemplate">PDF template to be used</param>
+        /// <returns></returns>
         public byte[] CreatePdf(IDocument pdfTemplate)
         {
             byte[] pdfBytes = pdfTemplate.GeneratePdf();
@@ -117,6 +127,11 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
             }
         }
 
+        /// <summary>
+        /// Verifies if the selected short codes are a subset of either of the two sets of short codes contained in this ballot.
+        /// </summary>
+        /// <param name="selection">Selected short codes</param>
+        /// <returns></returns>
         public bool HasShortCodes(IList<string> selection)
         {
             // inspired by https://stackoverflow.com/questions/332973/check-whether-an-array-is-a-subset-of-another
@@ -127,6 +142,9 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
             return areShortCodesOfBallot1 ^ areShortCodesOfBallot2;
         }
 
+        /// <summary>
+        /// Removes the plaintext option names from all ballots.
+        /// </summary>
         public void ClearConfidential()
         {
             foreach (PaperBallotOption paperBallotOption in Options)

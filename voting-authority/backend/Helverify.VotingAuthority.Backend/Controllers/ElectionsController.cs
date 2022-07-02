@@ -179,6 +179,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         }
 
 
+        /// <summary>
+        /// Deploys a smart contract for the specified election.
+        /// </summary>
+        /// <param name="id">Election identifier</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("{id}/contract")]
         public async Task<ActionResult<ElectionDto>> DeployContract([FromRoute] string id)
@@ -242,13 +247,13 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             {
                 DecryptionShareDto? share = await _consensusNodeService.DecryptShareAsync(node.Endpoint, cipher.C, cipher.D);
 
-                ProofOfDecryption proof = new ProofOfDecryption(new BigInteger(share.ProofOfDecryption.D, 16), 
+                ProofOfDecryption proof = new ProofOfDecryption(new BigInteger(share!.ProofOfDecryption.D, 16), 
                     new BigInteger(share.ProofOfDecryption.U, 16),
                     new BigInteger(share.ProofOfDecryption.V, 16),
                     new BigInteger(share.ProofOfDecryption.S, 16));
 
                 bool isValid = proof.Verify(new BigInteger(cipher.C, 16), new BigInteger(cipher.D, 16),
-                    new DHPublicKeyParameters(node.PublicKeys[election.Id], election.DhParameters));
+                    new DHPublicKeyParameters(node.PublicKeys[election.Id!], election.DhParameters));
 
                 if (!isValid)
                 {

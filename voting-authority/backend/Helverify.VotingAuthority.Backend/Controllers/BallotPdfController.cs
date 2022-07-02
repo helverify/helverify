@@ -24,10 +24,10 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="electionRepository"></param>
-        /// <param name="ballotRepository"></param>
-        /// <param name="pdfService"></param>
-        /// <param name="zipFileService"></param>
+        /// <param name="electionRepository">Data access to elections</param>
+        /// <param name="ballotRepository">Data access to ballots</param>
+        /// <param name="pdfService">PDF generator</param>
+        /// <param name="zipFileService">ZIP file generator</param>
         public BallotPdfController(IRepository<Election> electionRepository,
             IRepository<PaperBallot> ballotRepository,
             IBallotPdfService pdfService,
@@ -39,6 +39,12 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             _zipFileService = zipFileService;
         }
 
+        /// <summary>
+        /// Generates PDF ballots packed into a ZIP file.
+        /// </summary>
+        /// <param name="electionId">Election identifier</param>
+        /// <param name="numberOfBallots">Number of ballots to be printed</param>
+        /// <returns></returns>
         [HttpGet]
         [Produces(ContentTypeZip)]
         public async Task<ActionResult> GenerateAllPdfs([FromRoute] string electionId, int numberOfBallots)

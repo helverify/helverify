@@ -6,31 +6,78 @@ using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Model.Decryption
 {
-    public class DecryptedShare
+    /// <summary>
+    /// Represents a single decrypted share of a ciphertext.
+    /// </summary>
+    public struct DecryptedShare
     {
+        /// <summary>
+        /// Decrypted share value
+        /// </summary>
         public BigInteger Share { get; set; }
 
+        /// <summary>
+        /// Proof of correct decryption
+        /// </summary>
         public ProofOfDecryption ProofOfDecryption { get; set; }
 
+        /// <summary>
+        /// Public key share of the decrypting consensus node
+        /// </summary>
         public BigInteger PublicKeyShare { get; set; }
     }
 
-    public class OptionShare
+    /// <summary>
+    /// Represents a decrypted share of an entire option (e.g., representing plaintext [0, 0, 1])
+    /// </summary>
+    public struct OptionShare
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public OptionShare()
+        {
+            ShortCode = null;
+            Shares = new List<DecryptedShare>();
+        }
+
+        /// <summary>
+        /// Short code of the option
+        /// </summary>
         public string ShortCode { get; set; }
 
-        public IList<DecryptedShare> Shares { get; set; } = new List<DecryptedShare>();
+        /// <summary>
+        /// Decrypted shares of each atomic encryption
+        /// </summary>
+        public IList<DecryptedShare> Shares { get; set; } 
     }
 
+    /// <summary>
+    /// Contains all shares of a decrypted ballot.
+    /// </summary>
     public class BallotShares
     {
+        /// <summary>
+        /// Contains the shares of all options of this ballot
+        /// </summary>
         public IList<OptionShare> OptionShares { get; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="optionShares">Decrypted shares of options</param>
         public BallotShares(IList<OptionShare> optionShares)
         {
             OptionShares = optionShares;
         }
 
+        /// <summary>
+        /// Reconstructs the plaintext ballot form the decrypted shares.
+        /// </summary>
+        /// <param name="election">Election</param>
+        /// <param name="virtualBallot">Ballot to be merged into</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public VirtualBallot CombineShares(Election election, VirtualBallot virtualBallot)
         {
             foreach (EncryptedOption encryptedOption in virtualBallot.EncryptedOptions)
@@ -71,12 +118,5 @@ namespace Helverify.VotingAuthority.Domain.Model.Decryption
 
             return virtualBallot;
         }
-    }
-
-
-    public class DecryptedBallot
-    {
-        public string BallotCode { get; set; }
-        public IList<PlainTextOption> PlainTextOptions { get; set; } = new List<PlainTextOption>();
     }
 }

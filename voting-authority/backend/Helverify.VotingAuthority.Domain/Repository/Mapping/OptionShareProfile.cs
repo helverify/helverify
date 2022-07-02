@@ -5,7 +5,10 @@ using Helverify.VotingAuthority.Domain.Repository.Mapping.Converter;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 {
-    internal class OptionShareProfile: Profile
+    /// <summary>
+    /// Mapping profile for OptionShares
+    /// </summary>
+    public class OptionShareProfile: Profile
     {
         public OptionShareProfile()
         {

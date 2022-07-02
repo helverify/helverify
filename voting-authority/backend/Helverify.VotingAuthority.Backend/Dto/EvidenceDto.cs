@@ -2,9 +2,21 @@
 
 namespace Helverify.VotingAuthority.Backend.Dto
 {
-    public class EvidenceDto
+    /// <summary>
+    /// Parameters for publishing voting evidence.
+    /// </summary>
+    public struct EvidenceDto
     {
-        public IList<string> SelectedOptions { get; set; } = new List<string>();
+        public EvidenceDto()
+        {
+            SpoiltBallotIndex = 0;
+            SelectedOptions = new List<string>();
+        }
+
+        /// <summary>
+        /// Contains the selected options of a ballot.
+        /// </summary>
+        public IList<string> SelectedOptions { get; set; }
 
         /// <summary>
         /// Column to be spoiled (0 or 1)

@@ -7,8 +7,33 @@ using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping.Converter
 {
+    /// <summary>
+    /// Custom type converter for restoring OptionShares
+    /// </summary>
     public class OptionShareConverter : ITypeConverter<DecryptedBallotShareDto, IList<OptionShare>>
     {
+        /// <inheritdoc cref="ITypeConverter{TSource,TDestination}.Convert"/>
+        public IList<OptionShare> Convert(DecryptedBallotShareDto decryptedBallot, IList<OptionShare> destination, ResolutionContext context)
+        {
+            IList<OptionShare> optionSharesPart = new List<OptionShare>();
+
+            foreach (string key in decryptedBallot.DecryptedShares.Keys)
+            {
+                IList<DecryptionShareDto> decryptedShareDtos = decryptedBallot.DecryptedShares[key];
+
+                IList<DecryptedShare> shares = ConvertDecryptedShares(decryptedShareDtos, decryptedBallot.PublicKey);
+
+                OptionShare optionShare = new OptionShare
+                {
+                    ShortCode = key,
+                    Shares = shares,
+                };
+
+                optionSharesPart.Add(optionShare);
+            }
+
+            return optionSharesPart;
+        }
 
         private IList<DecryptedShare> ConvertDecryptedShares(IList<DecryptionShareDto> decryptedBallotDecryptedShare,
             BigInteger publicKey)
@@ -33,28 +58,6 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping.Converter
             }
 
             return shares;
-        }
-
-        public IList<OptionShare> Convert(DecryptedBallotShareDto decryptedBallot, IList<OptionShare> destination, ResolutionContext context)
-        {
-            IList<OptionShare> optionSharesPart = new List<OptionShare>();
-
-            foreach (string key in decryptedBallot.DecryptedShares.Keys)
-            {
-                IList<DecryptionShareDto> decryptedShareDtos = decryptedBallot.DecryptedShares[key];
-
-                IList<DecryptedShare> shares = ConvertDecryptedShares(decryptedShareDtos, decryptedBallot.PublicKey);
-
-                OptionShare optionShare = new OptionShare
-                {
-                    ShortCode = key,
-                    Shares = shares,
-                };
-
-                optionSharesPart.Add(optionShare);
-            }
-
-            return optionSharesPart;
         }
     }
 }

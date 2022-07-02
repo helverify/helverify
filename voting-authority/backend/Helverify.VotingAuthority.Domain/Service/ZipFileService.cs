@@ -2,8 +2,10 @@
 
 namespace Helverify.VotingAuthority.Domain.Service
 {
+    /// <inheritdoc cref="IZipFileService"/>
     internal class ZipFileService : IZipFileService
     {
+        /// <inheritdoc cref="IZipFileService.CreateZip"/>
         public byte[] CreateZip(IList<ArchiveFile> files)
         {
             // inspired by https://stackoverflow.com/questions/51740673/building-a-corrupted-zip-file-using-asp-net-core-and-angular-6

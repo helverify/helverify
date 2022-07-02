@@ -5,10 +5,12 @@ using QuestPDF.Infrastructure;
 
 namespace Helverify.VotingAuthority.Domain.Service
 {
+    /// <inheritdoc cref="IBallotPdfService"/>
     internal class BallotPdfService : IBallotPdfService
     {
         private const string FileExtensionPdf = ".pdf";
-        
+
+        /// <inheritdoc cref="IBallotPdfService.GeneratePdfs"/>
         public async Task<IList<ArchiveFile>> GeneratePdfs(Election election, IList<PaperBallot> ballots)
         {
             IList<ArchiveFile> archiveFiles = new List<ArchiveFile>();

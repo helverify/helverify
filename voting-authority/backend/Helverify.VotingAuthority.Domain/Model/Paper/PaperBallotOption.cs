@@ -22,7 +22,14 @@ public sealed class PaperBallotOption
     /// </summary>
     public string ShortCode2 { get; }
 
+    /// <summary>
+    /// Random values used to encrypt the first ballot
+    /// </summary>
     public IList<BigInteger> RandomValues1 { get; }
+
+    /// <summary>
+    /// Random values used to encrypt the second ballot
+    /// </summary>
 
     public IList<BigInteger> RandomValues2 { get; }
 

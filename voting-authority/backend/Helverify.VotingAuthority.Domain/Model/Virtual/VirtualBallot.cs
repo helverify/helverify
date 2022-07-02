@@ -36,8 +36,14 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
         /// </summary>
         public IList<SumProof> ColumnProofs { get; }
 
+        /// <summary>
+        /// Address indicating the storage location of this ballot on IPFS.
+        /// </summary>
         public string IpfsCid { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public VirtualBallot()
         {
             EncryptedOptions = new List<EncryptedOption>();
@@ -155,6 +161,10 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
             return sum;
         }
 
+        /// <summary>
+        /// Retrieves the random values used to encrypt this ballot.
+        /// </summary>
+        /// <returns></returns>
         public IDictionary<string, IList<BigInteger>> GetRandomness()
         {
             IDictionary<string, IList<BigInteger>> randomness = new Dictionary<string, IList<BigInteger>>();

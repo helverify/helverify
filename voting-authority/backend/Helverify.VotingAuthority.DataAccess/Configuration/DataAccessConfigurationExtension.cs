@@ -22,21 +22,20 @@ namespace Helverify.VotingAuthority.DataAccess.Configuration
         /// <exception cref="InvalidOperationException"></exception>
         public static IServiceCollection AddDataAccessConfiguration(this IServiceCollection services)
         {
-            string connectionString = Environment.GetEnvironmentVariable("MongoDbConnectionString") ?? throw new InvalidOperationException();
-            string ipfsHost = Environment.GetEnvironmentVariable("IpfsHost") ?? throw new InvalidOperationException();
-            string web3ConnectionString = Environment.GetEnvironmentVariable("GethEndpoint") ?? throw new ArgumentNullException("GethEndpoint");
-            string accountPassword = Environment.GetEnvironmentVariable("BC_ACCOUNT_PWD") ??
-                                     throw new ArgumentNullException("BC_ACCOUNT_PWD");
+            string connectionString = Environment.GetEnvironmentVariable(EnvironmentVariables.MongoDbConnectionString) ?? throw new InvalidOperationException();
+            string ipfsHost = Environment.GetEnvironmentVariable(EnvironmentVariables.IpfsHost) ?? throw new InvalidOperationException();
+            string accountPassword = Environment.GetEnvironmentVariable(EnvironmentVariables.BcAccountPassword) ??
+                                     throw new ArgumentNullException(nameof(EnvironmentVariables.BcAccountPassword));
 
             services.AddHttpClient();
             services.AddSingleton<IRestClient, RestClient>();
             services.AddSingleton<IStorageClient, StorageClient>();
-            services.AddSingleton(cfg => new IpfsClient(ipfsHost));
+            services.AddSingleton(_ => new IpfsClient(ipfsHost));
             services.AddSingleton<IFileSystem, FileSystem>();
-            services.AddSingleton<IWeb3Loader>(cfg =>
+            services.AddSingleton(cfg =>
             {
                 IWeb3Loader loader =
-                    new Web3Loader(cfg.GetService<IFileSystem>(), accountPassword);
+                    new Web3Loader(cfg.GetService<IFileSystem>()!, accountPassword);
 
                 loader.LoadInstance();
 
@@ -45,7 +44,6 @@ namespace Helverify.VotingAuthority.DataAccess.Configuration
             services.AddScoped<IMongoClient>(_ => new MongoClient(connectionString));
             services.AddScoped(typeof(IMongoService<>), typeof(MongoService<>));
             
-
             return services;
         }
     }
