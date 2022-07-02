@@ -44,7 +44,20 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
         /// <returns></returns>
         public VirtualBallot Encrypt()
         {
-            return new VirtualBallot(PlainTextOptions, new DHPublicKeyParameters(Election.PublicKey, Election.DhParameters));
+            VirtualBallot virtualBallot = CreateVirtualBallot();
+
+            while (!virtualBallot.AreShortCodesUnique())
+            {
+                virtualBallot = CreateVirtualBallot();
+            }
+
+            return virtualBallot;
+        }
+
+        private VirtualBallot CreateVirtualBallot()
+        {
+            return new VirtualBallot(PlainTextOptions,
+                new DHPublicKeyParameters(Election.PublicKey, Election.DhParameters));
         }
     }
 }

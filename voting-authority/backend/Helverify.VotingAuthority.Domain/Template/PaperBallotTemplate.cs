@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using Helverify.VotingAuthority.Backend.Dto;
-using Helverify.VotingAuthority.Domain.Model;
+﻿using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Newtonsoft.Json;
 using QRCoder;
@@ -9,7 +7,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
-namespace Helverify.VotingAuthority.Backend.Template
+namespace Helverify.VotingAuthority.Domain.Template
 {
     /// <summary>
     /// According to this tutorial: https://www.questpdf.com/documentation/getting-started.html
@@ -148,7 +146,7 @@ namespace Helverify.VotingAuthority.Backend.Template
 
         private byte[] GenerateQrCode()
         {
-            BallotQrData ballotQr = new BallotQrData(Election.Id, PaperBallot.BallotId);
+            BallotQrData ballotQr = new BallotQrData(Election.Id!, PaperBallot.BallotId);
 
             string jsonQrData = JsonConvert.SerializeObject(ballotQr);
 

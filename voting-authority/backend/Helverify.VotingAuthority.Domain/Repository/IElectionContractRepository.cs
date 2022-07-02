@@ -1,5 +1,5 @@
-﻿using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
-using Helverify.VotingAuthority.Domain.Model;
+﻿using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 
 namespace Helverify.VotingAuthority.Domain.Repository;
@@ -43,7 +43,7 @@ public interface IElectionContractRepository
     /// <param name="election">Election</param>
     /// <param name="id">Ballot ID</param>
     /// <returns></returns>
-    Task<PaperBallot> GetBallot(Election election, string id);
+    Task<IList<PublishedBallot>> GetBallot(Election election, string id);
 
     /// <summary>
     /// Publishes the short codes of the selected options of one ballot.

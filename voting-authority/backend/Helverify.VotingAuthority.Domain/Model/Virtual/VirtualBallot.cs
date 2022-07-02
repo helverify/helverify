@@ -36,6 +36,8 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
         /// </summary>
         public IList<SumProof> ColumnProofs { get; }
 
+        public string IpfsCid { get; set; }
+
         public VirtualBallot()
         {
             EncryptedOptions = new List<EncryptedOption>();

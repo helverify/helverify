@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
 using Helverify.VotingAuthority.Domain.Model;
@@ -57,7 +56,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         }
 
         /// <inheritdoc cref="IElectionContractRepository.StoreBallots"/>
-        public async Task StoreBallots(Election election, IList<PaperBallot> paperBallots)
+        public async Task StoreBallots(Election election, IList<Model.Paper.PaperBallot> paperBallots)
         {
             Web3 web3 = _web3Loader.Web3Instance;
 
@@ -65,9 +64,24 @@ namespace Helverify.VotingAuthority.Domain.Repository
 
             ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
 
+            List<PaperBallot> ballots = paperBallots.Select(pb =>
+            {
+                VirtualBallot ballot1 = pb.Ballots[0];
+                VirtualBallot ballot2 = pb.Ballots[1];
+
+                return new PaperBallot
+                {
+                    Ballot1Code = ballot1.Code,
+                    Ballot1Ipfs = ballot1.IpfsCid,
+                    Ballot2Code = ballot2.Code,
+                    Ballot2Ipfs = ballot2.IpfsCid,
+                    BallotId = pb.BallotId
+                };
+            }).ToList();
+
             StoreBallotFunction storeBallotFunction = new StoreBallotFunction
             {
-                Ballots = paperBallots.ToList()
+                Ballots = ballots
             };
 
             await contract.SendRequestAsync(storeBallotFunction);
@@ -104,7 +118,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         }
 
         /// <inheritdoc cref="IElectionContractRepository.GetBallot"/>
-        public async Task<PaperBallot> GetBallot(Election election, string id)
+        public async Task<IList<PublishedBallot>> GetBallot(Election election, string id)
         {
             Web3 web3 = _web3Loader.Web3Instance;
 
@@ -118,8 +132,22 @@ namespace Helverify.VotingAuthority.Domain.Repository
             };
 
             PaperBallot paperBallot = (await contract.QueryDeserializingToObjectAsync<RetrieveBallotFunction, RetrieveBallotOutputDTO>(retrieveBallotFunction)).ReturnValue1;
-
-            return paperBallot;
+            
+            return new List<PublishedBallot>
+            {
+                new ()
+                {
+                    BallotId = paperBallot.BallotId,
+                    BallotCode = paperBallot.Ballot1Code,
+                    IpfsCid = paperBallot.Ballot1Ipfs
+                },
+                new ()
+                {
+                    BallotId = paperBallot.BallotId,
+                    BallotCode = paperBallot.Ballot2Code,
+                    IpfsCid = paperBallot.Ballot2Ipfs
+                }
+            };
         }
 
         /// <inheritdoc cref="IElectionContractRepository.PublishShortCodes"/>

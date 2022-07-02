@@ -26,7 +26,6 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<ElectionDtoProfile>();
     cfg.AddProfile<RegistrationDtoProfile>();
-    cfg.AddProfile<BallotProfile>();
     cfg.AddProfile<BlockchainDtoProfile>();
 });
 

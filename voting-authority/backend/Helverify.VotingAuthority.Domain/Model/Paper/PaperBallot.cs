@@ -1,6 +1,8 @@
 ﻿using Helverify.VotingAuthority.Domain.Helper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Org.BouncyCastle.Math;
+using QuestPDF.Fluent;
+using QuestPDF.Infrastructure;
 
 namespace Helverify.VotingAuthority.Domain.Model.Paper
 {
@@ -12,7 +14,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
         /// <summary>
         /// Election in for this paper ballot has been produced.
         /// </summary>
-        public Election Election { get; }
+        public Election Election { get; set; }
 
         /// <summary>
         /// Identifier, consists of the hash of both virtual ballots.
@@ -60,6 +62,29 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
         {
             BallotId = ballotId;
             Options = options;
+        }
+
+        public IDictionary<string, IList<BigInteger>> GetRandomness(int ballotIndex)
+        {
+            IDictionary<string, IList<BigInteger>> randomness = new Dictionary<string, IList<BigInteger>>();
+
+            foreach (PaperBallotOption paperBallotOption in Options)
+            {
+                randomness[paperBallotOption.GetShortCode(ballotIndex)] = paperBallotOption.GetRandomness(ballotIndex);
+            }
+
+            return randomness;
+        }
+
+        public byte[] CreatePdf(IDocument pdfTemplate)
+        {
+            byte[] pdfBytes = pdfTemplate.GeneratePdf();
+
+            Printed = true;
+
+            ClearConfidential();
+
+            return pdfBytes;
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿namespace Helverify.VotingAuthority.Backend.Dto
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Helverify.VotingAuthority.Backend.Dto
 {
     public class EvidenceDto
     {
@@ -7,6 +9,7 @@
         /// <summary>
         /// Column to be spoiled (0 or 1)
         /// </summary>
+        [Range(0, 1)]
         public int SpoiltBallotIndex { get; set; }
     }
 }

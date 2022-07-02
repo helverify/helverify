@@ -1,4 +1,4 @@
-﻿namespace Helverify.VotingAuthority.Backend.Dto;
+﻿namespace Helverify.VotingAuthority.Domain.Template;
 
 public class BallotQrData
 {

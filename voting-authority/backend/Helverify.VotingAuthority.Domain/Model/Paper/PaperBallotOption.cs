@@ -41,8 +41,43 @@ public sealed class PaperBallotOption
         RandomValues2 = randomValues2;
     }
 
+    /// <summary>
+    /// Clears the plain text name of the option.
+    /// </summary>
     public void ClearConfidential()
     {
         Name = string.Empty;
+    }
+
+    /// <summary>
+    /// Returns the randomness used for encrypting the ballot with the specified index.
+    /// </summary>
+    /// <param name="ballotIndex">0 or 1</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public IList<BigInteger> GetRandomness(int ballotIndex)
+    {
+        if (ballotIndex is not (0 or 1))
+        {
+            throw new ArgumentException("Index must be either 0 or 1", nameof(ballotIndex));
+        }
+        
+        return ballotIndex == 0 ? RandomValues1 : RandomValues2;
+    }
+
+    /// <summary>
+    /// Returns the short code of the specified ballot option.
+    /// </summary>
+    /// <param name="ballotIndex">0 or 1</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public string GetShortCode(int ballotIndex)
+    {
+        if (ballotIndex is not (0 or 1))
+        {
+            throw new ArgumentException("Index must be either 0 or 1", nameof(ballotIndex));
+        }
+
+        return ballotIndex == 0 ? ShortCode1 : ShortCode2;
     }
 }
