@@ -54,9 +54,17 @@ export interface Blockchain {
   registrations?: Registration[] | null;
 }
 
+/**
+ * Contains the blockchain parameters for configuration
+ */
 export interface BlockchainDto {
+  /** ID of the blockchain */
   id?: string | null;
+
+  /** Caption */
   name?: string | null;
+
+  /** Registered consensus nodes */
   registrations?: RegistrationDto[] | null;
 }
 
@@ -68,11 +76,6 @@ export interface Cipher {
   c?: string | null;
 
   /** Second parameter of an ElGamal ciphertext */
-  d?: string | null;
-}
-
-export interface CipherTextDto {
-  c?: string | null;
   d?: string | null;
 }
 
@@ -152,14 +155,20 @@ export interface ElectionOptionDto {
   name?: string | null;
 }
 
-export interface EncryptedOptionDao {
-  shortCode?: string | null;
-  values?: EncryptedOptionValueDao[] | null;
-}
+/**
+ * Parameters for publishing voting evidence.
+ */
+export interface EvidenceDto {
+  /** Contains the selected options of a ballot. */
+  selectedOptions?: string[] | null;
 
-export interface EncryptedOptionValueDao {
-  cipher?: CipherTextDto;
-  proofOfZeroOrOne?: ProofOfZeroOrOneDao;
+  /**
+   * Column to be spoiled (0 or 1)
+   * @format int32
+   * @min 0
+   * @max 1
+   */
+  spoiltBallotIndex?: number;
 }
 
 /**
@@ -171,48 +180,6 @@ export interface Message {
    * @format int32
    */
   m?: number;
-}
-
-/**
- * Contains the data needed for printing a ballot on paper.
- */
-export interface PrintBallotDto {
-  /** Ballot identifier */
-  ballotId?: string | null;
-
-  /** Selectable election options / candidates. */
-  options?: PrintOptionDto[] | null;
-}
-
-/**
- * Represents one selectable option / candidate
- */
-export interface PrintOptionDto {
-  /** Name of the option / candidate */
-  name?: string | null;
-
-  /** First short code (from first virtual ballot) */
-  shortCode1?: string | null;
-
-  /** Second short code (from second virtual ballot) */
-  shortCode2?: string | null;
-}
-
-export interface ProofOfContainingOneDao {
-  u?: string | null;
-  v?: string | null;
-  s?: string | null;
-}
-
-export interface ProofOfZeroOrOneDao {
-  u0?: string | null;
-  u1?: string | null;
-  v0?: string | null;
-  v1?: string | null;
-  c0?: string | null;
-  c1?: string | null;
-  r0?: string | null;
-  r1?: string | null;
 }
 
 export interface Registration {
@@ -239,18 +206,6 @@ export interface RegistrationDto {
 
   /** Public key of the consensus node. */
   publicKeys?: string[] | null;
-}
-
-export interface SumProofDao {
-  cipher?: CipherTextDto;
-  proofOfContainingOne?: ProofOfContainingOneDao;
-}
-
-export interface VirtualBallotDao {
-  code?: string | null;
-  rowProofs?: SumProofDao[] | null;
-  columnProofs?: SumProofDao[] | null;
-  encryptedOptions?: EncryptedOptionDao[] | null;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -470,34 +425,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     /**
      * No description
      *
-     * @tags Ballots
-     * @name ElectionsBallotsEncryptedDetail
-     * @summary TODO: refactor, only temporary for demo purposes
-     * @request GET:/api/elections/{electionId}/ballots/encrypted
+     * @tags BallotPdf
+     * @name ElectionsBallotsPdfDetail
+     * @summary Generates PDF ballots packed into a ZIP file.
+     * @request GET:/api/elections/{electionId}/ballots/pdf
      */
-    electionsBallotsEncryptedDetail: (electionId: string, query?: { id?: string }, params: RequestParams = {}) =>
-        this.request<VirtualBallotDao[], any>({
-          path: `/api/elections/${electionId}/ballots/encrypted`,
+    electionsBallotsPdfDetail: (electionId: string, query?: { numberOfBallots?: number }, params: RequestParams = {}) =>
+        this.request<void, any>({
+          path: `/api/elections/${electionId}/ballots/pdf`,
           method: "GET",
           query: query,
-          format: "json",
-          ...params,
-        }),
-
-    /**
-     * No description
-     *
-     * @tags Ballots
-     * @name ElectionsBallotsDetail
-     * @summary Shows the ballot data needed for printing a paper ballot.
-     * @request GET:/api/elections/{electionId}/ballots
-     */
-    electionsBallotsDetail: (electionId: string, query?: { id?: string }, params: RequestParams = {}) =>
-        this.request<PrintBallotDto, any>({
-          path: `/api/elections/${electionId}/ballots`,
-          method: "GET",
-          query: query,
-          format: "json",
           ...params,
         }),
 
@@ -523,34 +460,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * No description
      *
      * @tags Ballots
-     * @name ElectionsBallotsPdfDetail
-     * @summary Generates a PDF for the specified ballot.
-     * @request GET:/api/elections/{electionId}/ballots/pdf
+     * @name ElectionsBallotsEvidenceCreate
+     * @summary Publishes the evidence of a casted ballot, consisting of the selected short codes and the ballot to be spoiled.
+     * @request POST:/api/elections/{electionId}/ballots/{ballotId}/evidence
      */
-    electionsBallotsPdfDetail: (electionId: string, query?: { ballotId?: string }, params: RequestParams = {}) =>
-        this.request<void, any>({
-          path: `/api/elections/${electionId}/ballots/pdf`,
-          method: "GET",
-          query: query,
-          ...params,
-        }),
-
-    /**
-     * No description
-     *
-     * @tags Ballots
-     * @name ElectionsBallotsPdfAllDetail
-     * @request GET:/api/elections/{electionId}/ballots/pdf/all
-     */
-    electionsBallotsPdfAllDetail: (
+    electionsBallotsEvidenceCreate: (
         electionId: string,
-        query?: { numberOfBallots?: number },
+        ballotId: string,
+        data: EvidenceDto,
         params: RequestParams = {},
     ) =>
         this.request<void, any>({
-          path: `/api/elections/${electionId}/ballots/pdf/all`,
-          method: "GET",
-          query: query,
+          path: `/api/elections/${electionId}/ballots/${ballotId}/evidence`,
+          method: "POST",
+          body: data,
+          type: ContentType.Json,
           ...params,
         }),
 
@@ -692,6 +616,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags Elections
      * @name ElectionsContractCreate
+     * @summary Deploys a smart contract for the specified election.
      * @request POST:/api/elections/{id}/contract
      */
     electionsContractCreate: (id: string, params: RequestParams = {}) =>
