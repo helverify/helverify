@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Helverify.VotingAuthority.DataAccess.Ethereum;
+﻿using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
@@ -12,37 +11,35 @@ namespace Helverify.VotingAuthority.Domain.Repository
     public class ElectionContractRepository : IElectionContractRepository
     {
         private readonly IWeb3Loader _web3Loader;
-        private readonly IMapper _mapper;
-
+        
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="web3Loader">Web3 accessor</param>
         /// <param name="mapper">Automapper</param>
-        public ElectionContractRepository(IWeb3Loader web3Loader, IMapper mapper)
+        public ElectionContractRepository(IWeb3Loader web3Loader)
         {
             _web3Loader = web3Loader;
-            _mapper = mapper;
         }
 
-        /// <inheritdoc cref="IElectionContractRepository.DeployContract"/>
-        public async Task<string> DeployContract()
+        /// <inheritdoc cref="IElectionContractRepository.DeployContractAsync"/>
+        public async Task<string> DeployContractAsync()
         {
             ElectionDeployment electionDeployment = new ElectionDeployment();
 
-            Web3 web3 = _web3Loader.Web3Instance;
+            IWeb3 web3 = _web3Loader.Web3Instance;
 
-            await UnlockAccount();
+            await UnlockAccountAsync();
 
             return (await web3.Eth.GetContractDeploymentHandler<ElectionDeployment>().SendRequestAndWaitForReceiptAsync(electionDeployment)).ContractAddress;
         }
 
-        /// <inheritdoc cref="IElectionContractRepository.SetUp"/>
-        public async Task SetUp(Election election)
+        /// <inheritdoc cref="IElectionContractRepository.SetUpAsync"/>
+        public async Task SetUpAsync(Election election)
         {
-            Web3 web3 = _web3Loader.Web3Instance;
+            IWeb3 web3 = _web3Loader.Web3Instance;
 
-            await UnlockAccount();
+            await UnlockAccountAsync();
 
             ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
             
@@ -55,12 +52,12 @@ namespace Helverify.VotingAuthority.Domain.Repository
             await contract.SendRequestAndWaitForReceiptAsync(setUpFunction);
         }
 
-        /// <inheritdoc cref="IElectionContractRepository.StoreBallots"/>
-        public async Task StoreBallots(Election election, IList<Model.Paper.PaperBallot> paperBallots)
+        /// <inheritdoc cref="IElectionContractRepository.StoreBallotsAsync"/>
+        public async Task StoreBallotsAsync(Election election, IList<Model.Paper.PaperBallot> paperBallots)
         {
-            Web3 web3 = _web3Loader.Web3Instance;
+            IWeb3 web3 = _web3Loader.Web3Instance;
 
-            await UnlockAccount();
+            await UnlockAccountAsync();
 
             ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
 
@@ -87,12 +84,12 @@ namespace Helverify.VotingAuthority.Domain.Repository
             await contract.SendRequestAsync(storeBallotFunction);
         }
 
-        /// <inheritdoc cref="IElectionContractRepository.GetBallotIds"/>
-        public async Task<IList<string>> GetBallotIds(Election election)
+        /// <inheritdoc cref="IElectionContractRepository.GetBallotIdsAsync"/>
+        public async Task<IList<string>> GetBallotIdsAsync(Election election)
         {
-            Web3 web3 = _web3Loader.Web3Instance;
+            IWeb3 web3 = _web3Loader.Web3Instance;
 
-            await UnlockAccount();
+            await UnlockAccountAsync();
 
             ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
 
@@ -117,12 +114,12 @@ namespace Helverify.VotingAuthority.Domain.Repository
             return ballotIds;
         }
 
-        /// <inheritdoc cref="IElectionContractRepository.GetBallot"/>
-        public async Task<IList<PublishedBallot>> GetBallot(Election election, string id)
+        /// <inheritdoc cref="IElectionContractRepository.GetBallotAsync"/>
+        public async Task<IList<PublishedBallot>> GetBallotAsync(Election election, string id)
         {
-            Web3 web3 = _web3Loader.Web3Instance;
+            IWeb3 web3 = _web3Loader.Web3Instance;
 
-            await UnlockAccount();
+            await UnlockAccountAsync();
 
             ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
 
@@ -150,12 +147,12 @@ namespace Helverify.VotingAuthority.Domain.Repository
             };
         }
 
-        /// <inheritdoc cref="IElectionContractRepository.PublishShortCodes"/>
-        public async Task PublishShortCodes(Election election, string id, IList<string> shortCodes)
+        /// <inheritdoc cref="IElectionContractRepository.PublishShortCodesAsync"/>
+        public async Task PublishShortCodesAsync(Election election, string id, IList<string> shortCodes)
         {
-            Web3 web3 = _web3Loader.Web3Instance;
+            IWeb3 web3 = _web3Loader.Web3Instance;
 
-            await UnlockAccount();
+            await UnlockAccountAsync();
 
             ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
 
@@ -168,12 +165,12 @@ namespace Helverify.VotingAuthority.Domain.Repository
             await contract.SendRequestAsync(publishShortCodesFunction);
         }
 
-        /// <inheritdoc cref="IElectionContractRepository.SpoilBallot"/>
-        public async Task SpoilBallot(string ballotId, string virtualBallotId, Election election, string ipfsCid)
+        /// <inheritdoc cref="IElectionContractRepository.SpoilBallotAsync"/>
+        public async Task SpoilBallotAsync(string ballotId, string virtualBallotId, Election election, string ipfsCid)
         {
-            Web3 web3 = _web3Loader.Web3Instance;
+            IWeb3 web3 = _web3Loader.Web3Instance;
 
-            await UnlockAccount();
+            await UnlockAccountAsync();
 
             ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
 
@@ -187,9 +184,9 @@ namespace Helverify.VotingAuthority.Domain.Repository
             await contract.SendRequestAsync(spoilBallotFunction);
         }
 
-        private async Task UnlockAccount(int seconds = 120)
+        private async Task UnlockAccountAsync(int seconds = 120)
         {
-            Web3 web3 = _web3Loader.Web3Instance;
+            IWeb3 web3 = _web3Loader.Web3Instance;
 
             await web3.Personal.UnlockAccount.SendRequestAsync(_web3Loader.Account.Address, _web3Loader.Password, 120);
         }

@@ -192,11 +192,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             Election election = await _electionRepository.GetAsync(id);
 
-            election.ContractAddress = await _contractRepository.DeployContract();
+            election.ContractAddress = await _contractRepository.DeployContractAsync();
 
             await _electionRepository.UpdateAsync(id, election);
 
-            await _contractRepository.SetUp(election);
+            await _contractRepository.SetUpAsync(election);
 
             ElectionDto electionDto = _mapper.Map<ElectionDto>(election);
 

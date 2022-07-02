@@ -97,7 +97,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             {
                 IList<PaperBallot> partition = paperBallots.Skip(i).Take(partitionSize).ToList();
 
-                await _contractRepository.StoreBallots(election, partition);
+                await _contractRepository.StoreBallotsAsync(election, partition);
             }
 
             return Ok(paperBallots.Count);
@@ -136,14 +136,14 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             string cid = _publishedBallotRepository.StoreSpoiltBallot(virtualBallot, paperBallot.GetRandomness(spoiltBallotIndex));
 
-            await _contractRepository.SpoilBallot(paperBallot.BallotId, virtualBallot.Code, election, cid);
+            await _contractRepository.SpoilBallotAsync(paperBallot.BallotId, virtualBallot.Code, election, cid);
 
             return Ok();
         }
 
         private async Task<VirtualBallot> DecryptBallot(Election election, string ballotId, int spoiltBallotIndex)
         {
-            PublishedBallot publishedBallot = (await _contractRepository.GetBallot(election, ballotId))[spoiltBallotIndex];
+            PublishedBallot publishedBallot = (await _contractRepository.GetBallotAsync(election, ballotId))[spoiltBallotIndex];
 
             VirtualBallot virtualBallot = _publishedBallotRepository.RetrieveVirtualBallot(publishedBallot.IpfsCid);
 
@@ -161,7 +161,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
                 throw new ArgumentNullException(nameof(evidenceDto.SelectedOptions), "Selection is not valid");
             }
             
-            await _contractRepository.PublishShortCodes(paperBallot.Election, paperBallot.BallotId, selection);
+            await _contractRepository.PublishShortCodesAsync(paperBallot.Election, paperBallot.BallotId, selection);
         }
         
         private async Task<VirtualBallot> CoopDecryptBallot(VirtualBallot ballot, string electionId, string ipfsCid)
@@ -186,7 +186,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             foreach (Registration consensusNode in election.Blockchain.Registrations)
             {
                 DecryptedBallotShareDto? decryptedBallot =
-                    await _consensusNodeService.DecryptBallot(consensusNode.Endpoint, ballot, election.Id!, ipfsCid);
+                    await _consensusNodeService.DecryptBallotAsync(consensusNode.Endpoint, ballot, election.Id!, ipfsCid);
 
                 if (decryptedBallot == null)
                 {

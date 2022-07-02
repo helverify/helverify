@@ -139,7 +139,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
             
             bool areShortCodesOfBallot2 = selection.All(s => Options.Select(s => s.ShortCode2).Contains(s));
 
-            return areShortCodesOfBallot1 ^ areShortCodesOfBallot2;
+            return areShortCodesOfBallot1 || areShortCodesOfBallot2;
         }
 
         /// <summary>

@@ -91,7 +91,8 @@ namespace Helverify.VotingAuthority.Domain.Service
             await _restClient.Call(HttpMethod.Post, new Uri(endpoint, BcSealingRoute));
         }
 
-        public async Task<DecryptedBallotShareDto?> DecryptBallot(Uri endpoint, VirtualBallot ballot, string electionId, string ipfsCid)
+        /// <inheritdoc cref="IConsensusNodeService.DecryptBallotAsync"/>
+        public async Task<DecryptedBallotShareDto?> DecryptBallotAsync(Uri endpoint, VirtualBallot ballot, string electionId, string ipfsCid)
         {
             EncryptedBallotDto encryptedBallotDto = new EncryptedBallotDto(electionId, ballot.Code, ipfsCid);
 

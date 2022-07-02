@@ -1,4 +1,5 @@
-﻿using Helverify.VotingAuthority.Domain.Model;
+﻿using System.IO.Abstractions;
+using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Template;
 using QuestPDF.Infrastructure;
@@ -21,11 +22,7 @@ namespace Helverify.VotingAuthority.Domain.Service
 
                 byte[] pdfBytes = paperBallot.CreatePdf(paperBallotTemplate);
 
-                archiveFiles.Add(new ArchiveFile
-                {
-                    FileName = $"{paperBallot.BallotId}{FileExtensionPdf}",
-                    Data = pdfBytes
-                });
+                archiveFiles.Add(new ArchiveFile($"{paperBallot.BallotId}{FileExtensionPdf}", pdfBytes));
             }
 
             return archiveFiles;

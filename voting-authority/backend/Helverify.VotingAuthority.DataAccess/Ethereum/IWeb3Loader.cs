@@ -21,7 +21,7 @@ public interface IWeb3Loader
     /// <summary>
     /// Web3 instance (singleton)
     /// </summary>
-    public Web3 Web3Instance { get; }
+    public IWeb3 Web3Instance { get; }
     
     /// <summary>
     /// Establishes a connection to the machine's geth IPC.

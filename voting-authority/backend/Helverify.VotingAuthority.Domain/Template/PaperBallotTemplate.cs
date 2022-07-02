@@ -1,4 +1,5 @@
-﻿using Helverify.VotingAuthority.Domain.Model;
+﻿using System.IO.Abstractions;
+using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Newtonsoft.Json;
 using QRCoder;
@@ -14,7 +15,7 @@ namespace Helverify.VotingAuthority.Domain.Template
     /// </summary>
     public class PaperBallotTemplate : IDocument
     {
-        private const string BallotChoiceSymbolPath = "/app/graphics/square.png";
+        private const string BallotChoiceSymbolPath = "graphics/square.png";
         private const float BallotChoiceSize = 0.4f;
         private static byte[] BallotChoiceSymbol;
 

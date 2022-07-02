@@ -72,5 +72,5 @@ public interface IConsensusNodeService
     /// <param name="electionId">Identifier of current election</param>
     /// <param name="ipfsCid">Storage address of the encrypted ballot on IPFS</param>
     /// <returns></returns>
-    Task<DecryptedBallotShareDto?> DecryptBallot(Uri endpoint, VirtualBallot ballot, string electionId, string ipfsCid);
+    Task<DecryptedBallotShareDto?> DecryptBallotAsync(Uri endpoint, VirtualBallot ballot, string electionId, string ipfsCid);
 }

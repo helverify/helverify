@@ -14,10 +14,13 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Paper
 {
     internal class PaperBallotTests
     {
-        [Test]
-        public void TestPaperBallot()
+        private Election _election;
+        private VirtualBallot _ballot1;
+        private VirtualBallot _ballot2;
+
+        [SetUp]
+        public void SetUp()
         {
-            // arrange
             BigInteger p = new BigInteger(
                 "87a8e61db4b6663cffbbd19c651959998ceef608660dd0f25d2ceed4435e3b00e00df8f1d61957d4faf7df4561b2aa3016c3d91134096faa3bf4296d830e9a7c209e0c6497517abd5a8a9d306bcf67ed91f9e6725b4758c022e0b1ef4275bf7b6c5bfc11d45f9088b941f54eb1e59bb8bc39a0bf12307f5c4fdb70c581b23f76b63acae1caa6b7902d52526735488a0ef13c6d9a51bfa4ab3ad8347796524d8ef6a167b5a41825d967e144e5140564251ccacb83e6b486f6b3ca3f7971506026c0b857f689962856ded4010abd0be621c3a3960a54e710c375f26375d7014103a4b54330c198af126116d2276e11715f693877fad7ef09cadb094ae91e1a1597",
                 16);
@@ -29,7 +32,7 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Paper
             AsymmetricCipherKeyPair keyPair = elGamal.KeyGen(p, g);
             DHPublicKeyParameters publicKey = (keyPair.Public as DHPublicKeyParameters)!;
 
-            Election election = new Election
+            _election = new Election
             {
                 Name = "Test",
                 Question = "Vote for whom?",
@@ -44,19 +47,12 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Paper
                 PublicKey = publicKey.Y
             };
 
-            BallotTemplate ballotTemplate = new BallotTemplate(election);
+            BallotTemplate ballotTemplate = new BallotTemplate(_election);
 
-            VirtualBallot ballot1 = ballotTemplate.Encrypt();
-            VirtualBallot ballot2 = ballotTemplate.Encrypt();
-
-            // act
-            PaperBallot paperBallot = new PaperBallot(election, ballot1, ballot2);
-
-            // assert
-            Assert.That(paperBallot, Is.Not.Null); // TODO: add more assertions
+            _ballot1 = ballotTemplate.Encrypt();
+            _ballot2 = ballotTemplate.Encrypt();
         }
-
-
+        
         [Test]
         public void TestPaperBallotPerformance()
         {
@@ -112,6 +108,55 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Paper
             
             // assert
             Assert.That(ballots.Count, Is.EqualTo(testIterations)); 
+        }
+
+        [Test]
+        public void TestGetRandomness()
+        {
+            // arrange
+            PaperBallot paperBallot = new PaperBallot(_election, _ballot1, _ballot2);
+
+            // act
+            IDictionary<string, IList<BigInteger>> randomness1 = paperBallot.GetRandomness(0);
+            IDictionary<string, IList<BigInteger>> randomness2 = paperBallot.GetRandomness(1);
+
+            // assert
+            Assert.That(randomness1, Is.EqualTo(_ballot1.GetRandomness()));
+            Assert.That(randomness2, Is.EqualTo(_ballot2.GetRandomness()));
+        }
+
+        [Test]
+        public void TestGetRandomnessInvalidIndex()
+        {
+            // arrange
+            PaperBallot paperBallot = new PaperBallot(_election, _ballot1, _ballot2);
+
+            // act, assert
+            Assert.Throws<ArgumentException>(() => paperBallot.GetRandomness(2));
+        }
+
+        [Test]
+        public void TestHasShortCodes()
+        {
+            // arrange
+            PaperBallot paperBallot = new PaperBallot(_election, _ballot1, _ballot2);
+
+            IList<string> shortCodes1 = _ballot1.EncryptedOptions.Select(o => o.ShortCode).ToList();
+            IList<string> shortCodes2 = _ballot2.EncryptedOptions.Select(o => o.ShortCode).ToList();
+
+            string shortCode11 = shortCodes1[0];
+            string shortCode12 = shortCodes1[1];
+            string shortCode2 = shortCodes2[0];
+
+            // act
+            bool hasShortCodes1 = paperBallot.HasShortCodes(new List<string>{shortCode11, shortCode12});
+            bool hasShortCodes2 = paperBallot.HasShortCodes(new List<string>{shortCode2});
+            bool hasShortCodes3 = paperBallot.HasShortCodes(new List<string>{shortCode11, "inexistent shortcode"});
+
+            // assert
+            Assert.True(hasShortCodes1);
+            Assert.True(hasShortCodes2);
+            Assert.False(hasShortCodes3);
         }
     }
 }

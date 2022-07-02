@@ -20,7 +20,7 @@ namespace Helverify.VotingAuthority.DataAccess.Ethereum
         public string Password { get; }
 
         /// <inheritdoc cref="IWeb3Loader.Web3Instance"/>
-        public Web3 Web3Instance { get; private set; }
+        public IWeb3 Web3Instance { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -45,7 +45,7 @@ namespace Helverify.VotingAuthority.DataAccess.Ethereum
 
             Account = Account.LoadFromKeyStore(keyFilePath, Password, 13337);
 
-            Web3 instance = new Web3(Account, new UnixIpcClient(IpcPath));
+            IWeb3 instance = new Web3(Account, new UnixIpcClient(IpcPath));
             
             instance.Eth.TransactionManager.UseLegacyAsDefault = true;
             
