@@ -9,8 +9,16 @@ using Helverify.ConsensusNode.Domain.Repository;
 [assembly: InternalsVisibleTo("Helverify.ConsensusNode.Domain.Tests")]
 namespace Helverify.ConsensusNode.Domain.Configuration
 {
+    /// <summary>
+    /// Extension class to register domain services.
+    /// </summary>
     public static class DomainConfigurationExtension
     {
+        /// <summary>
+        /// Adds all services needed by the domain layer to the DI container.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection AddDomainConfiguration(this IServiceCollection services)
         {
             services.AddDataAccessConfiguration();

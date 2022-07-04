@@ -6,8 +6,14 @@ using Org.BouncyCastle.Math;
 
 namespace Helverify.ConsensusNode.Domain.Mapping
 {
+    /// <summary>
+    /// Mapping profile for encrypted ballots
+    /// </summary>
     internal class BallotEncryptionProfile : Profile
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public BallotEncryptionProfile()
         {
             CreateCiphertextMapping();

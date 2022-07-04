@@ -1,5 +1,8 @@
 ﻿namespace Helverify.ConsensusNode.DataAccess.Ipfs;
 
+/// <summary>
+/// IPFS accessor
+/// </summary>
 public interface IStorageClient
 {
     /// <summary>

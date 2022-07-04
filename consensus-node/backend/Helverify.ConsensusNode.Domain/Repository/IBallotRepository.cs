@@ -2,7 +2,15 @@
 
 namespace Helverify.ConsensusNode.Domain.Repository;
 
+/// <summary>
+/// Provides access to encrypted ballots
+/// </summary>
 public interface IBallotRepository
 {
-    Task<BallotEncryption> GetBallotEncryption(string cid);
+    /// <summary>
+    /// Retrieves encrypted ballots from IPFS
+    /// </summary>
+    /// <param name="cid">IPFS cid (address) of the encrypted ballot</param>
+    /// <returns></returns>
+    Task<BallotEncryption> GetBallotEncryptionAsync(string cid);
 }

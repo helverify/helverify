@@ -1,6 +1,5 @@
 ﻿using Ipfs.Http;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Helverify.ConsensusNode.DataAccess.Ipfs
 {

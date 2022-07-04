@@ -5,18 +5,25 @@ using Helverify.ConsensusNode.Domain.Model;
 
 namespace Helverify.ConsensusNode.Domain.Repository
 {
+    /// <inheritdoc cref="IBallotRepository"/>
     public class BallotRepository : IBallotRepository
     {
         private readonly IStorageClient _storageClient;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="storageClient">IPFS storage client</param>
+        /// <param name="mapper">Automapper instance</param>
         public BallotRepository(IStorageClient storageClient, IMapper mapper)
         {
             _storageClient = storageClient;
             _mapper = mapper;
         }
 
-        public async Task<BallotEncryption> GetBallotEncryption(string cid)
+        /// <inheritdoc cref="IBallotRepository.GetBallotEncryptionAsync"/>
+        public async Task<BallotEncryption> GetBallotEncryptionAsync(string cid)
         {
             VirtualBallotDao ballot = await _storageClient.Retrieve<VirtualBallotDao>(cid);
 

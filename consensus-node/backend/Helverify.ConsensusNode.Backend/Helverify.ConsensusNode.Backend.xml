@@ -67,11 +67,11 @@
             <param name="requestDto">CipherText of an ElGamal cryptosystem</param>
             <returns>Decrypted share</returns>
         </member>
-        <member name="M:Helverify.ConsensusNode.Backend.Controllers.DecryptionController.PostBallotDecryption(Helverify.ConsensusNode.Backend.Controllers.EncryptedBallotDto)">
+        <member name="M:Helverify.ConsensusNode.Backend.Controllers.DecryptionController.PostBallotDecryption(Helverify.ConsensusNode.Backend.Dto.EncryptedBallotDto)">
             <summary>
-            Decrypts this node's share of the specified ciphertext.
+            Decrypts this node's share of the specified ballot.
             </summary>
-            <param name="requestDto">CipherText of an ElGamal cryptosystem</param>
+            <param name="requestDto">Contains the data necessary to retrieve an encrypted ballot from IPFS</param>
             <returns>Decrypted share</returns>
         </member>
         <member name="T:Helverify.ConsensusNode.Backend.Controllers.KeyPairController">
@@ -128,6 +128,26 @@
         <member name="P:Helverify.ConsensusNode.Backend.Dto.DecryptionShareDto.ProofOfDecryption">
             <summary>
             Chaum-Pedersen proof that the encryption has been done correctly.
+            </summary>
+        </member>
+        <member name="T:Helverify.ConsensusNode.Backend.Dto.EncryptedBallotDto">
+            <summary>
+            Represents an encrypted ballot to be decrypted
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.EncryptedBallotDto.ElectionId">
+            <summary>
+            Election identifier
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.EncryptedBallotDto.BallotCode">
+            <summary>
+            Ballot identifier
+            </summary>
+        </member>
+        <member name="P:Helverify.ConsensusNode.Backend.Dto.EncryptedBallotDto.IpfsCid">
+            <summary>
+            IPFS cid reference to retrieve the encrypted ballot
             </summary>
         </member>
         <member name="T:Helverify.ConsensusNode.Backend.Dto.EncryptedShareRequestDto">

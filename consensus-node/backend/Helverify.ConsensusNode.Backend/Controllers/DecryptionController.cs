@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Helverify.ConsensusNode.Backend.Dto;
-using Helverify.ConsensusNode.DataAccess.Ipfs;
 using Helverify.ConsensusNode.Domain.Model;
 using Helverify.ConsensusNode.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
@@ -53,9 +52,9 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         }
 
         /// <summary>
-        /// Decrypts this node's share of the specified ciphertext.
+        /// Decrypts this node's share of the specified ballot.
         /// </summary>
-        /// <param name="requestDto">CipherText of an ElGamal cryptosystem</param>
+        /// <param name="requestDto">Contains the data necessary to retrieve an encrypted ballot from IPFS</param>
         /// <returns>Decrypted share</returns>
         [HttpPost]
         [Consumes("application/json")]
@@ -65,7 +64,7 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         {
             AsymmetricCipherKeyPair keyPair = _keyPairHandler.LoadFromDisk(requestDto.ElectionId);
 
-            BallotEncryption ballotEncryption = await _ballotRepository.GetBallotEncryption(requestDto.IpfsCid);
+            BallotEncryption ballotEncryption = await _ballotRepository.GetBallotEncryptionAsync(requestDto.IpfsCid);
 
             IDictionary<string, IList<DecryptionShareDto>> decryptedShares = new Dictionary<string, IList<DecryptionShareDto>>();
 
