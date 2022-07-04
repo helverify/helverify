@@ -1,17 +1,11 @@
-import {Camera, CameraAlt, QrCodeScanner} from "@mui/icons-material";
+import {CameraAlt, QrCodeScanner} from "@mui/icons-material";
 import {QrReader} from "react-qr-reader";
 import {useState} from "react";
 import {
     Box,
     Button,
     Card,
-    CardContent,
-    Checkbox,
-    FormControl, FormControlLabel, FormLabel, Radio,
-    RadioGroup,
-    Skeleton,
-    Stack,
-    Typography
+    Stack
 } from "@mui/material";
 import {apiClient} from "../../api/apiClient";
 import {ElectionDto, PrintBallotDto} from "../../api/Api";
@@ -51,17 +45,17 @@ export const BallotRegistrationView = () => {
                             {isCameraEnabled && (<QrReader
                                 onResult={(res, err) => {
                                     let text = res?.getText();
-                                    if (text === undefined || text === null) {
-                                        return;
-                                    }
-
-                                    if (text.length > 0) {
+                                    if (!!text) {
                                         let data = JSON.parse(text);
 
                                         const qrData: QrData = {electionId: data.ElectionId, ballotId: data.BallotId};
 
                                         loadElection(qrData);
                                         loadBallot(qrData);
+                                    }
+
+                                    if(err && err.message){
+                                        console.log(err.message)
                                     }
                                 }}
                                 constraints={{facingMode: "environment"}}

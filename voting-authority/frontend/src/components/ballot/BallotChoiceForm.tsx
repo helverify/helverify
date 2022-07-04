@@ -1,7 +1,10 @@
 import {
     Backdrop,
-    Button, Card,
-    CardContent, Checkbox, CircularProgress,
+    Button,
+    Card,
+    CardContent,
+    Checkbox,
+    CircularProgress,
     FormControl,
     FormControlLabel,
     FormLabel,
@@ -10,7 +13,7 @@ import {
     Stack,
     Typography
 } from "@mui/material";
-import { EvidenceDto, PrintBallotDto, PrintOptionDto} from "../../api/Api";
+import {EvidenceDto, PrintBallotDto, PrintOptionDto} from "../../api/Api";
 import {useState} from "react";
 import {apiClient} from "../../api/apiClient";
 
@@ -48,8 +51,7 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
         let choicesClone;
 
         if (checked) {
-            const newChoice = index;
-            choicesClone = [...choices, newChoice];
+            choicesClone = [...choices, index];
         } else {
             const optionIndex = choices.indexOf(index, 0);
             choicesClone = [...choices];
@@ -61,26 +63,26 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
 
     const handleSubmit = () => {
         if (!(column === 0 || column === 1)) {
-            throw "Column not selected";
+            throw new Error("Column not selected");
         }
 
         if (props.ballot === undefined || props.ballot === null) {
-            throw "Ballot is not defined"
+            throw new Error("Ballot is not defined");
         }
 
         const ballot = props.ballot;
 
         if(ballot.options === undefined || ballot.options === null){
-            throw "Ballot options are not defined"
+            throw new Error("Ballot options are not defined");
         }
 
         const options = ballot.options;
 
         // get correct short codes for column selection
         let selection : string[] = [];
-        choices.map(choice => {
+        choices.forEach(choice => {
             if(!options[choice]){
-                throw "Undefined option";
+                throw new Error("Undefined option");
             }
 
             let shortCode;
@@ -92,7 +94,7 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
             }
 
             if(shortCode === undefined || shortCode === null){
-                throw "Undefined short code";
+                throw new Error("Undefined short code");
             }
 
             selection.push(shortCode);
@@ -104,7 +106,7 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
         }
 
         if(ballot.ballotId === undefined || ballot.ballotId === null){
-            throw "BallotId not set";
+            throw new Error("BallotId not set");
         }
 
         setLoading(true);
