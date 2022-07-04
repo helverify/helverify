@@ -59,6 +59,22 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         }
 
         /// <summary>
+        /// Shows the ballot data needed for printing a paper ballot.
+        /// </summary>
+        /// <param name="id">Ballot id</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Produces(ContentTypeJson)]
+        public async Task<ActionResult<PrintBallotDto>> GetPrint(string id)
+        {
+            PaperBallot paperBallot = await _ballotRepository.GetAsync(id);
+
+            PrintBallotDto printBallot = _mapper.Map<PrintBallotDto>(paperBallot);
+
+            return printBallot;
+        }
+
+        /// <summary>
         /// Generates new ballots, stores the encryptions on IPFS, publishes the evidence and the IPFS CIDs on the smart contract,
         /// and persists the plaintext print ballots onto the database.
         /// </summary>

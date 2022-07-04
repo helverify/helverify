@@ -160,3 +160,4 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model.Paper
         }
     }
 }
+    

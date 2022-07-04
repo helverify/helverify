@@ -92,8 +92,6 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
 
             Printed = true;
 
-            ClearConfidential();
-
             return pdfBytes;
         }
 

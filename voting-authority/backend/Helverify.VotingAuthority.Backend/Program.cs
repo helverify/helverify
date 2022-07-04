@@ -27,6 +27,7 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<ElectionDtoProfile>();
     cfg.AddProfile<RegistrationDtoProfile>();
     cfg.AddProfile<BlockchainDtoProfile>();
+    cfg.AddProfile<BalloDtoProfile>();
 });
 
 builder.Services.AddCors(opt =>
