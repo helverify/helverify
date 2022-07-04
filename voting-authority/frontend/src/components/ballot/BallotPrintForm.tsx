@@ -17,7 +17,7 @@ export const BallotPrintForm = () => {
 
         setLoading(true);
 
-        const url: string = `${process.env.REACT_APP_VA_BACKEND}/api/elections/${electionId}/ballots/pdf/all?numberOfBallots=${numberOfBallots}`;
+        const url: string = `${process.env.REACT_APP_VA_BACKEND}/api/elections/${electionId}/ballots/pdf?numberOfBallots=${numberOfBallots}`;
 
         // inspired by https://stackoverflow.com/questions/66811401/material-ui-how-to-download-a-file-when-clicking-a-button
         const downloadLink = document.createElement("a");

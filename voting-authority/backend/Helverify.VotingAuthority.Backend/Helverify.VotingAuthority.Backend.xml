@@ -4,28 +4,44 @@
         <name>Helverify.VotingAuthority.Backend</name>
     </assembly>
     <members>
+        <member name="T:Helverify.VotingAuthority.Backend.Controllers.BallotPdfController">
+            <summary>
+            Controller for Ballot PDF handling
+            </summary>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotPdfController.#ctor(Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Paper.PaperBallot},Helverify.VotingAuthority.Domain.Service.IBallotPdfService,Helverify.VotingAuthority.Domain.Service.IZipFileService)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="electionRepository">Data access to elections</param>
+            <param name="ballotRepository">Data access to ballots</param>
+            <param name="pdfService">PDF generator</param>
+            <param name="zipFileService">ZIP file generator</param>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotPdfController.GenerateAllPdfs(System.String,System.Int32)">
+            <summary>
+            Generates PDF ballots packed into a ZIP file.
+            </summary>
+            <param name="electionId">Election identifier</param>
+            <param name="numberOfBallots">Number of ballots to be printed</param>
+            <returns></returns>
+        </member>
         <member name="T:Helverify.VotingAuthority.Backend.Controllers.BallotsController">
             <summary>
             Controller for handling ballot life-cycle.
             </summary>
         </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.#ctor(Helverify.VotingAuthority.DataAccess.Ipfs.IStorageClient,Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Paper.PaperBallot},AutoMapper.IMapper,Helverify.VotingAuthority.Domain.Repository.IElectionContractRepository)">
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.#ctor(Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Election},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Paper.PaperBallot},Helverify.VotingAuthority.Domain.Repository.IRepository{Helverify.VotingAuthority.Domain.Model.Blockchain.Blockchain},Helverify.VotingAuthority.Domain.Service.IConsensusNodeService,Helverify.VotingAuthority.Domain.Repository.IElectionContractRepository,Helverify.VotingAuthority.Domain.Repository.IPublishedBallotRepository,AutoMapper.IMapper)">
             <summary>
             Constructor
             </summary>
-            <param name="storageClient">Provides access to IFPS</param>
             <param name="electionRepository">Provides access to elections stored on the database.</param>
             <param name="ballotRepository">Provides access to plain text ballots stored on the database.</param>
+            <param name="publishedBallotRepository"></param>
             <param name="mapper">Automapper</param>
+            <param name="consensusNodeService"></param>
             <param name="contractRepository">Provides access to the Election smart contract.</param>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.Get(System.String,System.String)">
-            <summary>
-            TODO: refactor, only temporary for demo purposes
-            </summary>
-            <param name="electionId"></param>
-            <param name="id"></param>
-            <returns></returns>
+            <param name="bcRepository">Provides access to the blockchain settings</param>
         </member>
         <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.GetPrint(System.String)">
             <summary>
@@ -34,7 +50,7 @@
             <param name="id">Ballot id</param>
             <returns></returns>
         </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.Post(System.String,Helverify.VotingAuthority.Backend.Dto.BallotGenerationDto)">
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.GenerateBallots(System.String,Helverify.VotingAuthority.Backend.Dto.BallotGenerationDto)">
             <summary>
             Generates new ballots, stores the encryptions on IPFS, publishes the evidence and the IPFS CIDs on the smart contract,
             and persists the plaintext print ballots onto the database.
@@ -43,12 +59,13 @@
             <param name="ballotParameters">Contains the ballot generation parameters, such as number of ballots to be created.</param>
             <returns></returns>
         </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.GeneratePdf(System.String,System.String)">
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.BallotsController.PublishEvidence(System.String,System.String,Helverify.VotingAuthority.Backend.Dto.EvidenceDto)">
             <summary>
-            Generates a PDF for the specified ballot.
+            Publishes the evidence of a casted ballot, consisting of the selected short codes and the ballot to be spoiled.
             </summary>
-            <param name="electionId">Current election id</param>
-            <param name="ballotId">Id of ballot to be printed</param>
+            <param name="electionId">Election identifier</param>
+            <param name="ballotId">Ballot identifier</param>
+            <param name="evidenceDto">Evidence parameters</param>
             <returns></returns>
         </member>
         <member name="M:Helverify.VotingAuthority.Backend.Controllers.BlockchainController.Post(Helverify.VotingAuthority.Backend.Dto.BlockchainDto)">
@@ -121,6 +138,13 @@
             <param name="id">Election identifier</param>
             <returns>Election public key</returns>
         </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.ElectionsController.DeployContract(System.String)">
+            <summary>
+            Deploys a smart contract for the specified election.
+            </summary>
+            <param name="id">Election identifier</param>
+            <returns></returns>
+        </member>
         <member name="M:Helverify.VotingAuthority.Backend.Controllers.ElectionsController.Encrypt(System.String,Helverify.VotingAuthority.Backend.Dto.Message)">
             <summary>
             For testing purposes
@@ -145,6 +169,26 @@
         <member name="P:Helverify.VotingAuthority.Backend.Dto.BallotGenerationDto.NumberOfBallots">
             <summary>
             Number of ballots to be generated at once.
+            </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Dto.BlockchainDto">
+            <summary>
+            Contains the blockchain parameters for configuration
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.BlockchainDto.Id">
+            <summary>
+            ID of the blockchain
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.BlockchainDto.Name">
+            <summary>
+            Caption
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.BlockchainDto.Registrations">
+            <summary>
+            Registered consensus nodes
             </summary>
         </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.ElectionDto">
@@ -205,6 +249,21 @@
         <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionOptionDto.Name">
             <summary>
             Candidate/Option name
+            </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Dto.EvidenceDto">
+            <summary>
+            Parameters for publishing voting evidence.
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.EvidenceDto.SelectedOptions">
+            <summary>
+            Contains the selected options of a ballot.
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.EvidenceDto.SpoiltBallotIndex">
+            <summary>
+            Column to be spoiled (0 or 1)
             </summary>
         </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.Message">
@@ -287,12 +346,22 @@
             Public key of the consensus node.
             </summary>
         </member>
-        <member name="T:Helverify.VotingAuthority.Backend.Mapping.BallotProfile">
+        <member name="T:Helverify.VotingAuthority.Backend.Mapping.BalloDtoProfile">
             <summary>
             Mapping profile for Ballots
             </summary>
         </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Mapping.BallotProfile.#ctor">
+        <member name="M:Helverify.VotingAuthority.Backend.Mapping.BalloDtoProfile.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Mapping.BlockchainDtoProfile">
+            <summary>
+            Mapping profile for Blockchain configuration
+            </summary>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Mapping.BlockchainDtoProfile.#ctor">
             <summary>
             Constructor
             </summary>
@@ -316,34 +385,6 @@
             <summary>
             Constructor
             </summary>
-        </member>
-        <member name="T:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate">
-            <summary>
-            According to this tutorial: https://www.questpdf.com/documentation/getting-started.html
-            </summary>
-        </member>
-        <member name="P:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate.Election">
-            <summary>
-            Current election.
-            </summary>
-        </member>
-        <member name="P:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate.PaperBallot">
-            <summary>
-            Paper ballot containing options in plain text.
-            </summary>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate.#ctor(Helverify.VotingAuthority.Domain.Model.Election,Helverify.VotingAuthority.Domain.Model.Paper.PaperBallot)">
-            <summary>
-            Constructor
-            </summary>
-            <param name="election">Election</param>
-            <param name="paperBallot">Paper ballot to be printed</param>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate.GetMetadata">
-            <inheritdoc cref="M:QuestPDF.Infrastructure.IDocument.GetMetadata"/>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Template.PaperBallotTemplate.Compose(QuestPDF.Infrastructure.IDocumentContainer)">
-            <inheritdoc cref="M:QuestPDF.Infrastructure.IDocument.Compose(QuestPDF.Infrastructure.IDocumentContainer)"/>
         </member>
     </members>
 </doc>

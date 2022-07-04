@@ -73,6 +73,8 @@ export const ElectionForm = (props: SetupStepProps) => {
 
         newElection[name as keyof ElectionDto] = value; // https://www.nadershamma.dev/blog/2019/how-to-access-object-properties-dynamically-using-bracket-notation-in-typescript/
 
+        newElection.blockchainId = props.blockchain.id;
+
         setElection((oldElection) => ({...oldElection, ...newElection})); // https://blog.logrocket.com/using-react-usestate-object/
     };
 

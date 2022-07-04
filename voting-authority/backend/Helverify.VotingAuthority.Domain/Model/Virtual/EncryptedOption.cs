@@ -26,6 +26,14 @@ public sealed class EncryptedOption
     /// <summary>
     /// Constructor
     /// </summary>
+    public EncryptedOption()
+    {
+        Values = new List<EncryptedOptionValue>();
+    }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
     /// <param name="publicKey">Public key of the election</param>
     /// <param name="plainTextOption">Option in plaintext, list of zeros and a one (position of one = selected candidate / option)</param>
     public EncryptedOption(DHPublicKeyParameters publicKey, IList<int> plainTextOption)

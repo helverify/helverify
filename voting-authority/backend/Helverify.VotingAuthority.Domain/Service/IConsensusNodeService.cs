@@ -1,6 +1,7 @@
 ﻿using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
+using Helverify.VotingAuthority.Domain.Model.Virtual;
 
 namespace Helverify.VotingAuthority.Domain.Service;
 
@@ -62,4 +63,14 @@ public interface IConsensusNodeService
     /// <param name="endpoint">Consensus node's REST endpoint address</param>
     /// <returns></returns>
     Task StartSealingAsync(Uri endpoint);
+
+    /// <summary>
+    /// Starts the decryption process returning a decrypted share of the ballot.
+    /// </summary>
+    /// <param name="endpoint">Consensus node's REST endpoint address</param>
+    /// <param name="ballot">Ballot to be decrypted</param>
+    /// <param name="electionId">Identifier of current election</param>
+    /// <param name="ipfsCid">Storage address of the encrypted ballot on IPFS</param>
+    /// <returns></returns>
+    Task<DecryptedBallotShareDto?> DecryptBallotAsync(Uri endpoint, VirtualBallot ballot, string electionId, string ipfsCid);
 }

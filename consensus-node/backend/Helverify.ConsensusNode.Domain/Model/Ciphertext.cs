@@ -39,6 +39,7 @@ namespace Helverify.ConsensusNode.Domain.Model
             return new DecryptedShare
             {
                 Share = decrypted,
+                Cipher = _cipher,
                 ProofOfDecryption = ProofOfDecryption.Create(_cipher.C, _cipher.D, publicKey, privateKey)
             };
         }

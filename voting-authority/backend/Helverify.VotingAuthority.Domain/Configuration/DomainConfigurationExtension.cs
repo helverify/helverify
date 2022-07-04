@@ -6,6 +6,7 @@ using Helverify.VotingAuthority.Domain.Model.Blockchain;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Repository;
 using Helverify.VotingAuthority.Domain.Repository.Mapping;
+using Helverify.VotingAuthority.Domain.Repository.Mapping.Converter;
 using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,6 +26,7 @@ namespace Helverify.VotingAuthority.Domain.Configuration
         public static IServiceCollection AddDomainConfiguration(this IServiceCollection services)
         {
             services.AddTransient<GenesisConverter>();
+            services.AddTransient<OptionShareConverter>();
             services.AddAutoMapper(cfg =>
             {
                 cfg.AddProfile<BigIntegerProfile>();
@@ -34,6 +36,7 @@ namespace Helverify.VotingAuthority.Domain.Configuration
                 cfg.AddProfile<BallotProfile>();
                 cfg.AddProfile<PrintBallotProfile>();
                 cfg.AddProfile<BlockchainProfile>();
+                cfg.AddProfile<OptionShareProfile>();
             });
             services.AddDataAccessConfiguration();
             services.AddSingleton<IConsensusNodeService, ConsensusNodeService>();
@@ -41,8 +44,11 @@ namespace Helverify.VotingAuthority.Domain.Configuration
             services.AddScoped<IRepository<Election>, GenericRepository<Election, ElectionDao>>();
             services.AddScoped<IRepository<Blockchain>, GenericRepository<Blockchain, BlockchainDao>>();
             services.AddScoped<IRepository<PaperBallot>, PaperBallotRepository>();
+            services.AddScoped<IPublishedBallotRepository, PublishedBallotRepository>();
             services.AddScoped<IBlockchainSetup, BlockchainSetup>();
             services.AddScoped<IElectionContractRepository, ElectionContractRepository>();
+            services.AddScoped<IBallotPdfService, BallotPdfService>();
+            services.AddScoped<IZipFileService, ZipFileService>();
 
             return services;
         }

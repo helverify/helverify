@@ -4,6 +4,7 @@ using Helverify.VotingAuthority.DataAccess.Rest;
 using Helverify.VotingAuthority.Domain.Extensions;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
+using Helverify.VotingAuthority.Domain.Model.Virtual;
 
 namespace Helverify.VotingAuthority.Domain.Service
 {
@@ -12,6 +13,7 @@ namespace Helverify.VotingAuthority.Domain.Service
     {
         private const string KeyPairRoute = "/api/key-pair";
         private const string DecryptionRoute = "/api/decryption";
+        private const string DecryptBallotRoute = "/api/decryption/ballot";
         private const string BcGenesisRoute = "/api/blockchain/genesis";
         private const string BcAddressRoute = "/api/blockchain/account";
         private const string BcPeerRoute = "/api/blockchain/peer";
@@ -87,6 +89,14 @@ namespace Helverify.VotingAuthority.Domain.Service
         public async Task StartSealingAsync(Uri endpoint)
         {
             await _restClient.Call(HttpMethod.Post, new Uri(endpoint, BcSealingRoute));
+        }
+
+        /// <inheritdoc cref="IConsensusNodeService.DecryptBallotAsync"/>
+        public async Task<DecryptedBallotShareDto?> DecryptBallotAsync(Uri endpoint, VirtualBallot ballot, string electionId, string ipfsCid)
+        {
+            EncryptedBallotDto encryptedBallotDto = new EncryptedBallotDto(electionId, ballot.Code, ipfsCid);
+
+            return await _restClient.Call<DecryptedBallotShareDto>(HttpMethod.Post, new Uri(endpoint, DecryptBallotRoute), encryptedBallotDto);
         }
     }
 }

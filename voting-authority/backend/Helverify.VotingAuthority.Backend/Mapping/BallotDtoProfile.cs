@@ -7,12 +7,12 @@ namespace Helverify.VotingAuthority.Backend.Mapping
     /// <summary>
     /// Mapping profile for Ballots
     /// </summary>
-    public class BallotProfile: Profile
+    public class BalloDtoProfile : Profile
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        public BallotProfile()
+        public BalloDtoProfile()
         {
             CreateBallotMap();
         }

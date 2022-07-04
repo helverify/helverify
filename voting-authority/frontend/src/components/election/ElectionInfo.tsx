@@ -21,7 +21,7 @@ export const ElectionInfo = (props: ElectionInfoProps) => {
     const options = areOptionsSet(props.election.options) ? props.election.options : [];
 
     return (
-        <Box sx={{m: 2}}>
+        <Box>
             <Card variant="elevation">
                 <CardContent>
                     <Stack direction="column" spacing={1}>

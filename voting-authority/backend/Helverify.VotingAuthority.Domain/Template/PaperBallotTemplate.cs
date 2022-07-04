@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using Helverify.VotingAuthority.Backend.Dto;
+﻿using System.IO.Abstractions;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Newtonsoft.Json;
@@ -9,14 +8,14 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
-namespace Helverify.VotingAuthority.Backend.Template
+namespace Helverify.VotingAuthority.Domain.Template
 {
     /// <summary>
     /// According to this tutorial: https://www.questpdf.com/documentation/getting-started.html
     /// </summary>
     public class PaperBallotTemplate : IDocument
     {
-        private const string BallotChoiceSymbolPath = "/app/graphics/square.png";
+        private const string BallotChoiceSymbolPath = "graphics/square.png";
         private const float BallotChoiceSize = 0.4f;
         private static byte[] BallotChoiceSymbol;
 
@@ -148,7 +147,7 @@ namespace Helverify.VotingAuthority.Backend.Template
 
         private byte[] GenerateQrCode()
         {
-            BallotQrData ballotQr = new BallotQrData(Election.Id, PaperBallot.BallotId);
+            BallotQrData ballotQr = new BallotQrData(Election.Id!, PaperBallot.BallotId);
 
             string jsonQrData = JsonConvert.SerializeObject(ballotQr);
 

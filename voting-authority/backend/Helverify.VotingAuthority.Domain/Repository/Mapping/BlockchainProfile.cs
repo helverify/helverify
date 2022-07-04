@@ -4,8 +4,14 @@ using Helverify.VotingAuthority.Domain.Model.Blockchain;
 
 namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 {
+    /// <summary>
+    /// Mapping profile for Blockchain
+    /// </summary>
     public class BlockchainProfile: Profile
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public BlockchainProfile()
         {
             CreateBlockchainMapping();
