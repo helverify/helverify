@@ -1,7 +1,10 @@
-﻿using Helverify.VotingAuthority.DataAccess.Dto;
+﻿using Helverify.Cryptography.Encryption;
+using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
+using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
+using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Service;
 
@@ -22,10 +25,11 @@ public interface IConsensusNodeService
     /// Uses the consensus node to decrypt the share of a ciphertext.
     /// </summary>
     /// <param name="endpoint">Consensus node's REST endpoint address</param>
+    /// <param name="election">Current election</param>
     /// <param name="c">First component of ElGamal cipher (c)</param>
     /// <param name="d">Second component of ElGamal cipher (d)</param>
     /// <returns></returns>
-    Task<DecryptionShareDto?> DecryptShareAsync(Uri endpoint, string c, string d);
+    Task<DecryptedShare> DecryptShareAsync(Uri endpoint, Election election, ElGamalCipher cipher, BigInteger publicKey);
 
     /// <summary>
     /// Initializes the genesis block on a consensus node.

@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using Helverify.Cryptography.Encryption;
-using Helverify.Cryptography.ZeroKnowledge;
 using Helverify.VotingAuthority.Backend.Dto;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
+using Helverify.VotingAuthority.Domain.Model.Decryption;
+using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Helverify.VotingAuthority.Domain.Repository;
 using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
@@ -27,6 +27,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         private readonly IConsensusNodeService _consensusNodeService;
         private readonly IElectionContractRepository _contractRepository;
         private readonly IRepository<Blockchain> _bcRepository;
+        private readonly IPublishedBallotRepository _publishedBallotRepository;
         private readonly IMapper _mapper;
         private readonly IWeb3Loader _web3Loader;
 
@@ -37,12 +38,14 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         /// <param name="consensusNodeService">Accessor to consensus node service</param>
         /// <param name="contractRepository">Smart contract accessor</param>
         /// <param name="bcRepository">Blockchain repository</param>
+        /// <param name="publishedBallotRepository">Accessor to published ballots</param>
         /// <param name="web3Loader">Web3 instance loader</param>
         /// <param name="mapper">Automapper</param>
         public ElectionsController(IRepository<Election> electionRepository,
             IConsensusNodeService consensusNodeService, 
             IElectionContractRepository contractRepository,
             IRepository<Blockchain> bcRepository,
+            IPublishedBallotRepository publishedBallotRepository,
             IWeb3Loader web3Loader,
             IMapper mapper)
         {
@@ -50,6 +53,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             _consensusNodeService = consensusNodeService;
             _contractRepository = contractRepository;
             _bcRepository = bcRepository;
+            _publishedBallotRepository = publishedBallotRepository;
             _web3Loader = web3Loader;
             _mapper = mapper;
         }
@@ -203,37 +207,13 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return Ok(electionDto);
         }
 
-
         /// <summary>
-        /// For testing purposes
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("{id}/encrypt")]
-        public async Task<ActionResult<Cipher>> Encrypt(string id, Message message)
-        {
-            Election election = await _electionRepository.GetAsync(id);
-
-            ElGamalCipher cipher = election.Encrypt(message.M);
-
-            return new Cipher
-            {
-                C = cipher.C.ToString(16),
-                D = cipher.D.ToString(16)
-            };
-        }
-
-        /// <summary>
-        /// For testing purposes
+        /// Decrypts a single ciphertext cooperatively
         /// </summary>
         /// <param name="id"></param>
         /// <param name="cipher"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("{id}/decrypt")]
-        public async Task<ActionResult<Message>> Decrypt(string id, Cipher cipher)
+        private async Task<DecryptedValue> Decrypt(string id, ElGamalCipher cipher)
         {
             Election election = await _electionRepository.GetAsync(id);
 
@@ -241,34 +221,97 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             IList<Registration> consensusNodes = election.Blockchain.Registrations;
             
-            IList<string> shares = new List<string>();
+            IList<DecryptedShare> shares = new List<DecryptedShare>();
 
             foreach (Registration node in consensusNodes)
             {
-                DecryptionShareDto? share = await _consensusNodeService.DecryptShareAsync(node.Endpoint, cipher.C, cipher.D);
-
-                ProofOfDecryption proof = new ProofOfDecryption(new BigInteger(share!.ProofOfDecryption.D, 16), 
-                    new BigInteger(share.ProofOfDecryption.U, 16),
-                    new BigInteger(share.ProofOfDecryption.V, 16),
-                    new BigInteger(share.ProofOfDecryption.S, 16));
-
-                bool isValid = proof.Verify(new BigInteger(cipher.C, 16), new BigInteger(cipher.D, 16),
-                    new DHPublicKeyParameters(node.PublicKeys[election.Id!], election.DhParameters));
+                DecryptedShare share = await _consensusNodeService.DecryptShareAsync(node.Endpoint, election, cipher, node.PublicKeys[election.Id!]);
+                
+                bool isValid = share.ProofOfDecryption.Verify(cipher.C, cipher.D, new DHPublicKeyParameters(share.PublicKeyShare, election.DhParameters));
 
                 if (!isValid)
                 {
                     throw new Exception("Decryption proof is invalid");
                 }
 
-                shares.Add(share.DecryptedShare);
+                shares.Add(share);
             }
 
-            int message = election.CombineShares(shares, cipher.D);
+            int plainText = election.CombineShares(shares, cipher.D);
 
-            return new Message
+            return new DecryptedValue
             {
-                M = message
+                PlainText = plainText,
+                CipherText = cipher,
+                Shares = shares
             };
+        }
+
+        /// <summary>
+        /// Calculates the final tally and publishes the results with evidence.
+        /// </summary>
+        /// <param name="id">Election identifier</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("{id}/tally")]
+        public async Task<ActionResult> CalculateTally([FromRoute] string id)
+        {
+            Election election = await _electionRepository.GetAsync(id);
+
+            int numberOfBallots = await _contractRepository.GetNumberOfBallotsAsync(election);
+            
+            int index = 0;
+            int partitionSize = 100;
+
+            IList<EncryptedOption> selectedEncryptedOptions = await GetEncryptedOptions(index, numberOfBallots, election, partitionSize);
+
+            Tally tally = new Tally(selectedEncryptedOptions);
+
+            IList<ElGamalCipher> encryptedResults = tally.CalculateCipherResult(election);
+
+            IList<DecryptedValue> results = new List<DecryptedValue>();
+            
+            foreach (ElGamalCipher cipher in encryptedResults)
+            {
+                DecryptedValue decryptedValue = await Decrypt(election.Id!, cipher);
+
+                results.Add(decryptedValue);
+            }
+            
+            string evidenceCid = _publishedBallotRepository.StoreDecryptedResults(results);
+
+            await _contractRepository.PublishResults(election, results, evidenceCid);
+            
+            return Ok(results.Select(r => r.PlainText));
+        }
+
+        private async Task<IList<EncryptedOption>> GetEncryptedOptions(int index, int numberOfBallots, Election election, int partitionSize)
+        {
+            List<EncryptedOption> selectedEncryptedOptions = new List<EncryptedOption>();
+
+            while (index < numberOfBallots)
+            {
+                Tuple<IList<string>, int> result = await _contractRepository.GetBallotIdsAsync(election, index, partitionSize);
+
+                foreach (string ballotId in result.Item1)
+                {
+                    if (string.IsNullOrEmpty(ballotId))
+                    {
+                        break;
+                    }
+
+                    Tuple<PublishedBallot, IList<string>> ballotResult =
+                        await _contractRepository.GetCastBallotAsync(election, ballotId);
+
+                    VirtualBallot virtualBallot = _publishedBallotRepository.RetrieveVirtualBallot(ballotResult.Item1.IpfsCid);
+
+                    selectedEncryptedOptions.AddRange(virtualBallot.GetSelectedEncryptions(ballotResult.Item2));
+                }
+
+                index += partitionSize;
+            }
+
+            return selectedEncryptedOptions;
         }
     }
 }

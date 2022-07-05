@@ -1,4 +1,5 @@
 ﻿using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 
@@ -34,8 +35,10 @@ public interface IElectionContractRepository
     /// Retrieves all ballotIds for the specified election.
     /// </summary>
     /// <param name="election">Election</param>
+    /// <param name="startIndex">Ballot ID index to start reading from</param>
+    /// <param name="partitionSize">Number of elements to read</param>
     /// <returns></returns>
-    Task<IList<string>> GetBallotIdsAsync(Election election);
+    Task<Tuple<IList<string>, int>> GetBallotIdsAsync(Election election, int startIndex, int partitionSize);
 
     /// <summary>
     /// Retrieves a single ballot from the smart contract, containing a tuple (ballotId, ballot1Code, ballot1Ipfs, ballot2Code, ballot2Ipfs)
@@ -50,9 +53,10 @@ public interface IElectionContractRepository
     /// </summary>
     /// <param name="election">Election</param>
     /// <param name="id">Ballot ID</param>
+    /// <param name="ballotCode">Code of the virtual ballot</param>
     /// <param name="shortCodes">Selected short codes of the non-spoilt ballot.</param>
     /// <returns></returns>
-    Task PublishShortCodesAsync(Election election, string id, IList<string> shortCodes);
+    Task PublishBallotSelectionAsync(Election election, string id, string ballotCode, IList<string> shortCodes);
 
 
     /// <summary>
@@ -64,4 +68,26 @@ public interface IElectionContractRepository
     /// <param name="ipfsCid">IPFS Cid</param>
     /// <returns></returns>
     Task SpoilBallotAsync(string ballotId, string virtualBallotId, Election election, string ipfsCid);
+
+    /// <summary>
+    /// Returns the number of ballots registered on the smart contract.
+    /// </summary>
+    /// <param name="election">Election</param>
+    /// <returns></returns>
+    Task<int> GetNumberOfBallotsAsync(Election election);
+
+    /// <summary>
+    /// Returns the selection and storage location of a cast ballot.
+    /// </summary>
+    /// <param name="ballotId">Ballot identifier</param>
+    /// <returns></returns>
+    Task<Tuple<PublishedBallot, IList<string>>> GetCastBallotAsync(Election election, string ballotId);
+
+    /// <summary>
+    /// Publishes the decrypted results on the smart contract.
+    /// </summary>
+    /// <param name="results">Result values</param>
+    /// <param name="evidenceCid">Evidence location on IFPS</param>
+    /// <returns></returns>
+    Task PublishResults(Election election, IList<DecryptedValue> results, string evidenceCid);
 }

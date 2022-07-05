@@ -1,6 +1,8 @@
-﻿using Helverify.VotingAuthority.DataAccess.Ethereum;
+﻿using System.Numerics;
+using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Nethereum.Contracts.ContractHandlers;
 using Nethereum.Web3;
@@ -37,12 +39,8 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.SetUpAsync"/>
         public async Task SetUpAsync(Election election)
         {
-            IWeb3 web3 = _web3Loader.Web3Instance;
+            ContractHandler contract = await GetContractHandlerAsync(election);
 
-            await UnlockAccountAsync();
-
-            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
-            
             SetUpFunction setUpFunction = new SetUpFunction
             {
                 Id = election.Id,
@@ -55,11 +53,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.StoreBallotsAsync"/>
         public async Task StoreBallotsAsync(Election election, IList<Model.Paper.PaperBallot> paperBallots)
         {
-            IWeb3 web3 = _web3Loader.Web3Instance;
-
-            await UnlockAccountAsync();
-
-            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
+            ContractHandler contract = await GetContractHandlerAsync(election);
 
             List<PaperBallot> ballots = paperBallots.Select(pb =>
             {
@@ -85,43 +79,29 @@ namespace Helverify.VotingAuthority.Domain.Repository
         }
 
         /// <inheritdoc cref="IElectionContractRepository.GetBallotIdsAsync"/>
-        public async Task<IList<string>> GetBallotIdsAsync(Election election)
+        public async Task<Tuple<IList<string>, int>> GetBallotIdsAsync(Election election, int startIndex, int partitionSize)
         {
-            IWeb3 web3 = _web3Loader.Web3Instance;
+            ContractHandler contract = await GetContractHandlerAsync(election);
 
-            await UnlockAccountAsync();
-
-            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
-
-            GetNumberOfBallotsFunction getNumberOfBallotsFunction = new GetNumberOfBallotsFunction();
-
-            int numberOfBallots = await contract.QueryAsync<GetNumberOfBallotsFunction, int>(getNumberOfBallotsFunction);
-
-            IList<string> ballotIds = new List<string>();
-
-            for (int i = 0; i < numberOfBallots; i++)
+            GetAllBallotIdsFunction getAllBallotIdsFunction = new GetAllBallotIdsFunction
             {
-                BallotIdsFunction ballotIdsFunction = new BallotIdsFunction
-                {
-                    ReturnValue1 = i
-                };
+                StartIndex = startIndex,
+                PartitionSize = partitionSize
 
-                string ballotId = await contract.QueryAsync<BallotIdsFunction, string>(ballotIdsFunction);
+            };
 
-                ballotIds.Add(ballotId);
-            }
+            GetAllBallotIdsOutputDTO result = await contract.QueryAsync<GetAllBallotIdsFunction, GetAllBallotIdsOutputDTO>(getAllBallotIdsFunction);
 
-            return ballotIds;
+            IList<string> ballotIds = result.ReturnValue1;
+            int currentIndex = (int)result.ReturnValue2;
+
+            return new Tuple<IList<string>, int>(ballotIds, currentIndex);
         }
 
         /// <inheritdoc cref="IElectionContractRepository.GetBallotAsync"/>
         public async Task<IList<PublishedBallot>> GetBallotAsync(Election election, string id)
         {
-            IWeb3 web3 = _web3Loader.Web3Instance;
-
-            await UnlockAccountAsync();
-
-            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
+            ContractHandler contract = await GetContractHandlerAsync(election);
 
             RetrieveBallotFunction retrieveBallotFunction = new RetrieveBallotFunction
             {
@@ -147,18 +127,15 @@ namespace Helverify.VotingAuthority.Domain.Repository
             };
         }
 
-        /// <inheritdoc cref="IElectionContractRepository.PublishShortCodesAsync"/>
-        public async Task PublishShortCodesAsync(Election election, string id, IList<string> shortCodes)
+        /// <inheritdoc cref="IElectionContractRepository.PublishBallotSelectionAsync"/>
+        public async Task PublishBallotSelectionAsync(Election election, string id, string ballotCode, IList<string> shortCodes)
         {
-            IWeb3 web3 = _web3Loader.Web3Instance;
+            ContractHandler contract = await GetContractHandlerAsync(election);
 
-            await UnlockAccountAsync();
-
-            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
-
-            PublishShortCodesFunction publishShortCodesFunction = new PublishShortCodesFunction
+            PublishBallotSelectionFunction publishShortCodesFunction = new PublishBallotSelectionFunction
             {
                 BallotId = id,
+                BallotCode = ballotCode,
                 ShortCodes = shortCodes.ToList()
             };
 
@@ -168,11 +145,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.SpoilBallotAsync"/>
         public async Task SpoilBallotAsync(string ballotId, string virtualBallotId, Election election, string ipfsCid)
         {
-            IWeb3 web3 = _web3Loader.Web3Instance;
-
-            await UnlockAccountAsync();
-
-            ContractHandler contract = web3.Eth.GetContractHandler(election.ContractAddress);
+            ContractHandler contract = await GetContractHandlerAsync(election);
 
             SpoilBallotFunction spoilBallotFunction = new SpoilBallotFunction
             {
@@ -182,6 +155,76 @@ namespace Helverify.VotingAuthority.Domain.Repository
             };
 
             await contract.SendRequestAsync(spoilBallotFunction);
+        }
+
+        /// <inheritdoc cref="IElectionContractRepository.GetNumberOfBallotsAsync"/>
+        public async Task<int> GetNumberOfBallotsAsync(Election election)
+        {
+            ContractHandler contract = await GetContractHandlerAsync(election);
+
+            GetNumberOfBallotsFunction getNumberOfBallotsFunction = new GetNumberOfBallotsFunction();
+            
+            int numberOfBallots = await contract.QueryAsync<GetNumberOfBallotsFunction, int>(getNumberOfBallotsFunction);
+
+            return numberOfBallots;
+        }
+
+        public async Task<Tuple<PublishedBallot, IList<string>>> GetCastBallotAsync(Election election, string ballotId)
+        {
+            ContractHandler contract = await GetContractHandlerAsync(election);
+
+            RetrieveCastBallotFunction castBallotsFunction = new RetrieveCastBallotFunction
+            {
+                BallotId = ballotId
+            };
+
+            RetrieveCastBallotOutputDTO result = await contract.QueryAsync<RetrieveCastBallotFunction, RetrieveCastBallotOutputDTO>(castBallotsFunction);
+
+            CastBallot castBallot = result.ReturnValue1;
+
+            PublishedBallot ballot = new()
+            {
+                BallotId = castBallot.BallotId,
+                BallotCode = castBallot.BallotCode,
+                IpfsCid = castBallot.BallotIpfs,
+            };
+
+            IList<string> selection = castBallot.Selection;
+
+            return new Tuple<PublishedBallot, IList<string>>(ballot, selection);
+        }
+
+        public async Task PublishResults(Election election, IList<DecryptedValue> results, string evidenceCid)
+        {
+            ContractHandler contract = await GetContractHandlerAsync(election);
+
+            List<Result> contractResults = new List<Result>();
+            
+            for (int i = 0; i < results.Count; i++)
+            {
+                contractResults.Add(new Result
+                {
+                    Option = election.Options[i].Name,
+                    Tally = new BigInteger(results[i].PlainText)
+                });
+            }
+
+            PublishResultFunction publishResultFunction = new PublishResultFunction
+            {
+                TallyResults = contractResults,
+                TallyProofsIpfs = evidenceCid
+            };
+
+            await contract.SendRequestAsync(publishResultFunction);
+        }
+        
+        private async Task<ContractHandler> GetContractHandlerAsync(Election election)
+        {
+            IWeb3 web3 = _web3Loader.Web3Instance;
+
+            await UnlockAccountAsync();
+
+            return web3.Eth.GetContractHandler(election.ContractAddress);
         }
 
         private async Task UnlockAccountAsync(int seconds = 120)

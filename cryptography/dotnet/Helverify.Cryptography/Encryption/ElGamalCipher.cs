@@ -20,7 +20,7 @@ namespace Helverify.Cryptography.Encryption
         /// <summary>
         /// Randomness used for the encryption.
         /// </summary>
-        public BigInteger R { get; } // considered a secret value, but needed for proof of containing 1 and proof of containing 0 or 1
+        public BigInteger? R { get; } // considered a secret value, but needed for proof of containing 1 and proof of containing 0 or 1
 
         /// <summary>
         /// Constructor
@@ -28,7 +28,7 @@ namespace Helverify.Cryptography.Encryption
         /// <param name="c">First component</param>
         /// <param name="d">Second component</param>
         /// <param name="r">Randomness</param>
-        public ElGamalCipher(BigInteger c, BigInteger d, BigInteger r)
+        public ElGamalCipher(BigInteger c, BigInteger d, BigInteger? r)
         {
             C = c;
             D = d;
@@ -47,7 +47,12 @@ namespace Helverify.Cryptography.Encryption
 
             BigInteger c = C.Multiply(otherCipher.C).Mod(p);
             BigInteger d = D.Multiply(otherCipher.D).Mod(p);
-            BigInteger r = R.Add(otherCipher.R).Mod(q);
+
+            BigInteger? r = null;
+            if (R != null && otherCipher.R != null)
+            {
+                r = R.Add(otherCipher.R).Mod(q);
+            }
 
             return new ElGamalCipher(c, d, r);
         }

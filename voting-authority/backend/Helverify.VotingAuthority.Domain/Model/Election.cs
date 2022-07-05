@@ -90,22 +90,6 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// <param name="decryptedShares">Decrypted shares</param>
         /// <param name="cipherD">Second component (d) of an ElGamal ciphertext</param>
         /// <returns></returns>
-        public int CombineShares(IList<string> decryptedShares, string cipherD)
-        {
-            IList<BigInteger> shares = decryptedShares.Select(s => s.ConvertToBigInteger()).ToList();
-            BigInteger d = cipherD.ConvertToBigInteger();
-
-            int message = _elGamal.CombineShares(shares, d, P, G);
-
-            return message;
-        }
-
-        /// <summary>
-        /// Combines the decryption shares of the consensus nodes to restore the plaintext message.
-        /// </summary>
-        /// <param name="decryptedShares">Decrypted shares</param>
-        /// <param name="cipherD">Second component (d) of an ElGamal ciphertext</param>
-        /// <returns></returns>
         public int CombineShares(IList<DecryptedShare> decryptedShares, BigInteger cipherD)
         {
             int message = _elGamal.CombineShares(decryptedShares.Select(d => d.Share).ToList(), cipherD, P, G);

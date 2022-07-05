@@ -1,4 +1,7 @@
-﻿using Helverify.VotingAuthority.Domain.Model.Virtual;
+﻿using Helverify.Cryptography.Encryption;
+using Helverify.Cryptography.ZeroKnowledge;
+using Helverify.VotingAuthority.Domain.Model.Decryption;
+using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Repository;
@@ -29,4 +32,11 @@ public interface IPublishedBallotRepository
     /// <param name="ipfsCid">IPFS cid (address) of the ballot</param>
     /// <returns></returns>
     VirtualBallot RetrieveVirtualBallot(string ipfsCid);
+
+    /// <summary>
+    /// Stores the decrypted results on IPFS
+    /// </summary>
+    /// <param name="decryptedValues">Decrypted data for verification</param>
+    /// <returns>IPFS cid of the evidence.</returns>
+    string StoreDecryptedResults(IList<DecryptedValue> decryptedValues);
 }

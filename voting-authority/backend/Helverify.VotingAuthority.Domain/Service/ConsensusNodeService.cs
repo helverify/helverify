@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using Helverify.Cryptography.Encryption;
+using Helverify.Cryptography.ZeroKnowledge;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.DataAccess.Rest;
 using Helverify.VotingAuthority.Domain.Extensions;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
+using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
+using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Service
 {
@@ -46,17 +50,32 @@ namespace Helverify.VotingAuthority.Domain.Service
         }
 
         /// <inheritdoc cref="IConsensusNodeService.DecryptShareAsync"/>
-        public async Task<DecryptionShareDto?> DecryptShareAsync(Uri endpoint, string c, string d)
+        public async Task<DecryptedShare> DecryptShareAsync(Uri endpoint, Election election, ElGamalCipher cipher, BigInteger publicKey)
         {
-            return await _restClient.Call<DecryptionShareDto>(HttpMethod.Post, new Uri(endpoint, DecryptionRoute),
-            new EncryptedShareRequestDto
-            {
-                Cipher = new CipherTextDto
+            DecryptionShareDto share = (await _restClient.Call<DecryptionShareDto>(HttpMethod.Post, new Uri(endpoint, DecryptionRoute),
+                new EncryptedShareRequestDto
                 {
-                    C = c,
-                    D = d,
-                },
-            });
+                    Cipher = new CipherTextDto
+                    {
+                        C = cipher.C.ConvertToHexString(),
+                        D = cipher.D.ConvertToHexString(),
+                    },
+                    ElectionId = election.Id!
+                }))!;
+
+            ProofOfDecryption proof = new ProofOfDecryption(share.ProofOfDecryption.D.ConvertToBigInteger(),
+                share.ProofOfDecryption.U.ConvertToBigInteger(),
+                share.ProofOfDecryption.V.ConvertToBigInteger(),
+                share.ProofOfDecryption.S.ConvertToBigInteger());
+
+            DecryptedShare decryptedShare = new DecryptedShare
+            {
+                ProofOfDecryption = proof,
+                PublicKeyShare = publicKey,
+                Share = share.DecryptedShare.ConvertToBigInteger()
+            };
+
+            return decryptedShare;
         }
 
         /// <inheritdoc cref="IConsensusNodeService.InitializeGenesisBlockAsync"/>

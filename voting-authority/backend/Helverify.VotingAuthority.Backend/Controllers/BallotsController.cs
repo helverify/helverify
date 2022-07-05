@@ -139,9 +139,11 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             paperBallot.Election = election;
 
+            PublishedBallot ballot = (await _contractRepository.GetBallotAsync(election, ballotId))[1-spoiltBallotIndex];
+
             try
             {
-                await PublishSelections(paperBallot, evidenceDto);
+                await PublishSelections(paperBallot, evidenceDto, ballot.BallotCode);
             }
             catch (ArgumentException ex)
             {
@@ -168,16 +170,16 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             return virtualBallot;
         }
 
-        private async Task PublishSelections(PaperBallot paperBallot, EvidenceDto evidenceDto)
+        private async Task PublishSelections(PaperBallot paperBallot, EvidenceDto evidenceDto, string ballotCode)
         {
             IList<string> selection = evidenceDto.SelectedOptions.OrderBy(s => s).ToList();
-
+            
             if (!paperBallot.HasShortCodes(selection))
             {
                 throw new ArgumentNullException(nameof(evidenceDto.SelectedOptions), "Selection is not valid");
             }
             
-            await _contractRepository.PublishShortCodesAsync(paperBallot.Election, paperBallot.BallotId, selection);
+            await _contractRepository.PublishBallotSelectionAsync(paperBallot.Election, paperBallot.BallotId, ballotCode, selection);
         }
         
         private async Task<VirtualBallot> CoopDecryptBallot(VirtualBallot ballot, string electionId, string ipfsCid)

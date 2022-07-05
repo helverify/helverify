@@ -37,6 +37,7 @@ namespace Helverify.VotingAuthority.Domain.Configuration
                 cfg.AddProfile<PrintBallotProfile>();
                 cfg.AddProfile<BlockchainProfile>();
                 cfg.AddProfile<OptionShareProfile>();
+                cfg.AddProfile<DecryptionProfile>();
             });
             services.AddDataAccessConfiguration();
             services.AddSingleton<IConsensusNodeService, ConsensusNodeService>();
