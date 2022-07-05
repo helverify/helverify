@@ -1,29 +1,29 @@
 ﻿using AutoMapper;
+using Helverify.VotingAuthority.Application.Services;
 using Helverify.VotingAuthority.Backend.Dto;
-using Helverify.VotingAuthority.DataAccess.Dto;
-using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
-using Helverify.VotingAuthority.Domain.Repository;
-using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
+    /// <summary>
+    /// Blockchain initialization and status.
+    /// </summary>
     [Route("/api/blockchain")]
     [ApiController]
     public class BlockchainController
     {
-        private readonly IBlockchainSetup _blockchainSetup;
-        private readonly IRepository<Blockchain> _bcRepository;
-        
+        private readonly IBlockchainService _blockchainService;
         private readonly IMapper _mapper;
 
-        public BlockchainController(IBlockchainSetup blockchainSetup,
-            IRepository<Blockchain> bcRepository,
-            IMapper mapper)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="blockchainService">Facade for Blockchain domain logic.</param>
+        /// <param name="mapper">Automapper</param>
+        public BlockchainController(IBlockchainService blockchainService, IMapper mapper)
         {
-            _blockchainSetup = blockchainSetup;
-            _bcRepository = bcRepository;
+            _blockchainService = blockchainService;
             _mapper = mapper;
         }
 
@@ -36,21 +36,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         {
             Blockchain blockchain = _mapper.Map<Blockchain>(requestDto);
 
-            IList<Registration> registrations = blockchain.Registrations;
-
-            string nodeAddress = await _blockchainSetup.CreateAccountsAsync(registrations);
-
-            Genesis genesis = await _blockchainSetup.PropagateGenesisBlockAsync(registrations, new Account(nodeAddress, "1000000000000000000000000000000000000000000000"));
-
-            NodesDto nodes = await _blockchainSetup.StartPeersAsync(registrations);
-
-            await _blockchainSetup.InitializeNodesAsync(registrations, nodes);
-
-            await _blockchainSetup.StartSealingAsync(registrations);
-
-            _blockchainSetup.RegisterRpcEndpoint(genesis, nodes);
-
-            blockchain = await _bcRepository.CreateAsync(blockchain);
+            blockchain = await _blockchainService.Initialize(blockchain);
 
             BlockchainDto blockchainDto = _mapper.Map<BlockchainDto>(blockchain);
 
@@ -64,7 +50,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [HttpGet]
         public async Task<BlockchainDto> Get()
         {
-            Blockchain blockchain = (await _bcRepository.GetAsync()).OrderByDescending(bc => bc.Id).FirstOrDefault();
+            Blockchain? blockchain = await _blockchainService.GetInstance();
 
             BlockchainDto blockchainDto = _mapper.Map<BlockchainDto>(blockchain);
 
