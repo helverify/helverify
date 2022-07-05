@@ -1,6 +1,4 @@
-﻿using Helverify.Cryptography.Encryption;
-using Helverify.Cryptography.ZeroKnowledge;
-using Helverify.VotingAuthority.Domain.Model.Decryption;
+﻿using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Org.BouncyCastle.Math;
 

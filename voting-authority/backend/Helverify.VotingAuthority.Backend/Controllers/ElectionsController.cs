@@ -208,46 +208,6 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         }
 
         /// <summary>
-        /// Decrypts a single ciphertext cooperatively
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cipher"></param>
-        /// <returns></returns>
-        private async Task<DecryptedValue> Decrypt(string id, ElGamalCipher cipher)
-        {
-            Election election = await _electionRepository.GetAsync(id);
-
-            election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
-
-            IList<Registration> consensusNodes = election.Blockchain.Registrations;
-            
-            IList<DecryptedShare> shares = new List<DecryptedShare>();
-
-            foreach (Registration node in consensusNodes)
-            {
-                DecryptedShare share = await _consensusNodeService.DecryptShareAsync(node.Endpoint, election, cipher, node.PublicKeys[election.Id!]);
-                
-                bool isValid = share.ProofOfDecryption.Verify(cipher.C, cipher.D, new DHPublicKeyParameters(share.PublicKeyShare, election.DhParameters));
-
-                if (!isValid)
-                {
-                    throw new Exception("Decryption proof is invalid");
-                }
-
-                shares.Add(share);
-            }
-
-            int plainText = election.CombineShares(shares, cipher.D);
-
-            return new DecryptedValue
-            {
-                PlainText = plainText,
-                CipherText = cipher,
-                Shares = shares
-            };
-        }
-
-        /// <summary>
         /// Calculates the final tally and publishes the results with evidence.
         /// </summary>
         /// <param name="id">Election identifier</param>
@@ -273,7 +233,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             
             foreach (ElGamalCipher cipher in encryptedResults)
             {
-                DecryptedValue decryptedValue = await Decrypt(election.Id!, cipher);
+                DecryptedValue decryptedValue = await Decrypt(election, cipher);
 
                 results.Add(decryptedValue);
             }
@@ -283,6 +243,44 @@ namespace Helverify.VotingAuthority.Backend.Controllers
             await _contractRepository.PublishResults(election, results, evidenceCid);
             
             return Ok(results.Select(r => r.PlainText));
+        }
+
+        /// <summary>
+        /// Decrypts a single ciphertext cooperatively
+        /// </summary>
+        /// <param name="election">Current Election</param>
+        /// <param name="cipher">ElGamal ciphertext</param>
+        /// <returns></returns>
+        private async Task<DecryptedValue> Decrypt(Election election, ElGamalCipher cipher)
+        {
+            election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
+
+            IList<Registration> consensusNodes = election.Blockchain.Registrations;
+
+            IList<DecryptedShare> shares = new List<DecryptedShare>();
+
+            foreach (Registration node in consensusNodes)
+            {
+                DecryptedShare share = await _consensusNodeService.DecryptShareAsync(node.Endpoint, election, cipher, node.PublicKeys[election.Id!]);
+
+                bool isValid = share.ProofOfDecryption.Verify(cipher.C, cipher.D, new DHPublicKeyParameters(share.PublicKeyShare, election.DhParameters));
+
+                if (!isValid)
+                {
+                    throw new Exception("Decryption proof is invalid");
+                }
+
+                shares.Add(share);
+            }
+
+            int plainText = election.CombineShares(shares, cipher.D);
+
+            return new DecryptedValue
+            {
+                PlainText = plainText,
+                CipherText = cipher,
+                Shares = shares
+            };
         }
 
         private async Task<IList<EncryptedOption>> GetEncryptedOptions(int index, int numberOfBallots, Election election, int partitionSize)

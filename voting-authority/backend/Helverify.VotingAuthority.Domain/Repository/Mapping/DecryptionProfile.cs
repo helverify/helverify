@@ -29,7 +29,8 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
                 .ForMember(dest => dest.D, opt => opt.MapFrom(src => src.D))
                 .ForMember(dest => dest.U, opt => opt.MapFrom(src => src.U))
                 .ForMember(dest => dest.V, opt => opt.MapFrom(src => src.V))
-                .ForMember(dest => dest.S, opt => opt.MapFrom(src => src.S));
+                .ForMember(dest => dest.S, opt => opt.MapFrom(src => src.S))
+                .ReverseMap();
         }
     }
 }

@@ -63,11 +63,8 @@ namespace Helverify.VotingAuthority.Domain.Service
                     ElectionId = election.Id!
                 }))!;
 
-            ProofOfDecryption proof = new ProofOfDecryption(share.ProofOfDecryption.D.ConvertToBigInteger(),
-                share.ProofOfDecryption.U.ConvertToBigInteger(),
-                share.ProofOfDecryption.V.ConvertToBigInteger(),
-                share.ProofOfDecryption.S.ConvertToBigInteger());
-
+            ProofOfDecryption proof = _mapper.Map<ProofOfDecryption>(share.ProofOfDecryption);
+            
             DecryptedShare decryptedShare = new DecryptedShare
             {
                 ProofOfDecryption = proof,

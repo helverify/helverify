@@ -1,5 +1,4 @@
-﻿using System.IO.Abstractions;
-using Helverify.VotingAuthority.Domain.Model;
+﻿using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Helverify.VotingAuthority.Domain.Template;
 using QuestPDF.Infrastructure;

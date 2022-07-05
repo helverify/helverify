@@ -169,6 +169,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             return numberOfBallots;
         }
 
+        /// <inheritdoc cref="IElectionContractRepository.GetCastBallotAsync"/>
         public async Task<Tuple<PublishedBallot, IList<string>>> GetCastBallotAsync(Election election, string ballotId)
         {
             ContractHandler contract = await GetContractHandlerAsync(election);
@@ -194,6 +195,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             return new Tuple<PublishedBallot, IList<string>>(ballot, selection);
         }
 
+        /// <inheritdoc cref="IElectionContractRepository.PublishResults"/>
         public async Task PublishResults(Election election, IList<DecryptedValue> results, string evidenceCid)
         {
             ContractHandler contract = await GetContractHandlerAsync(election);

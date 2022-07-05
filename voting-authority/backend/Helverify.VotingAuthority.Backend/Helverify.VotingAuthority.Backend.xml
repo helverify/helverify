@@ -146,19 +146,19 @@
             <param name="id">Election identifier</param>
             <returns></returns>
         </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.ElectionsController.CalculateTally(System.String)">
+            <summary>
+            Calculates the final tally and publishes the results with evidence.
+            </summary>
+            <param name="id">Election identifier</param>
+            <returns></returns>
+        </member>
         <member name="M:Helverify.VotingAuthority.Backend.Controllers.ElectionsController.Decrypt(System.String,Helverify.Cryptography.Encryption.ElGamalCipher)">
             <summary>
             Decrypts a single ciphertext cooperatively
             </summary>
             <param name="id"></param>
             <param name="cipher"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Helverify.VotingAuthority.Backend.Controllers.ElectionsController.CalculateTally(System.String)">
-            <summary>
-            Calculates the final tally and publishes the results with evidence.
-            </summary>
-            <param name="id">Election identifier</param>
             <returns></returns>
         </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.BallotGenerationDto">
