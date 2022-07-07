@@ -36,39 +36,38 @@ export const ElectionResults = (props: ElectionResultsProps) => {
         return `${entry.optionName} (${entry.count})`;
     };
 
-    const resultDetails =
-        <Box>
-            <Card variant="elevation">
-                <CardContent>
-                    <PieChart
-                        width={800}
-                        height={600}
-                    >
-                        <Pie
-                            data={results}
-                            innerRadius={100}
-                            outerRadius={150}
-                            dataKey="count"
-                            nameKey="optionName"
-                            width={350}
-                            height={250}
-                            paddingAngle={3}
-                            label={getLabel}
-                        >
-                            {results.map((result, index) => {
-                                return (<Cell key={`result-${index}`} fill={colors[index]}/>)
-                            })}
-                        </Pie>
-                    </PieChart>
-                </CardContent>
-            </Card>
-        </Box>
-
-    ;
+    const resultsChart = (
+        <PieChart
+            width={800}
+            height={600}
+        >
+            <Pie
+                data={results}
+                innerRadius={100}
+                outerRadius={150}
+                dataKey="count"
+                nameKey="optionName"
+                width={350}
+                height={250}
+                paddingAngle={3}
+                label={getLabel}
+            >
+                {results.map((result, index) => {
+                    return (<Cell key={`result-${index}`} fill={colors[index]}/>)
+                })}
+            </Pie>
+        </PieChart>
+    );
 
     return (
         <>
-            {resultDetails}
+            {results.length > 0 && (<Box>
+                <Card variant="elevation">
+                    <CardContent>
+                        {resultsChart}
+                    </CardContent>
+                </Card>
+            </Box>)}
         </>
     );
 }
