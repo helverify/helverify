@@ -10,7 +10,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
         /// <summary>
         /// Election for which the options are valid.
         /// </summary>
-        public Election Election { get; set; }
+        public Model.Election Election { get; set; }
 
         /// <summary>
         /// Contains the plaintext options for the election.
@@ -21,7 +21,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
         /// Constructor
         /// </summary>
         /// <param name="election">Election for which this template is valid.</param>
-        public BallotTemplate(Election election)
+        public BallotTemplate(Model.Election election)
         {
             Election = election;
 

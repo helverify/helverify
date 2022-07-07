@@ -14,7 +14,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
         /// <summary>
         /// Election in for this paper ballot has been produced.
         /// </summary>
-        public Election Election { get; set; }
+        public Model.Election Election { get; set; }
 
         /// <summary>
         /// Identifier, consists of the hash of both virtual ballots.
@@ -39,7 +39,7 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
         /// <param name="election">Corresponding election</param>
         /// <param name="ballot1">First virtual ballot</param>
         /// <param name="ballot2">Second virtual ballot</param>
-        public PaperBallot(Election election, VirtualBallot ballot1, VirtualBallot ballot2)
+        public PaperBallot(Model.Election election, VirtualBallot ballot1, VirtualBallot ballot2)
         {
             Election = election;
 

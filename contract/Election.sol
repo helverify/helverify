@@ -120,6 +120,7 @@ contract Election {
         if(msg.sender != votingAuthority){
             revert("Only voting authority is allowed to publish results.");
         }
+        delete results;
 
         for(uint i = 0; i < tallyResults.length; i++){
             results.push(tallyResults[i]);
@@ -151,6 +152,10 @@ contract Election {
 
     function getNumberOfBallots() public view returns (uint) {
         return ballotIds.length;
+    }
+
+    function getResults() public view returns (Result[] memory){
+        return results;
     }
 
     // according to: https://stackoverflow.com/questions/57727780/how-to-compare-string-in-solidity

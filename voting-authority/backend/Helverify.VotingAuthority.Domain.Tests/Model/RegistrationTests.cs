@@ -1,6 +1,7 @@
 ﻿using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.Domain.Extensions;
 using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Consensus;
 using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Tests.Model

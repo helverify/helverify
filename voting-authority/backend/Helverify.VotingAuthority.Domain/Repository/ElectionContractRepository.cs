@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using AutoMapper;
 using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
 using Helverify.VotingAuthority.Domain.Model;
@@ -13,15 +14,17 @@ namespace Helverify.VotingAuthority.Domain.Repository
     public class ElectionContractRepository : IElectionContractRepository
     {
         private readonly IWeb3Loader _web3Loader;
-        
+        private readonly IMapper _mapper;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="web3Loader">Web3 accessor</param>
         /// <param name="mapper">Automapper</param>
-        public ElectionContractRepository(IWeb3Loader web3Loader)
+        public ElectionContractRepository(IWeb3Loader web3Loader, IMapper mapper)
         {
             _web3Loader = web3Loader;
+            _mapper = mapper;
         }
 
         /// <inheritdoc cref="IElectionContractRepository.DeployContractAsync"/>
@@ -218,6 +221,22 @@ namespace Helverify.VotingAuthority.Domain.Repository
             };
 
             await contract.SendRequestAsync(publishResultFunction);
+        }
+
+        /// <inheritdoc cref="IElectionContractRepository.GetResultsAsync"/>
+        public async Task<ElectionResults> GetResultsAsync(Election election)
+        {
+            ContractHandler contract = await GetContractHandlerAsync(election);
+
+            GetResultsFunction getResultsFunction = new GetResultsFunction();
+
+            GetResultsOutputDTO getResultsOutputDto = await contract.QueryAsync<GetResultsFunction, GetResultsOutputDTO>(getResultsFunction);
+
+            List<Result> resultsDto = getResultsOutputDto.ReturnValue1;
+
+            IList<ElectionResult> electionResults = _mapper.Map<IList<ElectionResult>>(resultsDto);
+
+            return new ElectionResults(electionResults);
         }
         
         private async Task<ContractHandler> GetContractHandlerAsync(Election election)

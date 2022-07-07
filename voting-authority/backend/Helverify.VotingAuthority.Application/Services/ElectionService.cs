@@ -3,6 +3,7 @@ using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
+using Helverify.VotingAuthority.Domain.Model.Consensus;
 using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Helverify.VotingAuthority.Domain.Repository;
@@ -61,8 +62,8 @@ namespace Helverify.VotingAuthority.Application.Services
         /// <inheritdoc cref="IElectionService.DeleteAsync"/>
         public async Task DeleteAsync(string electionId) => await _electionRepository.DeleteAsync(electionId);
 
-        /// <inheritdoc cref="IElectionService.GeneratePublicKey"/>
-        public async Task<Election> GeneratePublicKey(string electionId)
+        /// <inheritdoc cref="IElectionService.GeneratePublicKeyAsync"/>
+        public async Task<Election> GeneratePublicKeyAsync(string electionId)
         {
             Election election = await GetAsync(electionId);
 
@@ -91,8 +92,8 @@ namespace Helverify.VotingAuthority.Application.Services
             return election;
         }
 
-        /// <inheritdoc cref="IElectionService.DeployElectionContract"/>
-        public async Task<Election> DeployElectionContract(string electionId)
+        /// <inheritdoc cref="IElectionService.DeployElectionContractAsync"/>
+        public async Task<Election> DeployElectionContractAsync(string electionId)
         {
             _web3Loader.LoadInstance();
 
@@ -107,8 +108,8 @@ namespace Helverify.VotingAuthority.Application.Services
             return election;
         }
 
-        /// <inheritdoc cref="IElectionService.CalculateTally"/>
-        public async Task<IList<DecryptedValue>> CalculateTally(string electionId)
+        /// <inheritdoc cref="IElectionService.CalculateTallyAsync"/>
+        public async Task<IList<DecryptedValue>> CalculateTallyAsync(string electionId)
         {
             Election election = await GetAsync(electionId);
 
@@ -117,7 +118,7 @@ namespace Helverify.VotingAuthority.Application.Services
             int index = 0;
             int partitionSize = 100;
 
-            IList<EncryptedOption> selectedEncryptedOptions = await GetEncryptedOptions(index, numberOfBallots, election, partitionSize);
+            IList<EncryptedOption> selectedEncryptedOptions = await GetEncryptedOptionsAsync(index, numberOfBallots, election, partitionSize);
 
             Tally tally = new Tally(selectedEncryptedOptions);
 
@@ -127,7 +128,7 @@ namespace Helverify.VotingAuthority.Application.Services
 
             foreach (ElGamalCipher cipher in encryptedResults)
             {
-                DecryptedValue decryptedValue = await Decrypt(election, cipher);
+                DecryptedValue decryptedValue = await DecryptAsync(election, cipher);
 
                 results.Add(decryptedValue);
             }
@@ -139,13 +140,23 @@ namespace Helverify.VotingAuthority.Application.Services
             return results;
         }
 
+        /// <inheritdoc cref="IElectionService.GetResultsAsync"/>
+        public async Task<ElectionResults> GetResultsAsync(string electionId)
+        {
+            Election election = await GetAsync(electionId);
+
+            ElectionResults electionResults = await _contractRepository.GetResultsAsync(election);
+
+            return electionResults;
+        }
+
         /// <summary>
         /// Decrypts a single ciphertext cooperatively
         /// </summary>
         /// <param name="election">Current Election</param>
         /// <param name="cipher">ElGamal ciphertext</param>
         /// <returns></returns>
-        private async Task<DecryptedValue> Decrypt(Election election, ElGamalCipher cipher)
+        private async Task<DecryptedValue> DecryptAsync(Election election, ElGamalCipher cipher)
         {
             election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
 
@@ -177,7 +188,7 @@ namespace Helverify.VotingAuthority.Application.Services
             };
         }
 
-        private async Task<IList<EncryptedOption>> GetEncryptedOptions(int index, int numberOfBallots, Election election, int partitionSize)
+        private async Task<IList<EncryptedOption>> GetEncryptedOptionsAsync(int index, int numberOfBallots, Election election, int partitionSize)
         {
             List<EncryptedOption> selectedEncryptedOptions = new List<EncryptedOption>();
 
@@ -194,6 +205,11 @@ namespace Helverify.VotingAuthority.Application.Services
 
                     Tuple<PublishedBallot, IList<string>> ballotResult =
                         await _contractRepository.GetCastBallotAsync(election, ballotId);
+
+                    if (string.IsNullOrEmpty(ballotResult.Item1.IpfsCid))
+                    {
+                        continue;
+                    }
 
                     VirtualBallot virtualBallot = _publishedBallotRepository.RetrieveVirtualBallot(ballotResult.Item1.IpfsCid);
 

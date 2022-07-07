@@ -90,4 +90,11 @@ public interface IElectionContractRepository
     /// <param name="evidenceCid">Evidence location on IFPS</param>
     /// <returns></returns>
     Task PublishResults(Election election, IList<DecryptedValue> results, string evidenceCid);
+
+    /// <summary>
+    /// Retrieves the final tally (results) from the smart contract.
+    /// </summary>
+    /// <param name="election">Current election</param>
+    /// <returns></returns>
+    Task<ElectionResults> GetResultsAsync(Election election);
 }

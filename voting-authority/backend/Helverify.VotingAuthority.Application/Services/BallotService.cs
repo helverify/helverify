@@ -95,11 +95,12 @@ namespace Helverify.VotingAuthority.Application.Services
             {
                 throw ex;
             }
-
+            Console.WriteLine($"DEBUG -- Before decrypt ballot: {DateTime.Now:hh:mm:ss.FFF}");
             VirtualBallot virtualBallot = await DecryptBallot(election, ballotId, spoiltBallotIndex);
+            Console.WriteLine($"DEBUG -- After decrypt ballot: {DateTime.Now:hh:mm:ss.FFF}");
 
             string cid = _publishedBallotRepository.StoreSpoiltBallot(virtualBallot, paperBallot.GetRandomness(spoiltBallotIndex));
-
+            
             await _contractRepository.SpoilBallotAsync(paperBallot.BallotId, virtualBallot.Code, election, cid);
         }
 
@@ -131,22 +132,21 @@ namespace Helverify.VotingAuthority.Application.Services
             election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
 
             List<OptionShare> optionShares = await GetOptionShares(election, ballot, ipfsCid);
-
+            
             BallotShares ballotShares = new BallotShares(optionShares);
-
+            
             ballot = ballotShares.CombineShares(election, ballot);
-
+            
             return ballot;
         }
 
         private async Task<List<OptionShare>> GetOptionShares(Election election, VirtualBallot ballot, string ipfsCid)
         {
-            List<OptionShare> optionShares = new List<OptionShare>();
+            ConcurrentQueue<OptionShare> optionShares = new ConcurrentQueue<OptionShare>();
 
-            foreach (Registration consensusNode in election.Blockchain.Registrations)
+            Parallel.ForEach(election.Blockchain.Registrations, (consensusNode) =>
             {
-                DecryptedBallotShareDto? decryptedBallot =
-                    await _consensusNodeService.DecryptBallotAsync(consensusNode.Endpoint, ballot, election.Id!, ipfsCid);
+                DecryptedBallotShareDto? decryptedBallot = _consensusNodeService.DecryptBallotAsync(consensusNode.Endpoint, ballot, election.Id!, ipfsCid).Result;
 
                 if (decryptedBallot == null)
                 {
@@ -157,11 +157,13 @@ namespace Helverify.VotingAuthority.Application.Services
 
                 IList<OptionShare> optionSharesPart = _mapper.Map<IList<OptionShare>>(decryptedBallot);
 
-                optionShares.AddRange(optionSharesPart);
-            }
-
-            return optionShares;
+                foreach (OptionShare optionShare in optionSharesPart)
+                {
+                    optionShares.Enqueue(optionShare);
+                }
+            });
+            
+            return optionShares.ToList();
         }
-
     }
 }

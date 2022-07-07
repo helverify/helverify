@@ -1,6 +1,6 @@
 ﻿using Helverify.VotingAuthority.DataAccess.Dto;
-using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Blockchain;
+using Helverify.VotingAuthority.Domain.Model.Consensus;
 
 namespace Helverify.VotingAuthority.Domain.Service;
 

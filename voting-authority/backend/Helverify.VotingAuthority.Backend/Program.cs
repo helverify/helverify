@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
 using Helverify.VotingAuthority.Application.Configuration;
 using Helverify.VotingAuthority.Backend.Mapping;
-using Helverify.VotingAuthority.Domain.Configuration;
 using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.OpenApi.Models;
 
@@ -29,6 +28,7 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<RegistrationDtoProfile>();
     cfg.AddProfile<BlockchainDtoProfile>();
     cfg.AddProfile<BalloDtoProfile>();
+    cfg.AddProfile<ResultsDtoProfile>();
 });
 
 builder.Services.AddCors(opt =>

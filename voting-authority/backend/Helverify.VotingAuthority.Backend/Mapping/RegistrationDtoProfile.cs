@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Helverify.VotingAuthority.Backend.Dto;
-using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Consensus;
 
 namespace Helverify.VotingAuthority.Backend.Mapping
 {

@@ -48,19 +48,26 @@ public interface IElectionService
     /// </summary>
     /// <param name="electionId">Election identifier</param>
     /// <returns></returns>
-    Task<Election> GeneratePublicKey(string electionId);
+    Task<Election> GeneratePublicKeyAsync(string electionId);
 
     /// <summary>
     /// Deploys the smart contract for storing evidence about the specified election.
     /// </summary>
     /// <param name="electionId">Election identifier</param>
     /// <returns></returns>
-    Task<Election> DeployElectionContract(string electionId);
+    Task<Election> DeployElectionContractAsync(string electionId);
 
     /// <summary>
     /// Calculates the final tally and publishes the evidence on IPFS and the smart contract.
     /// </summary>
     /// <param name="electionId">Election identifier</param>
     /// <returns></returns>
-    Task<IList<DecryptedValue>> CalculateTally(string electionId);
+    Task<IList<DecryptedValue>> CalculateTallyAsync(string electionId);
+
+    /// <summary>
+    /// Retrieves the final results of an election.
+    /// </summary>
+    /// <param name="electionId">Election identifier</param>
+    /// <returns></returns>
+    Task<ElectionResults> GetResultsAsync(string electionId);
 }

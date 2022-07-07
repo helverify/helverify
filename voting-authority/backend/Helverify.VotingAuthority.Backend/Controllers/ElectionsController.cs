@@ -126,7 +126,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Produces(ContentType)]
         public async Task<ActionResult<ElectionDto>> Put(string id)
         {
-            Election election = await _electionService.GeneratePublicKey(id);
+            Election election = await _electionService.GeneratePublicKeyAsync(id);
 
             ElectionDto result = _mapper.Map<ElectionDto>(election);
 
@@ -143,7 +143,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Route("{id}/contract")]
         public async Task<ActionResult<ElectionDto>> DeployContract([FromRoute] string id)
         {
-            Election election = await _electionService.DeployElectionContract(id);
+            Election election = await _electionService.DeployElectionContractAsync(id);
 
             ElectionDto electionDto = _mapper.Map<ElectionDto>(election);
 
@@ -159,9 +159,25 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Route("{id}/tally")]
         public async Task<ActionResult> CalculateTally([FromRoute] string id)
         {
-            IList<DecryptedValue> decryptedValues = await _electionService.CalculateTally(id);
+            IList<DecryptedValue> decryptedValues = await _electionService.CalculateTallyAsync(id);
 
             return Ok(decryptedValues.Select(r => r.PlainText));
+        }
+
+        /// <summary>
+        /// Returns the final tally.
+        /// </summary>
+        /// <param name="id">Election identifier</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{id}/results")]
+        public async Task<ActionResult<ElectionResultsDto>> GetResults([FromRoute] string id)
+        {
+            ElectionResults results = await _electionService.GetResultsAsync(id);
+
+            ElectionResultsDto electionResultsDto = _mapper.Map<ElectionResultsDto>(results);
+
+            return Ok(electionResultsDto);
         }
     }
 }

@@ -5,7 +5,7 @@ using Helverify.VotingAuthority.Domain.Model.Blockchain;
 using Org.BouncyCastle.Math;
 
 
-namespace Helverify.VotingAuthority.Domain.Model
+namespace Helverify.VotingAuthority.Domain.Model.Consensus
 {
     /// <summary>
     /// Represents a registered consensus node.
@@ -21,7 +21,7 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// API Endpoint for calling the consensus node.
         /// </summary>
         public Uri Endpoint { get; set; }
-        
+
         /// <summary>
         /// Blockchain account of consensus node
         /// </summary>
@@ -31,7 +31,7 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// Enode Identifier of consensus node
         /// </summary>
         public string Enode { get; set; }
-        
+
         /// <summary>
         /// Public key for each election.
         /// </summary>

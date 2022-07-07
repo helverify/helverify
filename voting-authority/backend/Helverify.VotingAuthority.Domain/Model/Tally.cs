@@ -18,7 +18,7 @@ namespace Helverify.VotingAuthority.Domain.Model
         {
             _encryptedOptions = encryptedOptions;
         }
-        
+
         /// <summary>
         /// Performs homomorphic addition of the encrypted options to derive the final (encrypted) tally.
         /// </summary>

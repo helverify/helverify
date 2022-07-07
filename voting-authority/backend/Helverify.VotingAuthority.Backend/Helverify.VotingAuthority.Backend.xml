@@ -155,6 +155,13 @@
             <param name="id">Election identifier</param>
             <returns></returns>
         </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Controllers.ElectionsController.GetResults(System.String)">
+            <summary>
+            Returns the final tally.
+            </summary>
+            <param name="id">Election identifier</param>
+            <returns></returns>
+        </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.BallotGenerationDto">
             <summary>
             Contains the parameters for ballot generation
@@ -243,6 +250,36 @@
         <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionOptionDto.Name">
             <summary>
             Candidate/Option name
+            </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Dto.ElectionResultDto">
+            <summary>
+            Represents the result of a single option / candidate
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionResultDto.OptionName">
+            <summary>
+            Option / candidate name
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionResultDto.Count">
+            <summary>
+            Tally of option / candidate
+            </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Dto.ElectionResultsDto">
+            <summary>
+            Represents an election's final tally.
+            </summary>
+        </member>
+        <member name="P:Helverify.VotingAuthority.Backend.Dto.ElectionResultsDto.Results">
+            <summary>
+            Tally per candidate / option
+            </summary>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Dto.ElectionResultsDto.#ctor">
+            <summary>
+            Constructor
             </summary>
         </member>
         <member name="T:Helverify.VotingAuthority.Backend.Dto.EvidenceDto">
@@ -351,6 +388,16 @@
             </summary>
         </member>
         <member name="M:Helverify.VotingAuthority.Backend.Mapping.RegistrationDtoProfile.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:Helverify.VotingAuthority.Backend.Mapping.ResultsDtoProfile">
+            <summary>
+            Mapping profile for ElectionResultsDto
+            </summary>
+        </member>
+        <member name="M:Helverify.VotingAuthority.Backend.Mapping.ResultsDtoProfile.#ctor">
             <summary>
             Constructor
             </summary>

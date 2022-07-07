@@ -1,4 +1,6 @@
-﻿namespace Helverify.VotingAuthority.Domain.Model.Blockchain
+﻿using Helverify.VotingAuthority.Domain.Model.Consensus;
+
+namespace Helverify.VotingAuthority.Domain.Model.Blockchain
 {
     /// <summary>
     /// Represents a Blockchain for deploying smart contracts
