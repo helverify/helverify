@@ -17,12 +17,7 @@ namespace Helverify.Cryptography.Encryption.Strategy
             while (!found)
             {
                 exp++;
-
-                if (exp % 10000 == 0)
-                {
-                    Console.WriteLine($"Thread: {Task.CurrentId} Exponent: {exp}");
-                }
-
+                
                 BigInteger exponent = new BigInteger(exp.ToString(), 10);
                 BigInteger candidate = g.ModPow(exponent, p).Mod(p);
                 found = candidate.Equals(cipher);

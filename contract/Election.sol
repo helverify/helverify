@@ -16,10 +16,16 @@ contract Election {
         string ballotIpfs;
     }
 
+    struct CastBallot{
+        string ballotId;
+        string ballotCode;
+        string ballotIpfs;
+        string[] selection;
+    }
+
     struct Result{
         string option;
         uint tally;
-        string proofIpfs;
     }
 
     mapping(string => PaperBallot) paperBallots;
@@ -32,11 +38,13 @@ contract Election {
     
     mapping(string => SpoiltBallot) public spoiltBallots;
 
-    mapping(string => string[]) public selectedShortCodes;
+    mapping(string => CastBallot) public castBallots;
 
-    mapping(uint => Result) public results;
+    Result[] public results;
 
     mapping(uint => string) public options;
+
+    string public resultEvidenceIpfs;
     
     constructor (){
         votingAuthority = msg.sender;
@@ -76,27 +84,82 @@ contract Election {
         spoiltBallots[ballotId] = SpoiltBallot(virtualBallotId, spoiltBallotIpfs);
     }
 
-    function publishShortCodes(string memory ballotId, string[] memory shortCodes) public{
+    function publishBallotSelection(string memory ballotId, string memory ballotCode, string[] memory shortCodes) public{
         if(msg.sender != votingAuthority){
             revert("Only voting authority is allowed publish the selected short codes");
         }
+        
+        PaperBallot memory ballot = paperBallots[ballotId];
 
-        selectedShortCodes[ballotId] = shortCodes;
+        string memory ballotIpfs = "";
+        
+        if(equals(ballot.ballot1Code, ballotCode)){
+            ballotIpfs = ballot.ballot1Ipfs;
+        }
+
+        if(equals(ballot.ballot2Code, ballotCode)){
+            ballotIpfs = ballot.ballot2Ipfs;
+        }
+
+        if(equals(ballotIpfs, "")){
+            revert("Ballot code provided does not match with stored ballot information.");
+        }
+
+        castBallots[ballotId] = CastBallot(ballotId, ballotCode, ballotIpfs, shortCodes);
     }
 
     function retrieveBallot(string memory ballotId) public view returns (PaperBallot memory){
         return paperBallots[ballotId];
     }
+    
+    function retrieveCastBallot(string memory ballotId) public view returns (CastBallot memory){
+        return castBallots[ballotId];
+    }
 
-    function publishResult(uint option, uint tally, string memory tallyProofsIpfs) public {
+    function publishResult(Result[] memory tallyResults, string memory tallyProofsIpfs) public {
         if(msg.sender != votingAuthority){
             revert("Only voting authority is allowed to publish results.");
         }
+        delete results;
 
-        results[option] = Result(options[option], tally, tallyProofsIpfs);
+        for(uint i = 0; i < tallyResults.length; i++){
+            results.push(tallyResults[i]);
+        }
+
+        resultEvidenceIpfs = tallyProofsIpfs;
+    }
+
+    // Pagination pattern according to: https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
+    function getAllBallotIds(uint startIndex, uint partitionSize) public view returns (string[] memory, uint){
+        uint numberOfBallots = ballotIds.length;
+        
+        if(numberOfBallots < startIndex){
+            revert("startIndex out of array bounds");
+        }
+
+        uint endIndex = numberOfBallots > startIndex + partitionSize ? startIndex + partitionSize : numberOfBallots;
+
+        string[] memory ids = new string[](partitionSize);
+
+        uint i = 0;
+        
+        for(uint index = startIndex; index < endIndex; index++){
+            ids[i++] = ballotIds[index];
+        }
+
+        return (ids, endIndex);
     }
 
     function getNumberOfBallots() public view returns (uint) {
         return ballotIds.length;
+    }
+
+    function getResults() public view returns (Result[] memory){
+        return results;
+    }
+
+    // according to: https://stackoverflow.com/questions/57727780/how-to-compare-string-in-solidity
+    function equals(string memory a, string memory b) private pure returns (bool){
+        return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
     }
 }

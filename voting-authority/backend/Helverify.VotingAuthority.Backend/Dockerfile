@@ -18,6 +18,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["Helverify.VotingAuthority.Backend/Helverify.VotingAuthority.Backend.csproj", "Helverify.VotingAuthority.Backend/"]
+COPY ["Helverify.VotingAuthority.Application/Helverify.VotingAuthority.Application.csproj", "Helverify.VotingAuthority.Application/"]
 COPY ["Helverify.VotingAuthority.Domain/Helverify.VotingAuthority.Domain.csproj", "Helverify.VotingAuthority.Domain/"]
 COPY ["Helverify.VotingAuthority.DataAccess/Helverify.VotingAuthority.DataAccess.csproj", "Helverify.VotingAuthority.DataAccess/"]
 RUN dotnet restore "Helverify.VotingAuthority.Backend/Helverify.VotingAuthority.Backend.csproj"

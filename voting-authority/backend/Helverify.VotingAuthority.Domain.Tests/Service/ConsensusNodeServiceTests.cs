@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Helverify.Cryptography.Encryption;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.DataAccess.Rest;
 using Helverify.VotingAuthority.Domain.Extensions;
@@ -84,25 +85,7 @@ namespace Helverify.VotingAuthority.Domain.Tests.Service
             // act, assert
             Assert.ThrowsAsync<ArgumentException>(() => _consensusNodeService.GenerateKeyPairAsync(null, election));
         }
-
-        [Test]
-        public async Task TestDecryptShareAsync()
-        {
-            // arrange
-            string c = "af9839193bc";
-            string d = "ff9100adbe2";
-
-            // act
-
-            await _consensusNodeService.DecryptShareAsync(new Uri("http://helverify.test"), c, d);
-
-            // assert
-            EncryptedShareRequestDto dto = ((_fakeRestClient as FakeRestClient)!.Items.Single() as EncryptedShareRequestDto)!;
-
-            Assert.That(dto.Cipher.C, Is.EqualTo(c));
-            Assert.That(dto.Cipher.D, Is.EqualTo(d));
-        }
-
+        
         [Test]
         public async Task TestInitializeGenesisBlockAsync()
         {

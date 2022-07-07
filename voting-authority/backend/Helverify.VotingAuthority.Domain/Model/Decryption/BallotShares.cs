@@ -49,12 +49,17 @@ public class BallotShares
 
                 IList<DecryptedShare> decryptedShares = os.Select(o => o.Shares[i]).ToList(); // decrypted shares of one option vector element
 
-                if (!decryptedShares.All(d => d.ProofOfDecryption.Verify(cipher.C, cipher.D,
-                        new DHPublicKeyParameters(d.PublicKeyShare, election.DhParameters))))
+                Parallel.ForEach(decryptedShares, (share) =>
                 {
-                    throw new Exception("Proof of decryption is invalid");
-                }
+                    bool isValid = share.ProofOfDecryption.Verify(cipher.C, cipher.D,
+                        new DHPublicKeyParameters(share.PublicKeyShare, election.DhParameters));
 
+                    if (!isValid)
+                    {
+                        throw new Exception("Proof of decryption is invalid");
+                    }
+                });
+                
                 int plainTextValue = election.CombineShares(decryptedShares, d);
 
                 optionsVector.Add(plainTextValue);

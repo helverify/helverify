@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.DataAccess.Ipfs;
+using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
 using Org.BouncyCastle.Math;
 
@@ -55,6 +56,19 @@ namespace Helverify.VotingAuthority.Domain.Repository
             VirtualBallot virtualBallot = _mapper.Map<VirtualBallot>(encryption);
 
             return virtualBallot;
+        }
+
+        /// <inheritdoc cref="IPublishedBallotRepository.StoreDecryptedResults"/>
+        public string StoreDecryptedResults(IList<DecryptedValue> decryptedValues)
+        {
+            DecryptedResultsDao decryptedResults = new DecryptedResultsDao
+            {
+                DecryptedResults = _mapper.Map<IList<DecryptedValueDao>>(decryptedValues)
+            };
+
+            string cid = _storageClient.Store(decryptedResults).Result;
+
+            return cid;
         }
     }
 }

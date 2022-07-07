@@ -1,4 +1,5 @@
 ﻿using Helverify.Cryptography.Encryption;
+using Helverify.Cryptography.Encryption.Strategy;
 using Helverify.Cryptography.ZeroKnowledge;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -19,7 +20,7 @@ namespace Helverify.ConsensusNode.Domain.Model
         /// <param name="cipher">Original ElGamal ciphertext</param>
         public CipherText(ElGamalCipher cipher)
         {
-            _elGamal = new ExponentialElGamal();
+            _elGamal = new ExponentialElGamal(new ParallelDecryption());
             _cipher = cipher;
         }
 

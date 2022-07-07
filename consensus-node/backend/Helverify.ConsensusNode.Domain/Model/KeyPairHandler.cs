@@ -1,5 +1,6 @@
 ﻿using System.IO.Abstractions;
 using Helverify.Cryptography.Encryption;
+using Helverify.Cryptography.Encryption.Strategy;
 using Helverify.Cryptography.ZeroKnowledge;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -25,7 +26,7 @@ namespace Helverify.ConsensusNode.Domain.Model
         public KeyPairHandler(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            _elGamal = new ExponentialElGamal();
+            _elGamal = new ExponentialElGamal(new ParallelDecryption());
         }
 
         /// <inheritdoc cref="IKeyPairHandler.CreateKeyPair"/>

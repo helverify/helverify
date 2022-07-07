@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using System.Runtime.CompilerServices;
 using Helverify.VotingAuthority.DataAccess.Database;
 using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.DataAccess.Ipfs;
@@ -7,6 +8,7 @@ using Ipfs.Http;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 
+[assembly: InternalsVisibleTo("Helverify.VotingAuthority.DataAccess.Tests")]
 namespace Helverify.VotingAuthority.DataAccess.Configuration
 {
     /// <summary>

@@ -9,7 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helverify.VotingAuthority.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helverify.VotingAuthority.Domain", "Helverify.VotingAuthority.Domain\Helverify.VotingAuthority.Domain.csproj", "{C15D6DA0-AEE7-4E38-9F0B-1977CECA4D32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helverify.VotingAuthority.Domain.Tests", "Helverify.VotingAuthority.Domain.Tests\Helverify.VotingAuthority.Domain.Tests.csproj", "{E56AFBDC-EF62-421A-B808-785479345DE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helverify.VotingAuthority.Domain.Tests", "Helverify.VotingAuthority.Domain.Tests\Helverify.VotingAuthority.Domain.Tests.csproj", "{E56AFBDC-EF62-421A-B808-785479345DE7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helverify.VotingAuthority.Application", "Helverify.VotingAuthority.Application\Helverify.VotingAuthority.Application.csproj", "{21D29B81-495D-4DA2-8B2E-95BBF7CB5093}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helverify.VotingAuthority.DataAccess.Tests", "Helverify.VotingAuthority.DataAccess.Tests\Helverify.VotingAuthority.DataAccess.Tests.csproj", "{05331EBD-5609-48B1-A2E9-C8C87BF68B92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{E56AFBDC-EF62-421A-B808-785479345DE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E56AFBDC-EF62-421A-B808-785479345DE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E56AFBDC-EF62-421A-B808-785479345DE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21D29B81-495D-4DA2-8B2E-95BBF7CB5093}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21D29B81-495D-4DA2-8B2E-95BBF7CB5093}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21D29B81-495D-4DA2-8B2E-95BBF7CB5093}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21D29B81-495D-4DA2-8B2E-95BBF7CB5093}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05331EBD-5609-48B1-A2E9-C8C87BF68B92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05331EBD-5609-48B1-A2E9-C8C87BF68B92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05331EBD-5609-48B1-A2E9-C8C87BF68B92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05331EBD-5609-48B1-A2E9-C8C87BF68B92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

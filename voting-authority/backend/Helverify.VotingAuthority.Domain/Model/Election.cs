@@ -1,4 +1,5 @@
 ﻿using Helverify.Cryptography.Encryption;
+using Helverify.Cryptography.Encryption.Strategy;
 using Helverify.VotingAuthority.Domain.Extensions;
 using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
@@ -19,7 +20,7 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// </summary>
         public Election()
         {
-            _elGamal = new ExponentialElGamal();
+            _elGamal = new ExponentialElGamal(new ParallelDecryption());
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// <summary>
         /// Prime p of the ElGamal cryptosystem.
         /// </summary>
-        public BigInteger P { get; set; } 
+        public BigInteger P { get; set; }
 
         /// <summary>
         /// Generator g of the ElGamal cryptosystem.
@@ -56,7 +57,7 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// Election public key
         /// </summary>
         public BigInteger? PublicKey { get; set; }
-        
+
         /// <summary>
         /// Blockchain
         /// </summary>
@@ -90,33 +91,17 @@ namespace Helverify.VotingAuthority.Domain.Model
         /// <param name="decryptedShares">Decrypted shares</param>
         /// <param name="cipherD">Second component (d) of an ElGamal ciphertext</param>
         /// <returns></returns>
-        public int CombineShares(IList<string> decryptedShares, string cipherD)
-        {
-            IList<BigInteger> shares = decryptedShares.Select(s => s.ConvertToBigInteger()).ToList();
-            BigInteger d = cipherD.ConvertToBigInteger();
-
-            int message = _elGamal.CombineShares(shares, d, P, G);
-
-            return message;
-        }
-
-        /// <summary>
-        /// Combines the decryption shares of the consensus nodes to restore the plaintext message.
-        /// </summary>
-        /// <param name="decryptedShares">Decrypted shares</param>
-        /// <param name="cipherD">Second component (d) of an ElGamal ciphertext</param>
-        /// <returns></returns>
         public int CombineShares(IList<DecryptedShare> decryptedShares, BigInteger cipherD)
         {
             int message = _elGamal.CombineShares(decryptedShares.Select(d => d.Share).ToList(), cipherD, P, G);
-
+            
             return message;
         }
 
         /// <summary>
         /// Builds Diffie-Hellman parameters from the ElGamal cryptosystem parameters.
         /// </summary>
-        public DHParameters DhParameters => new (P, G);
+        public DHParameters DhParameters => new(P, G);
 
         /// <summary>
         /// Address of the smart contract for the election on the Ethereum blockchain.

@@ -1,20 +1,29 @@
 import {SetupStepProps} from "./electionSetupStep";
-import {Button, Card, FormControl, Grid, Stack} from "@mui/material";
+import {Backdrop, Button, Card, CircularProgress, FormControl, Grid, Stack} from "@mui/material";
 import {apiClient} from "../../api/apiClient";
+import {useState} from "react";
 
 export const ContractDeploymentForm = (props: SetupStepProps) => {
+
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const deployContract = () => {
         if(props.election.id === undefined || props.election.id === null){
             return;
         }
+        setLoading(true);
+
         apiClient().api.electionsContractCreate(props.election.id).then(() =>  {
-           props.next(props.election, props.blockchain);
+            setLoading(false);
+            props.next(props.election, props.blockchain);
         });
     }
 
     return(
         <>
+            <Backdrop open={isLoading}>
+                <CircularProgress />
+            </Backdrop>
             <Grid container spacing={1}>
                 <Grid item xs={6}>
                     <Card>

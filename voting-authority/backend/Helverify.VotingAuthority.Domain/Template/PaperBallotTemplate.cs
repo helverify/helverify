@@ -1,5 +1,4 @@
-﻿using System.IO.Abstractions;
-using Helverify.VotingAuthority.Domain.Model;
+﻿using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using Newtonsoft.Json;
 using QRCoder;
@@ -22,7 +21,7 @@ namespace Helverify.VotingAuthority.Domain.Template
         /// <summary>
         /// Current election.
         /// </summary>
-        public Election Election { get; } // TODO: integrate into paper ballot when storing
+        public Election Election { get; }
 
         /// <summary>
         /// Paper ballot containing options in plain text.

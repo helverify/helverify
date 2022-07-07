@@ -1,8 +1,17 @@
 import React from 'react';
 import './App.css';
 import {Elections} from "./components/election/Elections";
-import {BottomNavigation, BottomNavigationAction, Box, createTheme, CssBaseline, Paper} from "@mui/material";
-import {Add, HowToVote, PieChart, Link, QrCodeScanner} from "@mui/icons-material";
+import {
+    AppBar,
+    BottomNavigation,
+    BottomNavigationAction,
+    Box,
+    createTheme,
+    CssBaseline,
+    Paper, Toolbar,
+    Typography
+} from "@mui/material";
+import {Add, HowToVote, QrCodeScanner} from "@mui/icons-material";
 import {Route, Routes} from "react-router-dom";
 import {ElectionSetup, setupSteps} from "./components/setup/ElectionSetup";
 import {ThemeProvider} from "@mui/material";
@@ -24,8 +33,14 @@ function App() {
         <>
             <ThemeProvider theme={theme}>
                 <CssBaseline/>
-                <Box sx={{margin: "20px"}}>
-
+                <Box>
+                    <AppBar>
+                        <Toolbar>
+                            <HowToVote style={{marginRight:"10px"}}/>
+                            <Typography variant={"button"}>helverify - Verifiable Postal Voting</Typography>
+                        </Toolbar>
+                    </AppBar>
+                    <div style={{marginTop :"75px"}}>
                         <Routes>
                             <Route path="/">
                                 <Route index element={<Elections/>}/>
@@ -38,7 +53,7 @@ function App() {
                                 <Route path="tally"/>
                             </Route>
                         </Routes>
-
+                    </div>
                     <Paper>
                         <BottomNavigation
                             showLabels
@@ -47,8 +62,6 @@ function App() {
                             <BottomNavigationAction label="Elections" icon={<HowToVote/>} onClick={() => navigate("/elections")}/>
                             <BottomNavigationAction label="Setup" icon={<Add/>} onClick={() => navigate("/elections/create")}/>
                             <BottomNavigationAction label="Ballot Registration" icon={<QrCodeScanner/>} onClick={() => navigate("/ballots/register")} />
-                            <BottomNavigationAction label="Tallying" icon={<PieChart/>}/>
-                            <BottomNavigationAction label="Blockchain" icon={<Link/>} onClick={() => navigate("/blockchain")}/>
                         </BottomNavigation>
                     </Paper>
                 </Box>

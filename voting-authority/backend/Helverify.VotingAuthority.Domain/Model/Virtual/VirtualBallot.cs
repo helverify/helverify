@@ -190,5 +190,22 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
         /// Extracts all ciphertexts from the encrypted options
         /// </summary>
         private ElGamalCipher[] AllCiphers => EncryptedOptions.SelectMany(e => e.Values.Select(v => v.Cipher)).ToArray();
+
+        /// <summary>
+        /// Returns the encryptions based on the specified selection
+        /// </summary>
+        /// <param name="selection">Selected choices</param>
+        /// <returns></returns>
+        public IList<EncryptedOption> GetSelectedEncryptions(IList<string> selection)
+        {
+            IList<EncryptedOption> selectedOptions = new List<EncryptedOption>();
+
+            foreach (string shortCode in selection)
+            {
+                selectedOptions.Add(EncryptedOptions.Single(eo => eo.ShortCode == shortCode));
+            }
+
+            return selectedOptions;
+        }
     }
 }

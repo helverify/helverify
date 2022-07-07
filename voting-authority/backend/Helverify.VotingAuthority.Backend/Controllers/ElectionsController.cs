@@ -1,16 +1,9 @@
 ﻿using AutoMapper;
-using Helverify.Cryptography.Encryption;
-using Helverify.Cryptography.ZeroKnowledge;
+using Helverify.VotingAuthority.Application.Services;
 using Helverify.VotingAuthority.Backend.Dto;
-using Helverify.VotingAuthority.DataAccess.Dto;
-using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.Domain.Model;
-using Helverify.VotingAuthority.Domain.Model.Blockchain;
-using Helverify.VotingAuthority.Domain.Repository;
-using Helverify.VotingAuthority.Domain.Service;
+using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
 {
@@ -23,34 +16,18 @@ namespace Helverify.VotingAuthority.Backend.Controllers
     {
         private const string ContentType = "application/json";
 
-        private readonly IRepository<Election> _electionRepository;
-        private readonly IConsensusNodeService _consensusNodeService;
-        private readonly IElectionContractRepository _contractRepository;
-        private readonly IRepository<Blockchain> _bcRepository;
         private readonly IMapper _mapper;
-        private readonly IWeb3Loader _web3Loader;
+        private readonly IElectionService _electionService;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="electionRepository">Repository for elections</param>
-        /// <param name="consensusNodeService">Accessor to consensus node service</param>
-        /// <param name="contractRepository">Smart contract accessor</param>
-        /// <param name="bcRepository">Blockchain repository</param>
-        /// <param name="web3Loader">Web3 instance loader</param>
+        /// <param name="electionService">Facade for election operations</param>
         /// <param name="mapper">Automapper</param>
-        public ElectionsController(IRepository<Election> electionRepository,
-            IConsensusNodeService consensusNodeService, 
-            IElectionContractRepository contractRepository,
-            IRepository<Blockchain> bcRepository,
-            IWeb3Loader web3Loader,
+        public ElectionsController(IElectionService electionService,
             IMapper mapper)
         {
-            _electionRepository = electionRepository;
-            _consensusNodeService = consensusNodeService;
-            _contractRepository = contractRepository;
-            _bcRepository = bcRepository;
-            _web3Loader = web3Loader;
+            _electionService = electionService;
             _mapper = mapper;
         }
 
@@ -66,7 +43,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         {
             Election election = _mapper.Map<Election>(electionDto);
 
-            election = await _electionRepository.CreateAsync(election);
+            election = await _electionService.CreateAsync(election);
 
             ElectionDto result = _mapper.Map<ElectionDto>(election);
 
@@ -83,7 +60,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Produces(ContentType)]
         public async Task<ActionResult<ElectionDto>> Get(string id)
         {
-            Election election = await _electionRepository.GetAsync(id);
+            Election election = await _electionService.GetAsync(id);
 
             ElectionDto result = _mapper.Map<ElectionDto>(election);
 
@@ -98,7 +75,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Produces(ContentType)]
         public async Task<ActionResult<IList<ElectionDto>>> Get()
         {
-            IList<Election> elections = await _electionRepository.GetAsync();
+            IList<Election> elections = await _electionService.GetAsync();
 
             IList<ElectionDto> results = _mapper.Map<IList<ElectionDto>>(elections);
 
@@ -119,7 +96,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         {
             Election election = _mapper.Map<Election>(electionDto);
 
-            election = await _electionRepository.UpdateAsync(id, election);
+            election = await _electionService.UpdateAsync(id, election);
 
             ElectionDto result = _mapper.Map<ElectionDto>(election);
 
@@ -135,7 +112,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Route("{id}")]
         public async Task Delete(string id)
         {
-            await _electionRepository.DeleteAsync(id);
+            await _electionService.DeleteAsync(id);
         }
 
         /// <summary>
@@ -149,29 +126,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Produces(ContentType)]
         public async Task<ActionResult<ElectionDto>> Put(string id)
         {
-            Election election = await _electionRepository.GetAsync(id);
-
-            election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
-
-            if (election.Id == null)
-            {
-                throw new NullReferenceException("Election id is null");
-            }
-
-            IList<Registration> registrations = election.Blockchain.Registrations;
-            
-            foreach (Registration registration in registrations)
-            {
-                PublicKeyDto publicKey = await _consensusNodeService.GenerateKeyPairAsync(registration.Endpoint, election) ?? throw new NullReferenceException("Public key is null");
-
-                registration.SetPublicKey(publicKey, election);
-            }
-
-            await _bcRepository.UpdateAsync(election.Blockchain.Id, election.Blockchain);
-
-            election.CombinePublicKeys(registrations.Select(r => r.PublicKeys[election.Id]).ToList());
-
-            election = await _electionRepository.UpdateAsync(id, election);
+            Election election = await _electionService.GeneratePublicKeyAsync(id);
 
             ElectionDto result = _mapper.Map<ElectionDto>(election);
 
@@ -188,87 +143,41 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Route("{id}/contract")]
         public async Task<ActionResult<ElectionDto>> DeployContract([FromRoute] string id)
         {
-            _web3Loader.LoadInstance();
-
-            Election election = await _electionRepository.GetAsync(id);
-
-            election.ContractAddress = await _contractRepository.DeployContractAsync();
-
-            await _electionRepository.UpdateAsync(id, election);
-
-            await _contractRepository.SetUpAsync(election);
+            Election election = await _electionService.DeployElectionContractAsync(id);
 
             ElectionDto electionDto = _mapper.Map<ElectionDto>(election);
 
             return Ok(electionDto);
         }
 
-
         /// <summary>
-        /// For testing purposes
+        /// Calculates the final tally and publishes the results with evidence.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="message"></param>
+        /// <param name="id">Election identifier</param>
         /// <returns></returns>
         [HttpPost]
-        [Route("{id}/encrypt")]
-        public async Task<ActionResult<Cipher>> Encrypt(string id, Message message)
+        [Route("{id}/tally")]
+        public async Task<ActionResult> CalculateTally([FromRoute] string id)
         {
-            Election election = await _electionRepository.GetAsync(id);
+            IList<DecryptedValue> decryptedValues = await _electionService.CalculateTallyAsync(id);
 
-            ElGamalCipher cipher = election.Encrypt(message.M);
-
-            return new Cipher
-            {
-                C = cipher.C.ToString(16),
-                D = cipher.D.ToString(16)
-            };
+            return Ok(decryptedValues.Select(r => r.PlainText));
         }
 
         /// <summary>
-        /// For testing purposes
+        /// Returns the final tally.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cipher"></param>
+        /// <param name="id">Election identifier</param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("{id}/decrypt")]
-        public async Task<ActionResult<Message>> Decrypt(string id, Cipher cipher)
+        [HttpGet]
+        [Route("{id}/results")]
+        public async Task<ActionResult<ElectionResultsDto>> GetResults([FromRoute] string id)
         {
-            Election election = await _electionRepository.GetAsync(id);
+            ElectionResults results = await _electionService.GetResultsAsync(id);
 
-            election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
+            ElectionResultsDto electionResultsDto = _mapper.Map<ElectionResultsDto>(results);
 
-            IList<Registration> consensusNodes = election.Blockchain.Registrations;
-            
-            IList<string> shares = new List<string>();
-
-            foreach (Registration node in consensusNodes)
-            {
-                DecryptionShareDto? share = await _consensusNodeService.DecryptShareAsync(node.Endpoint, cipher.C, cipher.D);
-
-                ProofOfDecryption proof = new ProofOfDecryption(new BigInteger(share!.ProofOfDecryption.D, 16), 
-                    new BigInteger(share.ProofOfDecryption.U, 16),
-                    new BigInteger(share.ProofOfDecryption.V, 16),
-                    new BigInteger(share.ProofOfDecryption.S, 16));
-
-                bool isValid = proof.Verify(new BigInteger(cipher.C, 16), new BigInteger(cipher.D, 16),
-                    new DHPublicKeyParameters(node.PublicKeys[election.Id!], election.DhParameters));
-
-                if (!isValid)
-                {
-                    throw new Exception("Decryption proof is invalid");
-                }
-
-                shares.Add(share.DecryptedShare);
-            }
-
-            int message = election.CombineShares(shares, cipher.D);
-
-            return new Message
-            {
-                M = message
-            };
+            return Ok(electionResultsDto);
         }
     }
 }

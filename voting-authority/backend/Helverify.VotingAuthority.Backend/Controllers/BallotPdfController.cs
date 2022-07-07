@@ -1,7 +1,6 @@
-﻿using Helverify.VotingAuthority.Domain.Model;
+﻿using Helverify.VotingAuthority.Application.Services;
+using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
-using Helverify.VotingAuthority.Domain.Repository;
-using Helverify.VotingAuthority.Domain.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Helverify.VotingAuthority.Backend.Controllers
@@ -16,27 +15,24 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         private const string FileExtensionZip = ".zip";
         private const string ContentTypeZip = "application/zip";
 
-        private readonly IRepository<Election> _electionRepository;
-        private readonly IRepository<PaperBallot> _ballotRepository;
-        private readonly IBallotPdfService _pdfService;
-        private readonly IZipFileService _zipFileService;
-
+        private readonly IElectionService _electionService;
+        private readonly IBallotPrintService _ballotPrintService;
+        private readonly IBallotService _ballotService;
+        
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="electionRepository">Data access to elections</param>
-        /// <param name="ballotRepository">Data access to ballots</param>
-        /// <param name="pdfService">PDF generator</param>
-        /// <param name="zipFileService">ZIP file generator</param>
-        public BallotPdfController(IRepository<Election> electionRepository,
-            IRepository<PaperBallot> ballotRepository,
-            IBallotPdfService pdfService,
-            IZipFileService zipFileService)
+        /// <param name="ballotService">Facade for ballot domain logic.</param>
+        /// <param name="electionService">Facade for election domain logic.</param>
+        /// <param name="ballotPrintService">Facade for ballot print domain logic.</param>
+        public BallotPdfController(
+            IElectionService electionService,
+            IBallotPrintService ballotPrintService,
+        IBallotService ballotService)
         {
-            _electionRepository = electionRepository;
-            _ballotRepository = ballotRepository;
-            _pdfService = pdfService;
-            _zipFileService = zipFileService;
+            _electionService = electionService;
+            _ballotPrintService = ballotPrintService;
+            _ballotService = ballotService;
         }
 
         /// <summary>
@@ -49,23 +45,16 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         [Produces(ContentTypeZip)]
         public async Task<ActionResult> GenerateAllPdfs([FromRoute] string electionId, int numberOfBallots)
         {
-            Election election = await _electionRepository.GetAsync(electionId);
+            Election election = await _electionService.GetAsync(electionId);
 
-            IList<PaperBallot> paperBallots = (await _ballotRepository.GetAsync()).Where(b => !b.Printed).Take(numberOfBallots).ToList();
+            IList<PaperBallot> paperBallots = await _ballotService.GetAsync(numberOfBallots);
 
             if (!paperBallots.Any())
             {
                 return NoContent();
             }
-
-            IList<ArchiveFile> archiveFiles = await _pdfService.GeneratePdfs(election, paperBallots);
-
-            foreach (PaperBallot paperBallot in paperBallots)
-            {
-                await _ballotRepository.UpdateAsync(paperBallot.BallotId, paperBallot);
-            }
-
-            byte[] zipFile = _zipFileService.CreateZip(archiveFiles);
+            
+            byte[] zipFile = await _ballotPrintService.GeneratePdfsZipped(election, paperBallots);
 
             return File(zipFile, ContentTypeZip, $"ballots_{election.Id}{FileExtensionZip}");
         }

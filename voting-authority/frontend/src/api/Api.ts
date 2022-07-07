@@ -68,17 +68,6 @@ export interface BlockchainDto {
     registrations?: RegistrationDto[] | null;
 }
 
-/**
- * Represents the ciphertext of an ElGamal cryptosystem
- */
-export interface Cipher {
-    /** First parameter of an ElGamal ciphertext */
-    c?: string | null;
-
-    /** Second parameter of an ElGamal ciphertext */
-    d?: string | null;
-}
-
 export interface DHParameters {
     p?: BigInteger;
     g?: BigInteger;
@@ -156,6 +145,28 @@ export interface ElectionOptionDto {
 }
 
 /**
+ * Represents the result of a single option / candidate
+ */
+export interface ElectionResultDto {
+    /** Option / candidate name */
+    optionName?: string | null;
+
+    /**
+     * Tally of option / candidate
+     * @format int32
+     */
+    count?: number;
+}
+
+/**
+ * Represents an election's final tally.
+ */
+export interface ElectionResultsDto {
+    /** Tally per candidate / option */
+    results?: ElectionResultDto[] | null;
+}
+
+/**
  * Parameters for publishing voting evidence.
  */
 export interface EvidenceDto {
@@ -169,17 +180,6 @@ export interface EvidenceDto {
      * @max 1
      */
     spoiltBallotIndex?: number;
-}
-
-/**
- * Represents a plaintext message
- */
-export interface Message {
-    /**
-     * Numeric message
-     * @format int32
-     */
-    m?: number;
 }
 
 /**
@@ -673,17 +673,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags Elections
-         * @name ElectionsEncryptCreate
-         * @summary For testing purposes
-         * @request POST:/api/elections/{id}/encrypt
+         * @name ElectionsTallyCreate
+         * @summary Calculates the final tally and publishes the results with evidence.
+         * @request POST:/api/elections/{id}/tally
          */
-        electionsEncryptCreate: (id: string, data: Message, params: RequestParams = {}) =>
-            this.request<Cipher, any>({
-                path: `/api/elections/${id}/encrypt`,
+        electionsTallyCreate: (id: string, params: RequestParams = {}) =>
+            this.request<void, any>({
+                path: `/api/elections/${id}/tally`,
                 method: "POST",
-                body: data,
-                type: ContentType.Json,
-                format: "json",
                 ...params,
             }),
 
@@ -691,16 +688,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags Elections
-         * @name ElectionsDecryptCreate
-         * @summary For testing purposes
-         * @request POST:/api/elections/{id}/decrypt
+         * @name ElectionsResultsDetail
+         * @summary Returns the final tally.
+         * @request GET:/api/elections/{id}/results
          */
-        electionsDecryptCreate: (id: string, data: Cipher, params: RequestParams = {}) =>
-            this.request<Message, any>({
-                path: `/api/elections/${id}/decrypt`,
-                method: "POST",
-                body: data,
-                type: ContentType.Json,
+        electionsResultsDetail: (id: string, params: RequestParams = {}) =>
+            this.request<ElectionResultsDto, any>({
+                path: `/api/elections/${id}/results`,
+                method: "GET",
                 format: "json",
                 ...params,
             }),

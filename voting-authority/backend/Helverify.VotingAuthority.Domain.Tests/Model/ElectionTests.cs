@@ -1,4 +1,6 @@
-﻿using Helverify.VotingAuthority.Domain.Model;
+﻿using Helverify.VotingAuthority.Domain.Extensions;
+using Helverify.VotingAuthority.Domain.Model;
+using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Org.BouncyCastle.Math;
 
 namespace Helverify.VotingAuthority.Domain.Tests.Model
@@ -34,18 +36,25 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model
         public void TestCombineShares()
         {
             // arrange
-            
+
             // for the sake of completeness: string c = "8bd98e37f4897ab4605bf742988e6e3a0c73a2506b13c5cf9b52432f430490ac56bd95677a50509ebd9ddf56ff0fc39465d5d059b55256e3b8a9d5e1fd084571aea994aed1dde64303ec214ba9b017a39931dcf484ff51ae7367beadc008435b0986f2e20902ca8ba7a3211f83cf300587ae76da41e9cfbbdb61918d9569e44b6db6f58eb55b609bfc80893b69ad080a2d722b8afd453cd886bb324b3a3f5f049534197f454cd4d788ed37986cde66baf40717d766d7b881b80dc70106ed2701b2ae5cadf6f8e7941b9c69275f80ef23d1a42a80a0ca89a4bb7a74af8f287451253bbd31c484fac9ad88a3fa1685ea73bac28ee36f6816639db1eb185a46e3";
             string d = "408e194b50c0198ec92ff19fa0cdb990602b45ac7603b2bcc2a4d7d86c6ba60d07fc907762159441c488a5c84f9861af2ad348dbb9b2cf315b03dada524ad3914177346c9200aa83fa50e42645b5052658616ea30ddf7a44edfe64bca1cead9b3f5ed32aecbda005f740da1383420f6b1a1e60fe9a3b4b1053d1ce25508eed02f72526b9bedcf3a4d0b189608f1ac5c43f8302a4c9457f055cfd6f8a21840fef69a058f21b2ec5d879e439188a2f2f911921481456df24cab23e9c2d1a164db7c01b72f07060fcb8080cbb5af745b9fc65ffe941f5d7e9acb05ec7cd6bf7193c8ec64e42e3e89c3f39e6fd6a3a6d2dcdc4bd8d56ca84c2357fdca321386542b0";
-            
-            List<string> shares = new List<string>
+
+            List<DecryptedShare> shares = new List<DecryptedShare>
             {
-                "2576530babe0fd62ad19df19c5576ac278b9cfd674130a7766f110fab33ed78d85e50edea8af3e7bd3953b01286e2c31df76c9ab2eb457e3df1826f923366ff27f0b11678c1dc668bb455a0342c1964ff7da53ab35ee32c5cd8963d27f5ab05f970e4f43657eff9e1335cfbab55d4e83eaad28a87eeb126b8db5d28c5ece965c11212159235baca6a420b404df7e68658c33244ecf1460099211bcb47e6c45f8de058d69a93fac73c472a9d5751e2b54f8a84988d11a37757c660ddeba709dc692f2a4740352a477f9cade65a53ddc98acfc4a3d3a3fa2f7e5a8ad722427d36c297343eec09b2b1fd2a9ddb0095cba0486d53ba60ac99bf4002683a81635b38e",
-                "5a313e2f8c962a1a79a5c9a0b61397b442651a145a942c303e54d15292ad5667ff47264c1f9c9004d0d5079305c62c801a76b65dfeddb49860784e2d8696df9ae0fd68ed84abeff31f9d141dc7b7c5b168becb6dcf7af2d1fa41c34e0dc599ac1c4249415cd6cc403eeb3aa52588e85230f934df6b129b174964b26f21d4d1b5e0b8d96402b576c8fcaaed84c21da14aa9564121867f5d0422a56bc28c0adc1a3da19d1407b7bed6a90815a28ca638a762f42ebe9349e447b2f7502ccd4ea1e439cd07c64236c3fe1720a110fdcae4d19205dbf81a3d28cabf566479f876cd9390c7298027a6e1d672dd52d23552335515f896e38a82c0edd16101673a2a368f"
+                new ()
+                {
+                    Share = "2576530babe0fd62ad19df19c5576ac278b9cfd674130a7766f110fab33ed78d85e50edea8af3e7bd3953b01286e2c31df76c9ab2eb457e3df1826f923366ff27f0b11678c1dc668bb455a0342c1964ff7da53ab35ee32c5cd8963d27f5ab05f970e4f43657eff9e1335cfbab55d4e83eaad28a87eeb126b8db5d28c5ece965c11212159235baca6a420b404df7e68658c33244ecf1460099211bcb47e6c45f8de058d69a93fac73c472a9d5751e2b54f8a84988d11a37757c660ddeba709dc692f2a4740352a477f9cade65a53ddc98acfc4a3d3a3fa2f7e5a8ad722427d36c297343eec09b2b1fd2a9ddb0095cba0486d53ba60ac99bf4002683a81635b38e".ConvertToBigInteger()
+                },
+                new ()
+                {
+                    Share = "5a313e2f8c962a1a79a5c9a0b61397b442651a145a942c303e54d15292ad5667ff47264c1f9c9004d0d5079305c62c801a76b65dfeddb49860784e2d8696df9ae0fd68ed84abeff31f9d141dc7b7c5b168becb6dcf7af2d1fa41c34e0dc599ac1c4249415cd6cc403eeb3aa52588e85230f934df6b129b174964b26f21d4d1b5e0b8d96402b576c8fcaaed84c21da14aa9564121867f5d0422a56bc28c0adc1a3da19d1407b7bed6a90815a28ca638a762f42ebe9349e447b2f7502ccd4ea1e439cd07c64236c3fe1720a110fdcae4d19205dbf81a3d28cabf566479f876cd9390c7298027a6e1d672dd52d23552335515f896e38a82c0edd16101673a2a368f".ConvertToBigInteger()
+                }
+                
             };
 
             Election election = new Election
-            { 
+            {
                 Id = "test",
                 Name = "test",
                 Question = "test?",
@@ -63,9 +72,9 @@ namespace Helverify.VotingAuthority.Domain.Tests.Model
                 P = new BigInteger("87a8e61db4b6663cffbbd19c651959998ceef608660dd0f25d2ceed4435e3b00e00df8f1d61957d4faf7df4561b2aa3016c3d91134096faa3bf4296d830e9a7c209e0c6497517abd5a8a9d306bcf67ed91f9e6725b4758c022e0b1ef4275bf7b6c5bfc11d45f9088b941f54eb1e59bb8bc39a0bf12307f5c4fdb70c581b23f76b63acae1caa6b7902d52526735488a0ef13c6d9a51bfa4ab3ad8347796524d8ef6a167b5a41825d967e144e5140564251ccacb83e6b486f6b3ca3f7971506026c0b857f689962856ded4010abd0be621c3a3960a54e710c375f26375d7014103a4b54330c198af126116d2276e11715f693877fad7ef09cadb094ae91e1a1597", 16),
                 G = new BigInteger("3fb32c9b73134d0b2e77506660edbd484ca7b18f21ef205407f4793a1a0ba12510dbc15077be463fff4fed4aac0bb555be3a6c1b0c6b47b1bc3773bf7e8c6f62901228f8c28cbb18a55ae31341000a650196f931c77a57f2ddf463e5e9ec144b777de62aaab8a8628ac376d282d6ed3864e67982428ebc831d14348f6f2f9193b5045af2767164e1dfc967c1fb3f2e55a4bd1bffe83b9c80d052b985d182ea0adb2a3b7313d3fe14c8484b1e052588b9b7d2bbd2df016199ecd06e1557cd0915b3353bbb64e0ec377fd028370df92b52c7891428cdc67eb6184b523d1db246c32f63078490f00ef8d647d148d47954515e2327cfef98c582664b4c0f6cc41659", 16)
             };
-            
+
             // act
-            int message = election.CombineShares(shares, d);
+            int message = election.CombineShares(shares, d.ConvertToBigInteger());
 
             // assert
             Assert.That(message, Is.EqualTo(1337));
