@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import {Elections} from "./components/election/Elections";
 import {BottomNavigation, BottomNavigationAction, Box, createTheme, CssBaseline, Paper} from "@mui/material";
-import {Add, HowToVote, PieChart, Link, QrCodeScanner} from "@mui/icons-material";
+import {Add, HowToVote, QrCodeScanner} from "@mui/icons-material";
 import {Route, Routes} from "react-router-dom";
 import {ElectionSetup, setupSteps} from "./components/setup/ElectionSetup";
 import {ThemeProvider} from "@mui/material";
@@ -47,8 +47,6 @@ function App() {
                             <BottomNavigationAction label="Elections" icon={<HowToVote/>} onClick={() => navigate("/elections")}/>
                             <BottomNavigationAction label="Setup" icon={<Add/>} onClick={() => navigate("/elections/create")}/>
                             <BottomNavigationAction label="Ballot Registration" icon={<QrCodeScanner/>} onClick={() => navigate("/ballots/register")} />
-                            <BottomNavigationAction label="Tallying" icon={<PieChart/>}/>
-                            <BottomNavigationAction label="Blockchain" icon={<Link/>} onClick={() => navigate("/blockchain")}/>
                         </BottomNavigation>
                     </Paper>
                 </Box>
