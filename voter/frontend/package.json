@@ -15,8 +15,12 @@
     "@types/node": "^16.11.41",
     "@types/react": "^17.0.47",
     "@types/react-dom": "^17.0.17",
+    "@types/web3": "^1.2.2",
+    "big-integer": "^1.6.51",
+    "crypto-js": "^4.1.1",
     "dotenv": "^16.0.1",
     "dotenv-webpack": "^7.1.1",
+    "ipfs-http-client": "^57.0.3",
     "path-browserify": "^1.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -53,6 +57,7 @@
     ]
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
