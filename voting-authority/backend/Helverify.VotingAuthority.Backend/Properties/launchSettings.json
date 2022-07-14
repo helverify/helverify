@@ -38,7 +38,7 @@
         "GethEndpoint": "http://localhost:8545",
         "PORT": "30300"
       },
-      "DockerfileRunArguments": "-e BC_ACCOUNT_PWD=test1 -e PORT=30300 -p 8545:8545 -v va:/home",
+      "DockerfileRunArguments": "-e BC_ACCOUNT_PWD=test1 -e PORT=30300 -p 8545:8545 -p 8546:8546 -v va:/home",
       "httpPort": 5000,
       "publishAllPorts": true,
       "useSSL": false

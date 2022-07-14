@@ -146,7 +146,7 @@ namespace Helverify.VotingAuthority.Domain.Template
 
         private byte[] GenerateQrCode()
         {
-            BallotQrData ballotQr = new BallotQrData(Election.Id!, PaperBallot.BallotId);
+            BallotQrData ballotQr = new BallotQrData(Election.Id!, PaperBallot.BallotId, Election.ContractAddress);
 
             string jsonQrData = JsonConvert.SerializeObject(ballotQr);
 

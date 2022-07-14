@@ -13,6 +13,7 @@ services:
         ports:
             - 5000:5000
             - 8545:8545
+            - 8546:8546
             - 30300:30300
         environment: 
             - ASPNETCORE_URLS=http://+:5000

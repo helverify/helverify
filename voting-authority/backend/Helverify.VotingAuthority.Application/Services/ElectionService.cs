@@ -51,7 +51,14 @@ namespace Helverify.VotingAuthority.Application.Services
         }
 
         /// <inheritdoc cref="IElectionService.GetAsync(string)"/>
-        public async Task<Election> GetAsync(string electionId) => await _electionRepository.GetAsync(electionId);
+        public async Task<Election> GetAsync(string electionId)
+        {
+            Election election = await _electionRepository.GetAsync(electionId);
+
+            election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
+            
+            return election;
+        }
 
         /// <inheritdoc cref="IElectionService.GetAsync()"/>
         public async Task<IList<Election>> GetAsync() => await _electionRepository.GetAsync();
@@ -66,8 +73,6 @@ namespace Helverify.VotingAuthority.Application.Services
         public async Task<Election> GeneratePublicKeyAsync(string electionId)
         {
             Election election = await GetAsync(electionId);
-
-            election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
 
             if (election.Id == null)
             {
@@ -158,8 +163,6 @@ namespace Helverify.VotingAuthority.Application.Services
         /// <returns></returns>
         private async Task<DecryptedValue> DecryptAsync(Election election, ElGamalCipher cipher)
         {
-            election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
-
             IList<Registration> consensusNodes = election.Blockchain.Registrations;
 
             IList<DecryptedShare> shares = new List<DecryptedShare>();

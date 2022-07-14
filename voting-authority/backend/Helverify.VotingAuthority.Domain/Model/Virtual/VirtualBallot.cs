@@ -112,9 +112,12 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
 
                 for (int j = 0; j < EncryptedOptions.Count; j++)
                 {
-                    columnCiphers.Add(encOption.Values[j].Cipher);
+                    foreach (EncryptedOptionValue encryptedOption in EncryptedOptions.Select(o => o.Values[j]))
+                    {
+                      columnCiphers.Add(encryptedOption.Cipher);  
+                    }
                 }
-
+                
                 ElGamalCipher sum = SumUpCiphers(publicKey, columnCiphers);
 
                 ProofOfContainingOne columnProof = ProofOfContainingOne.Create(sum.C, sum.D, publicKey.Y, sum.R,
