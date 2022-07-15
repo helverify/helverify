@@ -33,15 +33,15 @@ export const EncryptedBallotVerification = (props: EncryptedBallotVerificationPr
                 <CardContent>
                     <Stack direction="column">
                         <div>
-                            <Typography color="text.secondary">All encryptions in a row sum up to 1</Typography>
+                            <Typography color="text.secondary">Each encrypted option represents exactly one candidate (row sums up to 1)</Typography>
                             <ValidityIcon isValid={areRowsValid}/>
                         </div>
                         <div>
-                            <Typography color="text.secondary">All encryptions in a column sum up to 1</Typography>
+                            <Typography color="text.secondary">Each candidate is represented by exactly one encrypted option (column sums up to 1)</Typography>
                             <ValidityIcon isValid={areColumnsValid}/>
                         </div>
                         <div>
-                            <Typography color="text.secondary">Each encryption is either an encryption of 0 or
+                            <Typography color="text.secondary">Each encrypted value is either an encryption of 0 or
                                 1</Typography>
                             <ValidityIcon isValid={containsOnlyZeroOrOne}/>
                         </div>

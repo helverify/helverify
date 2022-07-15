@@ -48,3 +48,14 @@ export interface VirtualBallotDto {
     columnProofs: ColumnProofDto[];
     encryptedOptions: EncryptedOptionDto[];
 }
+
+export interface OptionDto {
+    name: string;
+    shortCode: string;
+    values: number[];
+    randomness: string[];
+}
+
+export interface SpoiltBallotDto {
+    options: OptionDto[];
+}

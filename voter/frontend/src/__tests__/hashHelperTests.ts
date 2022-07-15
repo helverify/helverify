@@ -43,8 +43,6 @@ describe("HashHelper test", () => {
             d: BigNumberHelper.fromHexString(d5)
         }]);
 
-        console.log(result);
         expect(result.substring(0,2)).toStrictEqual("5d");
-
     });
 });

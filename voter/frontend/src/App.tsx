@@ -4,13 +4,14 @@ import {Card, Container, createTheme, CssBaseline, Stack, ThemeProvider} from '@
 import Web3 from "web3";
 import {ElectionABI} from "./contract/electionContract";
 import {QrReader} from "react-qr-reader";
-import {EncryptedBallotVerification} from "./components/EncryptedBallotVerification";
 import {BallotService} from "./services/ballotService";
 import {EncryptedBallot} from "./cryptography/encryptedBallot";
 import {ElectionParameters} from "./election/election";
 import {BigNumberHelper} from "./helper/bigNumberHelper";
 import bigInt from "big-integer";
 import {EncryptedBallotsView} from "./components/EncryptedBallotsView";
+import {SpoiltBallotView} from "./components/SpoiltBallotView";
+import {SpoiltBallot} from "./ballot/spoiltBallot";
 
 type QrData = {
     electionId: string,
@@ -27,16 +28,13 @@ function App() {
 
     const [qrData, setQrData] = useState<QrData>({electionId: "", ballotId: "", contractAddress: ""});
     const [ballots, setBallots] = useState<EncryptedBallot[]>();
+    const [spoiltBallot, setSpoiltBallot]  = useState<SpoiltBallot>();
     const [electionParameters, setElectionParameters] = useState<ElectionParameters>();
 
     const web3 = new Web3("ws://localhost:8546");
 
     const loadContractData = () => {
         const electionContract = new web3.eth.Contract(ElectionABI, qrData.contractAddress);
-
-        electionContract.methods.castBallots(qrData.ballotId).call().then(async (res: any) => {
-            console.log(res.ballotId);
-        });
 
         const ballotService: BallotService = new BallotService(qrData.contractAddress);
 
@@ -61,7 +59,13 @@ function App() {
             setElectionParameters(electionParams);
         });
 
-        //electionContract.methods.spoiltBallots(qrData.ballotId).call().then(console.log);
+        electionContract.methods.retrieveCastBallot(qrData.ballotId).call().then((result: any) => {
+            console.log("castBallot", result);
+        });
+
+        ballotService.getSpoiltBallot(qrData.ballotId).then((ballot: SpoiltBallot) => {
+            setSpoiltBallot(ballot);
+        });
     }
 
     useEffect(() => {
@@ -77,14 +81,13 @@ function App() {
             <ThemeProvider theme={theme}>
                 <CssBaseline/>
                 <Container>
-                    <Stack direction="row" spacing={1}>
+
+                    <Stack direction="column" spacing={1}>
                         {!hasBallot && (
                             <Card style={{width: "100%", maxWidth: "800px"}}>
                                 <QrReader
                                     onResult={(result, error) => {
-
                                         let text = result?.getText();
-
                                         if (!!text) {
                                             let data = JSON.parse(text);
 
@@ -93,7 +96,6 @@ function App() {
                                                 ballotId: data.BallotId,
                                                 contractAddress: data.ContractAddress
                                             };
-
                                             setQrData(qrData);
                                         }
                                     }}
@@ -104,9 +106,12 @@ function App() {
                         )}
                         <EncryptedBallotsView ballotId={qrData.ballotId} ballots={ballots}
                                               electionParameters={electionParameters}/>
+                        {spoiltBallot !== undefined && (
+                            <SpoiltBallotView ballot={spoiltBallot}/>
+                        )}
+
                     </Stack>
                 </Container>
-
             </ThemeProvider>
         </>
     );

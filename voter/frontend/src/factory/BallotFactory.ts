@@ -1,7 +1,7 @@
 import {
     CipherDto,
     ProofOfContainingOneDto,
-    ProofOfZeroOrOneDto,
+    ProofOfZeroOrOneDto, SpoiltBallotDto,
     VirtualBallotDto
 } from "../cryptography/ballot";
 import {
@@ -13,6 +13,7 @@ import {
 } from "../cryptography/encryptedBallot";
 import {ProofOfContainingOne} from "../cryptography/proofOfContainingOne";
 import {ProofOfZeroOrOne} from "../cryptography/proofOfZeroOrOne";
+import {PlainTextOption, SpoiltBallot} from "../ballot/spoiltBallot";
 
 export class BallotFactory {
 
@@ -44,6 +45,14 @@ export class BallotFactory {
         })
 
         return new EncryptedBallot(rowProofs, columnProofs, encryptedOptions, ballot.code);
+    }
+
+    static CreateSpoiltBallot(ballot: SpoiltBallotDto): SpoiltBallot {
+        let plainTextOptions: PlainTextOption[] = ballot.options.map(o => new PlainTextOption(o.name, o.shortCode, o.values.indexOf(1), o.randomness));
+
+        let spoiltBallot: SpoiltBallot = new SpoiltBallot(plainTextOptions);
+
+        return spoiltBallot;
     }
 
     private static getProofOfContainingOne(proof: ProofOfContainingOneDto): ProofOfContainingOne {

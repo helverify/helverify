@@ -54,7 +54,7 @@ export const EncryptedBallotsView = (props: EncryptedBallotViewProps) => {
 
     return (
         <>
-            <Card style={{width: "100%", maxWidth: "1200px"}}>
+            <Card>
                 <Box sx={{m: 1}}>
                     <Typography variant={"h4"}>Encrypted Ballot Verification</Typography>
 
