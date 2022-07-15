@@ -1,19 +1,18 @@
 import {EncryptedBallot} from "../cryptography/encryptedBallot";
 import {ElectionParameters} from "../election/election";
 import {Box, Card, CardContent, Typography, Stack} from "@mui/material";
-import {Check, Close, Warning} from "@mui/icons-material";
 import bigInt from "big-integer";
+import {useEffect} from "react";
+import {ValidityIcon} from "./ValidityIcon";
 
 export type EncryptedBallotVerificationProps = {
     caption: string;
     ballot: EncryptedBallot;
     electionParameters: ElectionParameters;
+    setValidity: (isValid: boolean) => void;
 }
 
 export const EncryptedBallotVerification = (props: EncryptedBallotVerificationProps) => {
-    const checkmarkStyle = {color: "#00FF00"};
-    const xmarkStyle = {color: "#FF0000"};
-
     const publicKey: bigInt.BigInteger = props.electionParameters.publicKey;
     const p: bigInt.BigInteger = props.electionParameters.p;
     const g: bigInt.BigInteger = props.electionParameters.g;
@@ -24,33 +23,35 @@ export const EncryptedBallotVerification = (props: EncryptedBallotVerificationPr
     const areShortCodesCorrect: boolean = props.ballot.verifyShortCodes();
     const isBallotIdCorrect: boolean = props.ballot.verifyBallotId();
 
+    useEffect(() => {
+        props.setValidity(areRowsValid && areColumnsValid && containsOnlyZeroOrOne && areShortCodesCorrect && isBallotIdCorrect);
+    }, []);
+
     return (
         <Box>
             <Card variant="elevation">
                 <CardContent>
                     <Stack direction="column">
-                        <Typography variant="h4">{props.caption}</Typography>
-                        <Typography variant="overline">{props.ballot.ballotId}</Typography>
                         <div>
                             <Typography color="text.secondary">All encryptions in a row sum up to 1</Typography>
-                            {areRowsValid ? <Check style={checkmarkStyle}/> : <Close style={xmarkStyle}/>}
+                            <ValidityIcon isValid={areRowsValid}/>
                         </div>
                         <div>
                             <Typography color="text.secondary">All encryptions in a column sum up to 1</Typography>
-                            {areColumnsValid ? <Check style={checkmarkStyle}/> : <Close style={xmarkStyle}/>}
+                            <ValidityIcon isValid={areColumnsValid}/>
                         </div>
                         <div>
                             <Typography color="text.secondary">Each encryption is either an encryption of 0 or
                                 1</Typography>
-                            {containsOnlyZeroOrOne ? <Check style={checkmarkStyle}/> : <Close style={xmarkStyle}/>}
+                            <ValidityIcon isValid={containsOnlyZeroOrOne}/>
                         </div>
                         <div>
                             <Typography color="text.secondary">Are the short codes correct?</Typography>
-                            {areShortCodesCorrect ? <Check style={checkmarkStyle}/> : <Close style={xmarkStyle}/>}
+                            <ValidityIcon isValid={areShortCodesCorrect}/>
                         </div>
                         <div>
                             <Typography color="text.secondary">Is the ballot ID correct?</Typography>
-                            {isBallotIdCorrect ? <Check style={checkmarkStyle}/> : <Close style={xmarkStyle}/>}
+                            <ValidityIcon isValid={isBallotIdCorrect}/>
                         </div>
                     </Stack>
                 </CardContent>

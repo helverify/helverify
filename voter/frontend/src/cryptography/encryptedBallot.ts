@@ -26,7 +26,6 @@ export class EncryptedBallot {
 
         const hash: string = HashHelper.getCipherHash(ciphers);
 
-        console.log(hash, this.ballotId);
         return hash === this.ballotId;
     }
 }

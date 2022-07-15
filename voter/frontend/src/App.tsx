@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import {Box, Card, createTheme, CssBaseline, Stack, ThemeProvider} from '@mui/material';
+import {Card, Container, createTheme, CssBaseline, Stack, ThemeProvider} from '@mui/material';
 import Web3 from "web3";
 import {ElectionABI} from "./contract/electionContract";
 import {QrReader} from "react-qr-reader";
@@ -10,6 +10,7 @@ import {EncryptedBallot} from "./cryptography/encryptedBallot";
 import {ElectionParameters} from "./election/election";
 import {BigNumberHelper} from "./helper/bigNumberHelper";
 import bigInt from "big-integer";
+import {EncryptedBallotsView} from "./components/EncryptedBallotsView";
 
 type QrData = {
     electionId: string,
@@ -54,11 +55,13 @@ function App() {
                 p: BigNumberHelper.fromHexString(result.elGamalParameters.p),
                 g: BigNumberHelper.fromHexString(result.elGamalParameters.g),
                 publicKey: BigNumberHelper.fromHexString(result.publicKey),
-                consensusNodePublicKeys:cnPublicKeys
+                consensusNodePublicKeys: cnPublicKeys
             };
 
             setElectionParameters(electionParams);
         });
+
+        //electionContract.methods.spoiltBallots(qrData.ballotId).call().then(console.log);
     }
 
     useEffect(() => {
@@ -67,45 +70,43 @@ function App() {
         }
     }, [qrData])
 
+    const hasBallot = qrData.electionId !== "";
+
     return (
         <>
             <ThemeProvider theme={theme}>
                 <CssBaseline/>
-                <Stack direction="row" spacing={1}>
-                    <Card style={{ width: "100%", maxWidth: "800px"}}>
-                        <QrReader
-                            onResult={(result, error) => {
+                <Container>
+                    <Stack direction="row" spacing={1}>
+                        {!hasBallot && (
+                            <Card style={{width: "100%", maxWidth: "800px"}}>
+                                <QrReader
+                                    onResult={(result, error) => {
 
-                                let text = result?.getText();
+                                        let text = result?.getText();
 
-                                if (!!text) {
-                                    let data = JSON.parse(text);
+                                        if (!!text) {
+                                            let data = JSON.parse(text);
 
-                                    const qrData: QrData = {
-                                        electionId: data.ElectionId,
-                                        ballotId: data.BallotId,
-                                        contractAddress: data.ContractAddress
-                                    };
+                                            const qrData: QrData = {
+                                                electionId: data.ElectionId,
+                                                ballotId: data.BallotId,
+                                                contractAddress: data.ContractAddress
+                                            };
 
-                                    setQrData(qrData);
-                                }
-                            }}
-                            constraints={{facingMode: "environment"}}
-                            containerStyle={{width: "100%"}}
-                        />
-                    </Card>
-
-                    {ballots?.length === 2 && electionParameters !== undefined && (
-                        <>
-                            <Card style={{ width: "100%", maxWidth: "800px"}}>
-                                <Stack direction="column">
-                                    <EncryptedBallotVerification caption="Ballot 1" ballot={ballots[0]} electionParameters={electionParameters}/>
-                                    <EncryptedBallotVerification caption="Ballot 2" ballot={ballots[1]} electionParameters={electionParameters}/>
-                                </Stack>
+                                            setQrData(qrData);
+                                        }
+                                    }}
+                                    constraints={{facingMode: "environment"}}
+                                    containerStyle={{width: "100%"}}
+                                />
                             </Card>
-                        </>
-                    )}
-                </Stack>
+                        )}
+                        <EncryptedBallotsView ballotId={qrData.ballotId} ballots={ballots}
+                                              electionParameters={electionParameters}/>
+                    </Stack>
+                </Container>
+
             </ThemeProvider>
         </>
     );

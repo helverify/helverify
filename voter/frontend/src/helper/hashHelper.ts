@@ -14,6 +14,17 @@ export class HashHelper {
         return bigInt(sha256(combined).toString(), 16).mod(q);
     }
 
+    static getHashOfStrings(strings: string[]){
+        let combined = "";
+
+        for(let i: number = 0; i < strings.length; i++){
+            let hash = sha256(strings[i]);
+            combined = combined.concat(hash.toString());
+        }
+
+        return sha256(combined).toString();
+    }
+
     static getCipherHash(ciphers: Cipher[]){
         let combined = "";
 
