@@ -20,7 +20,7 @@ namespace Helverify.VotingAuthority.Domain.Helper
         {
             StringBuilder sb = new StringBuilder();
 
-            foreach (ElGamalCipher cipher in ciphers)
+            foreach (ElGamalCipher cipher in ciphers.OrderBy(c => c.C.ToString(16)))
             {
                 string hashC = Hash(cipher.C.ToString(16));
                 string hashD = Hash(cipher.D.ToString(16));
