@@ -17,9 +17,13 @@ export class HashHelper {
     static getCipherHash(ciphers: Cipher[]){
         let combined = "";
 
-        for(let i: number = 0; i < ciphers.length; i++){
-            let hashC: string = sha256(ciphers[i].c.toString(16)).toString()
-            let hashD: string = sha256(ciphers[i].d.toString(16)).toString();
+        const sortedCiphers = ciphers.sort((a,b) => {
+            return a.c.toString(16).localeCompare(b.c.toString(16))
+        })
+
+        for(let i: number = 0; i < sortedCiphers.length; i++){
+            let hashC: string = sha256(sortedCiphers[i].c.toString(16)).toString()
+            let hashD: string = sha256(sortedCiphers[i].d.toString(16)).toString();
 
             combined = combined.concat(hashC.toString(), hashD.toString());
         }

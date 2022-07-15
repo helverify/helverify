@@ -43,7 +43,7 @@ export class BallotFactory {
             encryptedOptions.push(new EncryptedOption(eo.shortCode, values));
         })
 
-        return new EncryptedBallot(rowProofs, columnProofs, encryptedOptions);
+        return new EncryptedBallot(rowProofs, columnProofs, encryptedOptions, ballot.code);
     }
 
     private static getProofOfContainingOne(proof: ProofOfContainingOneDto): ProofOfContainingOne {

@@ -2,43 +2,32 @@ import {ProofOfContainingOne} from "./proofOfContainingOne";
 import {BigNumberHelper} from "../helper/bigNumberHelper";
 import {ProofOfZeroOrOne} from "./proofOfZeroOrOne";
 import bigInt from "big-integer";
+import {HashHelper} from "../helper/hashHelper";
 
 export class EncryptedBallot {
     rowProofs: SumProof[];
     columnProofs: SumProof[];
     encryptedOptions: EncryptedOption[];
+    ballotId: string;
 
-    constructor(rowProofs: SumProof[], columnProofs: SumProof[], encryptedOptions: EncryptedOption[]) {
+    constructor(rowProofs: SumProof[], columnProofs: SumProof[], encryptedOptions: EncryptedOption[], ballotId: string) {
         this.rowProofs = rowProofs;
         this.columnProofs = columnProofs;
         this.encryptedOptions = encryptedOptions;
+        this.ballotId = ballotId;
     }
 
-    verifyProofs(publicKey: bigInt.BigInteger, p: bigInt.BigInteger, g: bigInt.BigInteger): boolean {
-        this.rowProofs.forEach(proof => {
-            let isValid: boolean = proof.verify(publicKey, p, g);
-            if (!isValid) {
-                return false;
-            }
-        });
+    verifyShortCodes(){
+        return this.encryptedOptions.every(eo => eo.verifyShortCode());
+    }
 
-        this.columnProofs.forEach(proof => {
-            let isValid: boolean = proof.verify(publicKey, p, g);
-            if (!isValid) {
-                return false;
-            }
-        });
+    verifyBallotId(){
+        const ciphers: Cipher[] = this.encryptedOptions.flatMap(eo => eo.values.map(v => v.cipher));
 
-        this.encryptedOptions.forEach(option => {
-            option.values.forEach(v =>{
-                let isValid: boolean = v.verifyProof(publicKey, p, g);
-                if(!isValid){
-                    return false;
-                }
-            })
-        });
+        const hash: string = HashHelper.getCipherHash(ciphers);
 
-        return true;
+        console.log(hash, this.ballotId);
+        return hash === this.ballotId;
     }
 }
 
@@ -49,6 +38,12 @@ export class EncryptedOption {
     constructor(shortCode: string, values: EncryptedOptionValue[]) {
         this.shortCode = shortCode;
         this.values = values;
+    }
+
+    verifyShortCode(): boolean{
+        let hash = HashHelper.getCipherHash(this.values.map(v => v.cipher));
+
+        return hash.substring(0, 2) === this.shortCode;
     }
 }
 

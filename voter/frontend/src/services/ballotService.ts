@@ -22,8 +22,8 @@ export class BallotService {
         const cidFirstBallot: string = result[2];
         const cidSecondBallot: string = result[4];
 
-        encryptedBallots.push(await this.getBallotFromIpfs(cidFirstBallot));
-        encryptedBallots.push(await this.getBallotFromIpfs(cidSecondBallot));
+        encryptedBallots.push(await BallotService.getBallotFromIpfs(cidFirstBallot));
+        encryptedBallots.push(await BallotService.getBallotFromIpfs(cidSecondBallot));
 
         return encryptedBallots;
     }

@@ -71,38 +71,41 @@ function App() {
         <>
             <ThemeProvider theme={theme}>
                 <CssBaseline/>
-                <Box>
-                    <QrReader
-                        onResult={(result, error) => {
+                <Stack direction="row" spacing={1}>
+                    <Card style={{ width: "100%", maxWidth: "800px"}}>
+                        <QrReader
+                            onResult={(result, error) => {
 
-                            let text = result?.getText();
+                                let text = result?.getText();
 
-                            if (!!text) {
-                                let data = JSON.parse(text);
+                                if (!!text) {
+                                    let data = JSON.parse(text);
 
-                                const qrData: QrData = {
-                                    electionId: data.ElectionId,
-                                    ballotId: data.BallotId,
-                                    contractAddress: data.ContractAddress
-                                };
+                                    const qrData: QrData = {
+                                        electionId: data.ElectionId,
+                                        ballotId: data.BallotId,
+                                        contractAddress: data.ContractAddress
+                                    };
 
-                                setQrData(qrData);
-                            }
-                        }}
-                        constraints={{facingMode: "environment"}}
-                        containerStyle={{width: "100%"}}
-                    />
+                                    setQrData(qrData);
+                                }
+                            }}
+                            constraints={{facingMode: "environment"}}
+                            containerStyle={{width: "100%"}}
+                        />
+                    </Card>
+
                     {ballots?.length === 2 && electionParameters !== undefined && (
                         <>
-                            <Card>
-                                <Stack direction={"row"}>
+                            <Card style={{ width: "100%", maxWidth: "800px"}}>
+                                <Stack direction="column">
                                     <EncryptedBallotVerification caption="Ballot 1" ballot={ballots[0]} electionParameters={electionParameters}/>
                                     <EncryptedBallotVerification caption="Ballot 2" ballot={ballots[1]} electionParameters={electionParameters}/>
                                 </Stack>
                             </Card>
                         </>
                     )}
-                </Box>
+                </Stack>
             </ThemeProvider>
         </>
     );
