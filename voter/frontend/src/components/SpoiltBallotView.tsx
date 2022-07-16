@@ -13,16 +13,19 @@ export const SpoiltBallotView = (props: SpoiltBallotViewProps) => {
                 <Stack direction="column" spacing={1}>
                     <Typography variant={"h4"}>Spoilt Ballot</Typography>
                     <Typography variant={"h5"}>Options</Typography>
-                    {props.ballot.options.sort((a, b) => a.position - b.position).map(o => {
+                    {props.ballot.options.sort((a, b) => a.position - b.position).map((o, index) => {
                         return (
-                            <>
-                                <Stack direction="row" spacing={2}>
-                                    <Avatar style={{backgroundColor: "#3a3a3a", color: "#FFFFFF", width: "25px", height: "25px"}}>
-                                        <Typography variant="overline">{o.shortCode}</Typography>
-                                    </Avatar>
-                                    <Typography color="text.secondary">{o.name}</Typography>
-                                </Stack>
-                            </>
+                            <Stack key={index} direction="row" spacing={2}>
+                                <Avatar style={{
+                                    backgroundColor: "#3a3a3a",
+                                    color: "#FFFFFF",
+                                    width: "25px",
+                                    height: "25px"
+                                }}>
+                                    <Typography variant="overline">{o.shortCode}</Typography>
+                                </Avatar>
+                                <Typography color="text.secondary">{o.name}</Typography>
+                            </Stack>
                         )
                     })}
                 </Stack>

@@ -1,17 +1,30 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import {Card, Container, createTheme, CssBaseline, Stack, ThemeProvider} from '@mui/material';
+import {
+    AppBar,
+    Card,
+    Container,
+    createTheme,
+    CssBaseline,
+    Stack,
+    ThemeProvider,
+    Toolbar,
+    Typography
+} from '@mui/material';
 import Web3 from "web3";
 import {ElectionABI} from "./contract/electionContract";
 import {QrReader} from "react-qr-reader";
 import {BallotService} from "./services/ballotService";
-import {EncryptedBallot} from "./cryptography/encryptedBallot";
+import {EncryptedBallot} from "./ballot/encryptedBallot";
 import {ElectionParameters} from "./election/election";
 import {BigNumberHelper} from "./helper/bigNumberHelper";
 import bigInt from "big-integer";
 import {EncryptedBallotsView} from "./components/EncryptedBallotsView";
 import {SpoiltBallotView} from "./components/SpoiltBallotView";
 import {SpoiltBallot} from "./ballot/spoiltBallot";
+import {CastBallot} from "./ballot/castBallot";
+import {CastBallotView} from "./components/CastBallotView";
+import {HowToVote} from "@mui/icons-material";
 
 type QrData = {
     electionId: string,
@@ -28,7 +41,8 @@ function App() {
 
     const [qrData, setQrData] = useState<QrData>({electionId: "", ballotId: "", contractAddress: ""});
     const [ballots, setBallots] = useState<EncryptedBallot[]>();
-    const [spoiltBallot, setSpoiltBallot]  = useState<SpoiltBallot>();
+    const [spoiltBallot, setSpoiltBallot] = useState<SpoiltBallot>();
+    const [castBallot, setCastBallot] = useState<CastBallot>();
     const [electionParameters, setElectionParameters] = useState<ElectionParameters>();
 
     const web3 = new Web3("ws://localhost:8546");
@@ -59,9 +73,9 @@ function App() {
             setElectionParameters(electionParams);
         });
 
-        electionContract.methods.retrieveCastBallot(qrData.ballotId).call().then((result: any) => {
-            console.log("castBallot", result);
-        });
+        ballotService.getCastBallot(qrData.ballotId).then((ballot: CastBallot) => {
+            setCastBallot(ballot);
+        })
 
         ballotService.getSpoiltBallot(qrData.ballotId).then((ballot: SpoiltBallot) => {
             setSpoiltBallot(ballot);
@@ -80,8 +94,13 @@ function App() {
         <>
             <ThemeProvider theme={theme}>
                 <CssBaseline/>
-                <Container>
-
+                <AppBar>
+                    <Toolbar>
+                        <HowToVote style={{marginRight: "10px"}}/>
+                        <Typography variant={"button"}>helverify - Verifiable Postal Voting</Typography>
+                    </Toolbar>
+                </AppBar>
+                <Container style={{marginTop: "100px"}}>
                     <Stack direction="column" spacing={1}>
                         {!hasBallot && (
                             <Card style={{width: "100%", maxWidth: "800px"}}>
@@ -106,10 +125,14 @@ function App() {
                         )}
                         <EncryptedBallotsView ballotId={qrData.ballotId} ballots={ballots}
                                               electionParameters={electionParameters}/>
-                        {spoiltBallot !== undefined && (
-                            <SpoiltBallotView ballot={spoiltBallot}/>
-                        )}
-
+                        <Stack direction="row" spacing={1}>
+                            {castBallot !== undefined && (
+                                <CastBallotView ballot={castBallot}/>
+                            )}
+                            {spoiltBallot !== undefined && (
+                                <SpoiltBallotView ballot={spoiltBallot}/>
+                            )}
+                        </Stack>
                     </Stack>
                 </Container>
             </ThemeProvider>

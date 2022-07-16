@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import {EncryptedBallotVerification} from "./EncryptedBallotVerification";
 import React, {useState} from "react";
-import {EncryptedBallot} from "../cryptography/encryptedBallot";
+import {EncryptedBallot} from "../ballot/encryptedBallot";
 import {ElectionParameters} from "../election/election";
 import {HashHelper} from "../helper/hashHelper";
 import {Check, Close, ExpandMore} from "@mui/icons-material";

@@ -1,6 +1,6 @@
 import bigInt from "big-integer";
 import sha256 from "crypto-js/sha256";
-import {Cipher} from "../cryptography/encryptedBallot";
+import {Cipher} from "../ballot/encryptedBallot";
 
 export class HashHelper {
     static getHash(q: bigInt.BigInteger, params: bigInt.BigInteger[]){

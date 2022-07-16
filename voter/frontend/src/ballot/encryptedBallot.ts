@@ -1,6 +1,6 @@
-import {ProofOfContainingOne} from "./proofOfContainingOne";
+import {ProofOfContainingOne} from "../cryptography/proofOfContainingOne";
 import {BigNumberHelper} from "../helper/bigNumberHelper";
-import {ProofOfZeroOrOne} from "./proofOfZeroOrOne";
+import {ProofOfZeroOrOne} from "../cryptography/proofOfZeroOrOne";
 import bigInt from "big-integer";
 import {HashHelper} from "../helper/hashHelper";
 

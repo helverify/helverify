@@ -1,10 +1,11 @@
-import {SpoiltBallotDto, VirtualBallotDto} from "../cryptography/ballot";
+import {SpoiltBallotDto, VirtualBallotDto} from "../ballot/ballot";
 import Web3 from "web3";
 import {Contract} from "web3-eth-contract";
 import {ElectionABI} from "../contract/electionContract";
-import {EncryptedBallot} from "../cryptography/encryptedBallot";
+import {EncryptedBallot} from "../ballot/encryptedBallot";
 import {BallotFactory} from "../factory/BallotFactory";
 import {SpoiltBallot} from "../ballot/spoiltBallot";
+import {CastBallot} from "../ballot/castBallot";
 
 
 export class BallotService {
@@ -35,6 +36,12 @@ export class BallotService {
         return await BallotService.getSpoiltBallotFromIpfs(result[1]);
     }
 
+    async getCastBallot(ballotId: string): Promise<CastBallot> {
+        let result: string[] = await this.electionContract.methods.retrieveCastBallot(ballotId).call();
+
+        return BallotFactory.createCastBallot(result);
+    }
+
     private static async getEncryptedBallotFromIpfs(cid: string): Promise<EncryptedBallot> {
         let encryptedBallot: EncryptedBallot;
 
@@ -42,7 +49,7 @@ export class BallotService {
 
         let ballot: VirtualBallotDto = JSON.parse(text);
 
-        encryptedBallot = BallotFactory.CreateEncryptedBallot(ballot);
+        encryptedBallot = BallotFactory.createEncryptedBallot(ballot);
 
         return encryptedBallot;
     }
@@ -54,7 +61,7 @@ export class BallotService {
 
         let ballot: SpoiltBallotDto = JSON.parse(text);
 
-        spoiltBallot = BallotFactory.CreateSpoiltBallot(ballot);
+        spoiltBallot = BallotFactory.createSpoiltBallot(ballot);
 
         return spoiltBallot;
     }

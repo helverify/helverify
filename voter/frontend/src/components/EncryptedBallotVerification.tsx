@@ -1,4 +1,4 @@
-import {EncryptedBallot} from "../cryptography/encryptedBallot";
+import {EncryptedBallot} from "../ballot/encryptedBallot";
 import {ElectionParameters} from "../election/election";
 import {Box, Card, CardContent, Typography, Stack} from "@mui/material";
 import bigInt from "big-integer";
