@@ -33,7 +33,7 @@ export class BallotService {
     async getSpoiltBallot(ballotId: string) : Promise<SpoiltBallot> {
         let result: string[] = await this.electionContract.methods.retrieveSpoiltBallot(ballotId).call();
 
-        return await BallotService.getSpoiltBallotFromIpfs(result[1]);
+        return await BallotService.getSpoiltBallotFromIpfs(result[0], result[1]);
     }
 
     async getCastBallot(ballotId: string): Promise<CastBallot> {
@@ -54,14 +54,14 @@ export class BallotService {
         return encryptedBallot;
     }
 
-    private static async getSpoiltBallotFromIpfs(cid: string): Promise<SpoiltBallot> {
+    private static async getSpoiltBallotFromIpfs(ballotId: string, cid: string): Promise<SpoiltBallot> {
         let spoiltBallot: SpoiltBallot;
 
         let text: string = await BallotService.getJsonFromIpfs(cid);
 
         let ballot: SpoiltBallotDto = JSON.parse(text);
 
-        spoiltBallot = BallotFactory.createSpoiltBallot(ballot);
+        spoiltBallot = BallotFactory.createSpoiltBallot(ballotId, ballot);
 
         return spoiltBallot;
     }

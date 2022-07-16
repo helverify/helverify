@@ -1,16 +1,11 @@
 import {
     CipherDto,
     ProofOfContainingOneDto,
-    ProofOfZeroOrOneDto, SpoiltBallotDto,
+    ProofOfZeroOrOneDto,
+    SpoiltBallotDto,
     VirtualBallotDto
 } from "../ballot/ballotDto";
-import {
-    Cipher,
-    EncryptedBallot,
-    EncryptedOption,
-    EncryptedOptionValue,
-    SumProof
-} from "../ballot/encryptedBallot";
+import {Cipher, EncryptedBallot, EncryptedOption, EncryptedOptionValue, SumProof} from "../ballot/encryptedBallot";
 import {ProofOfContainingOne} from "../cryptography/proofOfContainingOne";
 import {ProofOfZeroOrOne} from "../cryptography/proofOfZeroOrOne";
 import {PlainTextOption, SpoiltBallot} from "../ballot/spoiltBallot";
@@ -48,12 +43,10 @@ export class BallotFactory {
         return new EncryptedBallot(rowProofs, columnProofs, encryptedOptions, ballot.code);
     }
 
-    static createSpoiltBallot(ballot: SpoiltBallotDto): SpoiltBallot {
-        let plainTextOptions: PlainTextOption[] = ballot.options.map(o => new PlainTextOption(o.name, o.shortCode, o.values.indexOf(1), o.randomness));
+    static createSpoiltBallot(ballotId: string, ballot: SpoiltBallotDto): SpoiltBallot {
+        const plainTextOptions: PlainTextOption[] = ballot.options.map(o => new PlainTextOption(o.name, o.shortCode, o.values.indexOf(1), o.randomness, o.values));
 
-        let spoiltBallot: SpoiltBallot = new SpoiltBallot(plainTextOptions);
-
-        return spoiltBallot;
+        return new SpoiltBallot(ballotId, plainTextOptions);
     }
 
     static createCastBallot(ballot: any[]): CastBallot {

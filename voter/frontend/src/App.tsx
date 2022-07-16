@@ -152,8 +152,8 @@ function App() {
                             {castBallot !== undefined && (
                                 <CastBallotView ballot={castBallot}/>
                             )}
-                            {spoiltBallot !== undefined && (
-                                <SpoiltBallotView ballot={spoiltBallot}/>
+                            {spoiltBallot !== undefined && electionParameters !== undefined && ballots !== undefined && (
+                                <SpoiltBallotView ballot={spoiltBallot} electionParameters={electionParameters} encryptions={ballots}/>
                             )}
                             {electionResults !== undefined && (
                                 <ResultsView electionResults={electionResults}/>

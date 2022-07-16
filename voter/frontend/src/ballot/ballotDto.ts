@@ -58,4 +58,5 @@ export interface OptionDto {
 
 export interface SpoiltBallotDto {
     options: OptionDto[];
+    values: number[];
 }
