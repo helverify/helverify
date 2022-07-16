@@ -16,7 +16,7 @@ import {ElectionABI} from "./contract/electionContract";
 import {QrReader} from "react-qr-reader";
 import {BallotService} from "./services/ballotService";
 import {EncryptedBallot} from "./ballot/encryptedBallot";
-import {ElectionParameters} from "./election/election";
+import {ElectionParameters, ElectionResults} from "./election/election";
 import {BigNumberHelper} from "./helper/bigNumberHelper";
 import bigInt from "big-integer";
 import {EncryptedBallotsView} from "./components/EncryptedBallotsView";
@@ -25,6 +25,8 @@ import {SpoiltBallot} from "./ballot/spoiltBallot";
 import {CastBallot} from "./ballot/castBallot";
 import {CastBallotView} from "./components/CastBallotView";
 import {HowToVote} from "@mui/icons-material";
+import {ElectionService} from "./services/electionService";
+import {ResultsView} from "./components/ResultsView";
 
 type QrData = {
     electionId: string,
@@ -44,6 +46,7 @@ function App() {
     const [spoiltBallot, setSpoiltBallot] = useState<SpoiltBallot>();
     const [castBallot, setCastBallot] = useState<CastBallot>();
     const [electionParameters, setElectionParameters] = useState<ElectionParameters>();
+    const [electionResults, setElectionResults] = useState<ElectionResults>();
 
     const web3 = new Web3("ws://localhost:8546");
 
@@ -51,6 +54,8 @@ function App() {
         const electionContract = new web3.eth.Contract(ElectionABI, qrData.contractAddress);
 
         const ballotService: BallotService = new BallotService(qrData.contractAddress);
+
+        const electionService: ElectionService = new ElectionService(qrData.contractAddress);
 
         ballotService.getEncryptedBallots(qrData.ballotId).then((encryptedBallots) => {
             setBallots(encryptedBallots);
@@ -80,6 +85,10 @@ function App() {
         ballotService.getSpoiltBallot(qrData.ballotId).then((ballot: SpoiltBallot) => {
             setSpoiltBallot(ballot);
         });
+
+        electionService.getFinalResults().then((results: ElectionResults) => {
+            setElectionResults(results);
+        })
     }
 
     useEffect(() => {
@@ -131,6 +140,9 @@ function App() {
                             )}
                             {spoiltBallot !== undefined && (
                                 <SpoiltBallotView ballot={spoiltBallot}/>
+                            )}
+                            {electionResults !== undefined && (
+                                <ResultsView electionResults={electionResults}/>
                             )}
                         </Stack>
                     </Stack>
