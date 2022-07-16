@@ -128,6 +128,10 @@ contract Election {
         return castBallots[ballotId];
     }
 
+    function retrieveSpoiltBallot(string memory ballotId) public view returns (SpoiltBallot memory){
+        return spoiltBallots[ballotId];
+    }
+
     function publishResult(Result[] memory tallyResults, string memory tallyProofsIpfs) public {
         if(msg.sender != votingAuthority){
             revert("Only voting authority is allowed to publish results.");
