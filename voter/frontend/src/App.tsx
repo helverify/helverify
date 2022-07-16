@@ -116,7 +116,7 @@ function App() {
                         <Typography variant={"button"}>helverify - Verifiable Postal Voting</Typography>
                     </Toolbar>
                 </AppBar>
-                <Container style={{marginTop: "100px"}}>
+                <Container style={{marginTop: "100px", maxWidth: "1200px"}}>
                     <Stack direction="column" spacing={1}>
                         {!hasBallot && (
                             <Card style={{width: "100%", maxWidth: "800px"}}>
@@ -139,9 +139,16 @@ function App() {
                                 />
                             </Card>
                         )}
-                        <EncryptedBallotsView ballotId={qrData.ballotId} ballots={ballots}
-                                              electionParameters={electionParameters}/>
-                        <Stack direction="row" spacing={1}>
+                        <EncryptedBallotsView
+                            ballotId={qrData.ballotId}
+                            ballots={ballots}
+                            electionParameters={electionParameters}
+                        />
+                        <Stack
+                            direction="column"
+                            spacing={1}
+                            style={{width: "100%", maxWidth: "1200px"}}
+                        >
                             {castBallot !== undefined && (
                                 <CastBallotView ballot={castBallot}/>
                             )}
