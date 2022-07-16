@@ -27,6 +27,8 @@ import {CastBallotView} from "./components/CastBallotView";
 import {HowToVote} from "@mui/icons-material";
 import {ElectionService} from "./services/electionService";
 import {ResultsView} from "./components/ResultsView";
+import {ResultEvidence} from "./election/resultEvidence";
+import {EvidenceView} from "./components/EvidenceView";
 
 type QrData = {
     electionId: string,
@@ -47,6 +49,7 @@ function App() {
     const [castBallot, setCastBallot] = useState<CastBallot>();
     const [electionParameters, setElectionParameters] = useState<ElectionParameters>();
     const [electionResults, setElectionResults] = useState<ElectionResults>();
+    const [evidence, setEvidence] = useState<ResultEvidence>();
 
     const web3 = new Web3("ws://localhost:8546");
 
@@ -88,7 +91,11 @@ function App() {
 
         electionService.getFinalResults().then((results: ElectionResults) => {
             setElectionResults(results);
-        })
+        });
+
+        electionService.getFinalResultEvidence().then((evidence: ResultEvidence) => {
+           setEvidence(evidence);
+        });
     }
 
     useEffect(() => {
@@ -143,6 +150,9 @@ function App() {
                             )}
                             {electionResults !== undefined && (
                                 <ResultsView electionResults={electionResults}/>
+                            )}
+                            {evidence !== undefined && electionParameters !== undefined  && (
+                                <EvidenceView electionEvidence={evidence} electionParameters={electionParameters}/>
                             )}
                         </Stack>
                     </Stack>

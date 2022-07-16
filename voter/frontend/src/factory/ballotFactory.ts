@@ -3,7 +3,7 @@ import {
     ProofOfContainingOneDto,
     ProofOfZeroOrOneDto, SpoiltBallotDto,
     VirtualBallotDto
-} from "../ballot/ballot";
+} from "../ballot/ballotDto";
 import {
     Cipher,
     EncryptedBallot,

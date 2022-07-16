@@ -1,9 +1,9 @@
-import {SpoiltBallotDto, VirtualBallotDto} from "../ballot/ballot";
+import {SpoiltBallotDto, VirtualBallotDto} from "../ballot/ballotDto";
 import Web3 from "web3";
 import {Contract} from "web3-eth-contract";
 import {ElectionABI} from "../contract/electionContract";
 import {EncryptedBallot} from "../ballot/encryptedBallot";
-import {BallotFactory} from "../factory/BallotFactory";
+import {BallotFactory} from "../factory/ballotFactory";
 import {SpoiltBallot} from "../ballot/spoiltBallot";
 import {CastBallot} from "../ballot/castBallot";
 

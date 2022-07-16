@@ -2,6 +2,9 @@ import {ElectionResults, OptionTally} from "../election/election";
 import {Contract} from "web3-eth-contract";
 import Web3 from "web3";
 import {ElectionABI} from "../contract/electionContract";
+import {ResultEvidence} from "../election/resultEvidence";
+import {EvidenceDto} from "../election/resultEvidenceDto";
+import {EvidenceFactory} from "../factory/evidenceFactory";
 
 export class ElectionService {
     electionContract: Contract;
@@ -23,5 +26,29 @@ export class ElectionService {
         });
 
         return new ElectionResults(optionTallies);
+    }
+
+    async getFinalResultEvidence(): Promise<ResultEvidence> {
+        const evidenceCid: string = await this.electionContract.methods.resultEvidenceIpfs().call();
+
+        return ElectionService.getEvidenceFromIpfs(evidenceCid);
+    }
+
+    private static async getEvidenceFromIpfs(cid: string): Promise<ResultEvidence> {
+        const text: string = await ElectionService.getJsonFromIpfs(cid);
+
+        const evidenceDto: EvidenceDto = JSON.parse(text);
+
+        const evidence: ResultEvidence = EvidenceFactory.createEvidence(evidenceDto);
+
+        return evidence;
+    }
+
+    private static async getJsonFromIpfs(cid: string): Promise<string>{
+        let result: Response = await fetch(`http://localhost:8080/ipfs/${cid}`);
+
+        let blob = await result.blob();
+
+        return await blob.text();
     }
 }

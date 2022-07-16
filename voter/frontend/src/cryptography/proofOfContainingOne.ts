@@ -24,7 +24,7 @@ export class ProofOfContainingOne{
      * @param p
      * @param g
      */
-    verify(a: bigInt.BigInteger, b: bigInt.BigInteger, h: bigInt.BigInteger, p: bigInt.BigInteger, g: bigInt.BigInteger){
+    verify(a: bigInt.BigInteger, b: bigInt.BigInteger, h: bigInt.BigInteger, p: bigInt.BigInteger, g: bigInt.BigInteger): boolean{
         const q: bigInt.BigInteger = p.subtract(bigInt.one).multiply(bigInt(2).modInv(p)).mod(p);
 
         const c: bigInt.BigInteger = HashHelper.getHash(q, [h, a, b, this.u, this.v]);
