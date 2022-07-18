@@ -6,15 +6,29 @@ import {ResultEvidence} from "../election/resultEvidence";
 import {EvidenceDto} from "../election/resultEvidenceDto";
 import {EvidenceFactory} from "../factory/evidenceFactory";
 
+/**
+ * Provides access to election data from contract / IPFS
+ */
 export class ElectionService {
+
+    /**
+     * Election Smart Contract
+     */
     electionContract: Contract;
 
+    /**
+     * Constructor
+     * @param contractAddress Address of the Election Smart Contract
+     */
     constructor(contractAddress: string) {
         const web3 = new Web3("ws://localhost:8546");
 
         this.electionContract = new web3.eth.Contract(ElectionABI, contractAddress);
     }
 
+    /**
+     * Retrieves the final results from contract
+     */
     async getFinalResults(): Promise<ElectionResults> {
         const results: any[] = await this.electionContract.methods.getResults().call();
 
@@ -28,6 +42,9 @@ export class ElectionService {
         return new ElectionResults(optionTallies);
     }
 
+    /**
+     * Retrieves the evidence of the final results from contract / IFPS
+     */
     async getFinalResultEvidence(): Promise<ResultEvidence> {
         const evidenceCid: string = await this.electionContract.methods.resultEvidenceIpfs().call();
 

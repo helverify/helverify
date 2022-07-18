@@ -3,20 +3,36 @@ import {BigNumberHelper} from "../helper/bigNumberHelper";
 import {HashHelper} from "../helper/hashHelper";
 
 /**
- *
+ * Proves that the decryption of a ciphertext has been performed correctly
  */
 export class ProofOfDecryption {
+
+    /**
+     * D component
+     */
     d: bigInt.BigInteger;
+
+    /**
+     * U component
+     */
     u: bigInt.BigInteger;
+
+    /**
+     * V component
+     */
     v: bigInt.BigInteger;
+
+    /**
+     * S component
+     */
     s: bigInt.BigInteger;
 
     /**
-     *
-     * @param dHex
-     * @param uHex
-     * @param vHex
-     * @param sHex
+     * Constructor
+     * @param dHex D component as hexadecimal string
+     * @param uHex U component as hexadecimal string
+     * @param vHex V component as hexadecimal string
+     * @param sHex S component as hexadecimal string
      */
     constructor(dHex: string, uHex: string, vHex: string, sHex: string) {
         this.d = BigNumberHelper.fromHexString(dHex);
@@ -26,12 +42,12 @@ export class ProofOfDecryption {
     }
 
     /**
-     *
-     * @param a
-     * @param b
-     * @param pk
-     * @param p
-     * @param g
+     * Verifies that this proof is valid, i.e., that the specified ciphertext has indeed been decrypted correctly
+     * @param a C component of the ElGamal ciphertext
+     * @param b D component of the ElGamal ciphertext
+     * @param pk Public key share of the decrypting consensus node
+     * @param p ElGamal parameter p
+     * @param g ElGamal parameter g
      */
     verify(a: bigInt.BigInteger, b: bigInt.BigInteger, pk: bigInt.BigInteger, p: bigInt.BigInteger, g: bigInt.BigInteger): boolean {
         const q: bigInt.BigInteger = p.subtract(bigInt.one).multiply(bigInt(2).modInv(p)).mod(p);

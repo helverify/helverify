@@ -11,8 +11,15 @@ import {ProofOfZeroOrOne} from "../cryptography/proofOfZeroOrOne";
 import {PlainTextOption, SpoiltBallot} from "../ballot/spoiltBallot";
 import {CastBallot} from "../ballot/castBallot";
 
+/**
+ * Generates all types of ballots from their Dtos
+ */
 export class BallotFactory {
 
+    /**
+     * Generates an encrypted ballot
+     * @param ballot VirtualBallotDto from IPFS
+     */
     static createEncryptedBallot(ballot: VirtualBallotDto): EncryptedBallot {
         let rowProofs: SumProof[] = [];
         let columnProofs: SumProof[] = [];
@@ -43,12 +50,21 @@ export class BallotFactory {
         return new EncryptedBallot(rowProofs, columnProofs, encryptedOptions, ballot.code);
     }
 
-    static createSpoiltBallot(ballotId: string, ballot: SpoiltBallotDto): SpoiltBallot {
+    /**
+     * Generates a SpoiltBallot
+     * @param ballotCode Ballot identifier
+     * @param ballot SpoiltBallotDto from IPFS
+     */
+    static createSpoiltBallot(ballotCode: string, ballot: SpoiltBallotDto): SpoiltBallot {
         const plainTextOptions: PlainTextOption[] = ballot.options.map(o => new PlainTextOption(o.name, o.shortCode, o.values.indexOf(1), o.randomness, o.values));
 
-        return new SpoiltBallot(ballotId, plainTextOptions);
+        return new SpoiltBallot(ballotCode, plainTextOptions);
     }
 
+    /**
+     * Generates a CastBallot
+     * @param ballot Cast ballot as stored on Smart Contract
+     */
     static createCastBallot(ballot: any[]): CastBallot {
         const selections : string[] = ballot[3];
 

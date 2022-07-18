@@ -11,14 +11,15 @@ export type SpoiltBallotViewProps = {
     electionParameters: ElectionParameters;
 }
 
-// sorting according to: https://www.w3schools.com/js/js_array_sort.asp
 export const SpoiltBallotView = (props: SpoiltBallotViewProps) => {
 
     const verifyEncryption = (): boolean => {
-        const spoiltBallot: EncryptedBallot =  props.encryptions.filter(e => e.ballotId === props.ballot.ballotId)[0];
+        const spoiltBallot: EncryptedBallot = props.encryptions.filter(e => e.ballotCode === props.ballot.ballotCode)[0];
 
         return BallotService.verifyEncryptions(props.ballot, spoiltBallot, props.electionParameters);
     }
+
+    // sorting according to: https://www.w3schools.com/js/js_array_sort.asp
 
     return (
         <Card>

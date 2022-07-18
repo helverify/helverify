@@ -8,16 +8,30 @@ import {SpoiltBallot} from "../ballot/spoiltBallot";
 import {CastBallot} from "../ballot/castBallot";
 import {ElectionParameters} from "../election/election";
 
-
+/**
+ * Provides access to all types of ballots for verification.
+ */
 export class BallotService {
+
+    /**
+     * Election Smart Contract
+     */
     electionContract: Contract;
 
+    /**
+     * Constructor
+     * @param contractAddress Address of the Election Smart Contract
+     */
     constructor(contractAddress: string) {
         const web3 = new Web3("ws://localhost:8546");
 
         this.electionContract = new web3.eth.Contract(ElectionABI, contractAddress);
     }
 
+    /**
+     * Retrieves the pair of encrypted ballots with the specified ballotId from contract / IPFS
+     * @param ballotId Ballot identifier
+     */
     async getEncryptedBallots(ballotId: string): Promise<EncryptedBallot[]> {
         let encryptedBallots: EncryptedBallot[] = [];
 
@@ -31,18 +45,32 @@ export class BallotService {
         return encryptedBallots;
     }
 
+    /**
+     * Retrieves the spoilt ballot for the specified ballotId from contract / IPFS
+     * @param ballotId Ballot identifier
+     */
     async getSpoiltBallot(ballotId: string) : Promise<SpoiltBallot> {
         let result: string[] = await this.electionContract.methods.retrieveSpoiltBallot(ballotId).call();
 
         return await BallotService.getSpoiltBallotFromIpfs(result[0], result[1]);
     }
 
+    /**
+     * Retrieves the cast ballot (i.e., the short codes of the selected options) from contract
+     * @param ballotId Ballot identifier
+     */
     async getCastBallot(ballotId: string): Promise<CastBallot> {
         let result: string[] = await this.electionContract.methods.retrieveCastBallot(ballotId).call();
 
         return BallotFactory.createCastBallot(result);
     }
 
+    /**
+     * Verifies that re-encrypting the plaintext values yields the same ciphertexts as in the encrypted ballot.
+     * @param spoiltBallot Spoilt ballot from IPFS
+     * @param encryptedBallot Encrypted ballot from IPFS
+     * @param electionParameters ElGamal parameters
+     */
     static verifyEncryptions(spoiltBallot: SpoiltBallot, encryptedBallot: EncryptedBallot, electionParameters: ElectionParameters): boolean {
         return spoiltBallot.options.every((o): boolean => {
             const shortCode: string = o.shortCode;
@@ -65,14 +93,14 @@ export class BallotService {
         return encryptedBallot;
     }
 
-    private static async getSpoiltBallotFromIpfs(ballotId: string, cid: string): Promise<SpoiltBallot> {
+    private static async getSpoiltBallotFromIpfs(ballotCode: string, cid: string): Promise<SpoiltBallot> {
         let spoiltBallot: SpoiltBallot;
 
         let text: string = await BallotService.getJsonFromIpfs(cid);
 
         let ballot: SpoiltBallotDto = JSON.parse(text);
 
-        spoiltBallot = BallotFactory.createSpoiltBallot(ballotId, ballot);
+        spoiltBallot = BallotFactory.createSpoiltBallot(ballotCode, ballot);
 
         return spoiltBallot;
     }

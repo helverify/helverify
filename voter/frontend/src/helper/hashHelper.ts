@@ -2,8 +2,17 @@ import bigInt from "big-integer";
 import sha256 from "crypto-js/sha256";
 import {Cipher} from "../ballot/encryptedBallot";
 
+/**
+ * Provides various types of SHA-256 hashes
+ */
 export class HashHelper {
-    static getHash(q: bigInt.BigInteger, params: bigInt.BigInteger[]){
+
+    /**
+     * Creates a SHA-256 hash of all the BigIntegers with modulus q
+     * @param q Modulus to be applied
+     * @param params List of BigIntegers to be hashed
+     */
+    static getHash(q: bigInt.BigInteger, params: bigInt.BigInteger[]): bigInt.BigInteger {
         let combined = "";
 
         for(let i: number = 0; i < params.length; i++){
@@ -14,7 +23,11 @@ export class HashHelper {
         return bigInt(sha256(combined).toString(), 16).mod(q);
     }
 
-    static getHashOfStrings(strings: string[]){
+    /**
+     * Creates a SHA-256 hash of the specified list of strings
+     * @param strings List of strings to be hashed
+     */
+    static getHashOfStrings(strings: string[]): string{
         let combined = "";
 
         for(let i: number = 0; i < strings.length; i++){
@@ -25,6 +38,10 @@ export class HashHelper {
         return sha256(combined).toString();
     }
 
+    /**
+     * Creates a SHA-256 hash of the specified ElGamal ciphertexts
+     * @param ciphers List of ElGamal ciphertexts to be hashed
+     */
     static getCipherHash(ciphers: Cipher[]){
         let combined = "";
 

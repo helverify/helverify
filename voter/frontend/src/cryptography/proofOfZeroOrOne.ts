@@ -3,18 +3,60 @@ import {HashHelper} from "../helper/hashHelper";
 import {BigNumberHelper} from "../helper/bigNumberHelper";
 
 /**
- *
+ * Proves that a ciphertext either contains the value zero or one
  */
 export class ProofOfZeroOrOne {
+    /**
+     * U0 component
+     */
     u0: bigInt.BigInteger;
+
+    /**
+     * U1 component
+     */
     u1: bigInt.BigInteger;
+
+    /**
+     * V0 component
+     */
     v0: bigInt.BigInteger;
+
+    /**
+     * V1 component
+     */
     v1: bigInt.BigInteger;
+
+    /**
+     * C0 component
+     */
     c0: bigInt.BigInteger;
+
+    /**
+     * C1 component
+     */
     c1: bigInt.BigInteger;
+
+    /**
+     * R0 component
+     */
     r0: bigInt.BigInteger;
+
+    /**
+     * R1 component
+     */
     r1: bigInt.BigInteger;
 
+    /**
+     * Constructor
+     * @param u0Hex U0 component as hexadecimal string
+     * @param u1Hex U1 component as hexadecimal string
+     * @param v0Hex V0 component as hexadecimal string
+     * @param v1Hex V1 component as hexadecimal string
+     * @param c0Hex C0 component as hexadecimal string
+     * @param c1Hex C1 component as hexadecimal string
+     * @param r0Hex R0 component as hexadecimal string
+     * @param r1Hex R1 component as hexadecimal string
+     */
     constructor(u0Hex: string, u1Hex: string, v0Hex: string, v1Hex: string, c0Hex: string, c1Hex: string, r0Hex: string, r1Hex: string) {
         this.u0 = BigNumberHelper.fromHexString(u0Hex);
         this.u1 = BigNumberHelper.fromHexString(u1Hex);
@@ -27,12 +69,12 @@ export class ProofOfZeroOrOne {
     }
 
     /**
-     *
-     * @param a
-     * @param b
-     * @param h
-     * @param p
-     * @param g
+     * Verifies that the provided ciphertext indeed contains the value zero or one.
+     * @param a C component of the ElGamal ciphertext
+     * @param b D component of the ElGamal ciphertext
+     * @param h Election public key
+     * @param p ElGamal parameter p
+     * @param g ElGamal parameter g
      */
     verify(a: bigInt.BigInteger, b: bigInt.BigInteger, h: bigInt.BigInteger, p: bigInt.BigInteger, g: bigInt.BigInteger) {
         const q: bigInt.BigInteger = p.subtract(bigInt.one).multiply(bigInt(2).modInv(p)).mod(p);

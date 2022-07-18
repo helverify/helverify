@@ -4,17 +4,15 @@ import {
     AccordionDetails,
     Box,
     Card,
-    Checkbox,
     Stack,
-    Typography,
-    Avatar
+    Typography
 } from "@mui/material";
 import {EncryptedBallotVerification} from "./EncryptedBallotVerification";
 import React, {useState} from "react";
 import {EncryptedBallot} from "../ballot/encryptedBallot";
 import {ElectionParameters} from "../election/election";
 import {HashHelper} from "../helper/hashHelper";
-import {Check, Close, ExpandMore} from "@mui/icons-material";
+import {ExpandMore} from "@mui/icons-material";
 import {ValidityIcon} from "./ValidityIcon";
 
 export type EncryptedBallotViewProps = {
@@ -24,9 +22,6 @@ export type EncryptedBallotViewProps = {
 }
 
 export const EncryptedBallotsView = (props: EncryptedBallotViewProps) => {
-    const checkStyle = {color: "#00FF00"};
-    const xmarkStyle = {color: "#FF0000"};
-
     const ballots: EncryptedBallot[] | undefined = props.ballots;
     const electionParameters: ElectionParameters | undefined = props.electionParameters;
     const ballotId: string = props.ballotId;
@@ -41,7 +36,7 @@ export const EncryptedBallotsView = (props: EncryptedBallotViewProps) => {
             return false;
         }
 
-        return ballotId === HashHelper.getHashOfStrings([ballots[0].ballotId, ballots[1].ballotId]);
+        return ballotId === HashHelper.getHashOfStrings([ballots[0].ballotCode, ballots[1].ballotCode]);
     }
 
     const handleBallot1Change = (isValid: boolean) => {
@@ -83,7 +78,7 @@ export const EncryptedBallotsView = (props: EncryptedBallotViewProps) => {
                                         <Stack direction="row" spacing={1}>
                                             <ValidityIcon isValid={isBallot1Valid}/>
                                             <Typography variant="h5">Ballot 1</Typography>
-                                            <Typography variant="overline">{ballots[0].ballotId}</Typography>
+                                            <Typography variant="overline">{ballots[0].ballotCode}</Typography>
                                         </Stack>
                                     </AccordionSummary>
                                     <AccordionDetails>
@@ -100,7 +95,7 @@ export const EncryptedBallotsView = (props: EncryptedBallotViewProps) => {
                                         <Stack direction="row" spacing={1}>
                                             <ValidityIcon isValid={isBallot2Valid}/>
                                             <Typography variant="h5">Ballot 2</Typography>
-                                            <Typography variant="overline">{ballots[1].ballotId}</Typography>
+                                            <Typography variant="overline">{ballots[1].ballotCode}</Typography>
                                         </Stack>
                                     </AccordionSummary>
                                     <AccordionDetails>
