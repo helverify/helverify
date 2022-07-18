@@ -51,7 +51,7 @@ function App() {
     const [electionResults, setElectionResults] = useState<ElectionResults>();
     const [evidence, setEvidence] = useState<ResultEvidence>();
 
-    const web3 = new Web3("ws://localhost:8546");
+    const web3 = new Web3(process.env.REACT_APP_GETH_WS ?? "");
 
     const loadContractData = () => {
         const electionContract = new web3.eth.Contract(ElectionABI, qrData.contractAddress);

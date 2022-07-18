@@ -21,7 +21,7 @@ export class ElectionService {
      * @param contractAddress Address of the Election Smart Contract
      */
     constructor(contractAddress: string) {
-        const web3 = new Web3("ws://localhost:8546");
+        const web3 = new Web3(process.env.REACT_APP_GETH_WS ?? "");
 
         this.electionContract = new web3.eth.Contract(ElectionABI, contractAddress);
     }
@@ -62,7 +62,7 @@ export class ElectionService {
     }
 
     private static async getJsonFromIpfs(cid: string): Promise<string>{
-        let result: Response = await fetch(`http://localhost:8080/ipfs/${cid}`);
+        let result: Response = await fetch(`${process.env.REACT_APP_IPFS_URL}/${cid}`);
 
         let blob = await result.blob();
 
