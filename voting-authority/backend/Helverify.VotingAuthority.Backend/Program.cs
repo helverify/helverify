@@ -33,7 +33,7 @@ builder.Services.AddAutoMapper(cfg =>
 
 builder.Services.AddCors(opt =>
 {
-    opt.AddPolicy("DEV", policy => policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader());
+    opt.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
 var app = builder.Build();
@@ -46,19 +46,15 @@ if(fileSystem.File.Exists("/home/eth/data/geth.ipc")){
     cliRunner.Execute("/app/scripts/start-rpc.sh", "");
 }
 
-
-
 // Configure the HTTP request pipeline.
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-//app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseCors("DEV");
+app.UseCors();
 
 app.Run();
