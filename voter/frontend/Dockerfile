@@ -1,5 +1,5 @@
 # followed: https://docs.docker.com/language/nodejs/build-images/
-# and: https://mherman.org/blog/dockerizing-a-react-app/
+# and: https://create-react-app.dev/docs/deployment/
 
 FROM node:16.15.1-alpine3.16
 ENV NODE_ENV=production
