@@ -2,10 +2,11 @@ import {SpoiltBallotDto, VirtualBallotDto} from "../ballot/ballotDto";
 import Web3 from "web3";
 import {Contract} from "web3-eth-contract";
 import {ElectionABI} from "../contract/electionContract";
-import {EncryptedBallot} from "../ballot/encryptedBallot";
+import {EncryptedBallot, EncryptedOption} from "../ballot/encryptedBallot";
 import {BallotFactory} from "../factory/ballotFactory";
 import {SpoiltBallot} from "../ballot/spoiltBallot";
 import {CastBallot} from "../ballot/castBallot";
+import {ElectionParameters} from "../election/election";
 
 
 export class BallotService {
@@ -40,6 +41,16 @@ export class BallotService {
         let result: string[] = await this.electionContract.methods.retrieveCastBallot(ballotId).call();
 
         return BallotFactory.createCastBallot(result);
+    }
+
+    static verifyEncryptions(spoiltBallot: SpoiltBallot, encryptedBallot: EncryptedBallot, electionParameters: ElectionParameters): boolean {
+        return spoiltBallot.options.every((o): boolean => {
+            const shortCode: string = o.shortCode;
+
+            const encryptedOption: EncryptedOption = encryptedBallot.encryptedOptions.filter(enc => enc.shortCode === shortCode)[0];
+
+            return o.verifyEncryption(electionParameters.p, electionParameters.g, electionParameters.publicKey, encryptedOption.values.map(v => v.cipher));
+        })
     }
 
     private static async getEncryptedBallotFromIpfs(cid: string): Promise<EncryptedBallot> {

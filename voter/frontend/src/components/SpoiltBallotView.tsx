@@ -1,9 +1,9 @@
 import {SpoiltBallot} from "../ballot/spoiltBallot";
 import {Avatar, Box, Card, Stack, Typography} from "@mui/material";
-import {EncryptedBallot, EncryptedOption} from "../ballot/encryptedBallot";
-import {ElGamal} from "../cryptography/elGamal";
+import {EncryptedBallot} from "../ballot/encryptedBallot";
 import {ElectionParameters} from "../election/election";
 import {ValidityIcon} from "./ValidityIcon";
+import {BallotService} from "../services/ballotService";
 
 export type SpoiltBallotViewProps = {
     ballot: SpoiltBallot;
@@ -17,13 +17,7 @@ export const SpoiltBallotView = (props: SpoiltBallotViewProps) => {
     const verifyEncryption = (): boolean => {
         const spoiltBallot: EncryptedBallot =  props.encryptions.filter(e => e.ballotId === props.ballot.ballotId)[0];
 
-        return props.ballot.options.every((o): boolean => {
-            const shortCode: string = o.shortCode;
-
-            const encryptedOption: EncryptedOption = spoiltBallot.encryptedOptions.filter(enc => enc.shortCode === shortCode)[0];
-
-            return o.verifyEncryption(props.electionParameters.p, props.electionParameters.g, props.electionParameters.publicKey, encryptedOption.values.map(v => v.cipher));
-        })
+        return BallotService.verifyEncryptions(props.ballot, spoiltBallot, props.electionParameters);
     }
 
     return (

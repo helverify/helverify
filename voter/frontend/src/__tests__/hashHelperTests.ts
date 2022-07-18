@@ -5,12 +5,16 @@ import {BigNumberHelper} from "../helper/bigNumberHelper";
 describe("HashHelper test", () => {
     it("should produce same hash as c#",
         () => {
+            // arrange, act
             let result = HashHelper.getHash(bigInt(1024), [bigInt(3), bigInt(2), bigInt(10)]);
 
+            // assert
             expect(result.toString()).toStrictEqual(bigInt(724).toString());
         });
 
     it("should produce same short code as in c#", () => {
+        // arrange
+
         let c1: string = "25d4d241a18fa26fddba11d3bef3b5ea54da2c0cf9c406e1a1398352b6c4ed9fdf674b15ca6d0acdff08468c073e5061e8314e7c0bc2a3c0216b134a75b466dda22416a7012ff14e68999af5283fa7a7d54533e97ae24c6337f5f3e6147779f65e878f2547b963a8a969b47a33456cb12b779d5e8df4840f89f6faffe5b3983b1c234f153b88337eff49ec0419555558bcb6dbaf2ca43f1533ef11a7a906ed9d03783c4e6091dae4efa70382eb29ac8b0d4577812fcf981585e374ce51716ad3086bdedf9fe3a1604a0384d4ac5b80cebc1d08b8c78032ccb5c557986cfaeaad675c513f0337978cb91d41d8f91b8a0585c29302b60864c20fb42a0f6307bbed";
         let d1: string = "b858b7bd4193168a8ae0bc963296e4e6773acdc88726de9dc802b7ebe8735460fd01a3dabfe7b6e586c579e5f32d07da8fac7711444498bee052f6b0803f091ddeb08a7f70da182c067e9f384f24ed4b951ade81a73688d186d354b23c8e87ae1a5fdb5ba9da726b00030952b62b4216784cea869438509b3a38b92233437d9a0c1023c7b83563da64adf12f83d0817f2f8404905168d987edb8628c85dbc7af0c236d20efe1de3fa526b8b6df980710f862382e02843d58ecaf41c5549d197e58362e6fe6c6a43b5c4b5b5b52db7e30a01c98bb176b437eeb912ce70e095cf200b136709e8b7dfa782ca953e2ac66cfa9e5ceaf4c4729fa03b04dc263c13ff4";
 
@@ -26,6 +30,7 @@ describe("HashHelper test", () => {
         let c5: string = "d7a685e4a19f54d5ffe33743e303876ab4756eddf181a8a1326ee9e745bdaf5dc12577ac9cdb68ba434bcbfcaa4edb23a3ab7f2b0c02cd65cf16646cedba5e9ffcf83053fcedeb0e71fe51dcad6b55fbd20c48e7d5d32208b044314e1cd7d5ae396d00bf39fbaf5cde7422809ce0d6198a37a375a58f3f07e18f335c02132304972b28433f5ac3ef571376a9998f71af996af9cd391487594268aa4761506fb82abb3721c0d8bffda7d54576e0d57dca79dd548c0dd5174892f6b2ca443859e0f57f4aec490c6b3a8db0c909a9c1e59ab8536c761cfb00816b9e1ddaf5a894a90753d2c9672ce7fb67d2c21ed0633301f11ac1cdada7e63669b64689a5c23b95";
         let d5: string = "88c56079cde76dc40bcd313ce99b2577f45370a7cf9b7c4e17ac81dd5e2f4c2d452ed0308d21e0bb26eeab003af6cadcdf558bb43964ad4d33e506dbd5956ba988d78f8a9e3d80bd9ef60c763604d5525714dc5d6e103d987d7cdf3a827bdaf540b69a6098886ca401e0426b9fdfaeec4987293117474d5398bf6353e3029f32a6f0be1eaf375b44e6a446e75e1afc9218b5ce0fffa04717f84fe2a711cb0a0eb4330b23036b5d2729d41d438ee9181ab86fc57721a7bbc927dd0e230c40a24cf8ec497db6a01a7ad3f85a2ea076d7600ccf927e4de7744ff4f687ef4e36538536d611ac11a08c75e7fca921620e091fe0a9928fa3de262af9d28497650b9ebe";
 
+        // act
         let result: string = HashHelper.getCipherHash([{
             c: BigNumberHelper.fromHexString(c1),
             d: BigNumberHelper.fromHexString(d1)
@@ -43,6 +48,7 @@ describe("HashHelper test", () => {
             d: BigNumberHelper.fromHexString(d5)
         }]);
 
+        // assert
         expect(result.substring(0,2)).toStrictEqual("5d");
     });
 });
