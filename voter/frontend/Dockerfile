@@ -7,7 +7,7 @@ WORKDIR /app
 
 COPY ["package.json", "package-lock.json", "./"]
 
-RUN npm build
+RUN npm run build
 
 COPY . .
 
