@@ -18,18 +18,17 @@ namespace Helverify.VotingAuthority.Domain.Helper
         /// <returns></returns>
         internal string Hash(params ElGamalCipher[] ciphers)
         {
-            byte[] hashes = Array.Empty<byte>();
+            StringBuilder sb = new StringBuilder();
 
-            foreach (ElGamalCipher cipher in ciphers)
+            foreach (ElGamalCipher cipher in ciphers.OrderBy(c => c.C.ToString(16)))
             {
-                byte[] hashC = _sha256.ComputeHash(cipher.C.ToByteArray());
-                byte[] hashD = _sha256.ComputeHash(cipher.D.ToByteArray());
-                hashes = hashes.Concat(hashC.Concat(hashD).ToArray()).ToArray();
+                string hashC = Hash(cipher.C.ToString(16));
+                string hashD = Hash(cipher.D.ToString(16));
+
+                sb.Append(hashC).Append(hashD);
             }
 
-            byte[] ciphersHash = _sha256.ComputeHash(hashes);
-
-            return ConvertHashToHexString(ciphersHash);
+            return Hash(sb.ToString());
         }
 
         /// <summary>
@@ -39,18 +38,28 @@ namespace Helverify.VotingAuthority.Domain.Helper
         /// <returns></returns>
         internal string Hash(params string[] strs)
         {
-            SHA256 sha256 = SHA256.Create();
-
-            byte[] hashes = Array.Empty<byte>();
+            StringBuilder sb = new StringBuilder();
 
             foreach (string str in strs)
             {
-                byte[] h = sha256.ComputeHash(Encoding.UTF8.GetBytes(str));
-                
-                hashes = hashes.Concat(h).ToArray();
+                sb.Append(Hash(str));
             }
 
-            return ConvertHashToHexString(hashes);
+            return Hash(sb.ToString());
+        }
+
+        /// <summary>
+        /// Generates the hash of the specified string in hex format.
+        /// </summary>
+        /// <param name="str">String to be hashed</param>
+        /// <returns></returns>
+        private string Hash(string str)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(str);
+
+            byte[] hash = _sha256.ComputeHash(bytes);
+
+            return ConvertHashToHexString(hash);
         }
 
         /// <summary>

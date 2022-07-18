@@ -106,15 +106,15 @@ namespace Helverify.VotingAuthority.Domain.Model.Virtual
         /// <param name="publicKey">Public key of the election, used to encrypt the options.</param>
         private void GenerateColumnProofs(DHPublicKeyParameters publicKey)
         {
-            foreach (EncryptedOption encOption in EncryptedOptions)
+            for (int i = 0; i < EncryptedOptions.Count; i++)
             {
                 IList<ElGamalCipher> columnCiphers = new List<ElGamalCipher>();
-
-                for (int j = 0; j < EncryptedOptions.Count; j++)
+                
+                foreach (EncryptedOptionValue encryptedOption in EncryptedOptions.Select(o => o.Values[i]))
                 {
-                    columnCiphers.Add(encOption.Values[j].Cipher);
+                    columnCiphers.Add(encryptedOption.Cipher);  
                 }
-
+            
                 ElGamalCipher sum = SumUpCiphers(publicKey, columnCiphers);
 
                 ProofOfContainingOne columnProof = ProofOfContainingOne.Create(sum.C, sum.D, publicKey.Y, sum.R,

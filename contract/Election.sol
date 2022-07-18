@@ -28,9 +28,21 @@ contract Election {
         uint tally;
     }
 
-    mapping(string => PaperBallot) paperBallots;
+    struct ElectionParameters {
+        string electionId;
+        ElGamalParameters elGamalParameters;
+        string publicKey;
+        string[] consensusNodePublicKeys;
+    }
 
-    string public electionId;
+    struct ElGamalParameters {
+        string p;
+        string g;
+    }
+
+    mapping(string => PaperBallot) paperBallots;
+   
+    ElectionParameters public electionParameters;
 
     address public votingAuthority;
 
@@ -50,7 +62,7 @@ contract Election {
         votingAuthority = msg.sender;
     }
 
-    function setUp(string[] memory candidates, string memory id) public{
+    function setUp(string[] memory candidates, string memory id, ElGamalParameters memory parameters, string memory electionPublicKey, string[] memory consensusPublicKeys) public{
         if(msg.sender != votingAuthority){
             revert("Only voting authority is allowed to set up an election.");
         }
@@ -59,7 +71,7 @@ contract Election {
             options[i] = candidates[i];
         }
 
-        electionId = id;
+        electionParameters = ElectionParameters(id, parameters, electionPublicKey, consensusPublicKeys);
     }
 
     function storeBallot(PaperBallot[] memory ballots) public {
@@ -116,6 +128,10 @@ contract Election {
         return castBallots[ballotId];
     }
 
+    function retrieveSpoiltBallot(string memory ballotId) public view returns (SpoiltBallot memory){
+        return spoiltBallots[ballotId];
+    }
+
     function publishResult(Result[] memory tallyResults, string memory tallyProofsIpfs) public {
         if(msg.sender != votingAuthority){
             revert("Only voting authority is allowed to publish results.");
@@ -156,6 +172,10 @@ contract Election {
 
     function getResults() public view returns (Result[] memory){
         return results;
+    }
+
+    function getElectionParameters() public view returns(ElectionParameters memory){
+        return electionParameters;
     }
 
     // according to: https://stackoverflow.com/questions/57727780/how-to-compare-string-in-solidity

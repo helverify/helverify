@@ -2,6 +2,7 @@
 using AutoMapper;
 using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.DataAccess.Ethereum.Contract;
+using Helverify.VotingAuthority.Domain.Extensions;
 using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Decryption;
 using Helverify.VotingAuthority.Domain.Model.Virtual;
@@ -46,8 +47,16 @@ namespace Helverify.VotingAuthority.Domain.Repository
 
             SetUpFunction setUpFunction = new SetUpFunction
             {
-                Id = election.Id,
-                Candidates = election.Options.Select(o => o.Name).ToList()
+                Id = election.Id!,
+                Candidates = election.Options.Select(o => o.Name).ToList(),
+                Parameters = new ElGamalParameters
+                {
+                    P = election.P.ConvertToHexString(),
+                    G = election.G.ConvertToHexString()
+                },
+                ElectionPublicKey = election.PublicKey.ConvertToHexString(),
+                ConsensusPublicKeys = election.Blockchain.Registrations
+                    .Select(r => r.PublicKeys[election.Id!].ConvertToHexString()).ToList()
             };
 
             await contract.SendRequestAndWaitForReceiptAsync(setUpFunction);
