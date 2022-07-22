@@ -1,6 +1,13 @@
 import {useEffect, useState} from "react";
-import {Backdrop, CircularProgress, Container, Grid, SpeedDial, SpeedDialAction, Stack} from "@mui/material";
-import {Ballot, MoreHoriz, PieChart, Print} from "@mui/icons-material";
+import {
+    Backdrop, Button,
+    Card, CardActions, CardContent,
+    CardMedia,
+    CircularProgress,
+    Container,
+    Stack
+} from "@mui/material";
+import {Ballot, PieChart, Print} from "@mui/icons-material";
 import {useNavigate} from "react-router-dom";
 import {apiClient} from "../../api/apiClient";
 import {ElectionDto} from "../../api/Api";
@@ -17,7 +24,6 @@ export function Elections() {
         apiClient().api.electionsList().then((result) => {
             setElections(result.data);
         });
-
     }, [])
 
     const calculateResult = (electionId: string) => {
@@ -27,7 +33,6 @@ export function Elections() {
         setLoading(true);
         apiClient().api.electionsTallyCreate(electionId).then((result) => {
             setLoading(false);
-            console.log("results", result)
         });
     };
 
@@ -36,47 +41,32 @@ export function Elections() {
             <Backdrop open={isLoading}>
                 <CircularProgress/>
             </Backdrop>
-            <Container maxWidth={"xl"}>
+            <Container maxWidth={"md"}>
                 <Stack>
                     {elections.map((election, index) => {
                         return (
-                            <Grid key={index} container spacing={1} sx={{m:1}}>
-                                <Grid item xs={4}>
+                            <Card key={index} style={{marginTop: "18px"}}>
+                                <CardMedia>
                                     <ElectionInfo election={election}/>
-                                </Grid>
-                                <Grid item xs={7}>
+                                </CardMedia>
+                                <CardContent>
                                     <ElectionResults electionId={election.id ?? ""}/>
-                                </Grid>
-                                <Grid item xs={1}>
-                                    <SpeedDial
-                                        ariaLabel={"Election Actions"}
-                                        icon={<MoreHoriz/>}
-                                    >
-                                        <SpeedDialAction
-                                            icon={<Ballot/>}
-                                            tooltipTitle={"Create Ballots"}
+                                </CardContent>
+                                <CardActions>
+                                    <Button size={"small"}
                                             onClick={() => navigate(`/elections/${election.id}/ballots/create`)}
-                                        />
-                                        <SpeedDialAction
-                                            icon={<Print/>}
-                                            tooltipTitle={"Print Ballots"}
+                                            aria-label={"Create Ballots"}><Ballot/>&nbsp;Create Ballots</Button>
+                                    <Button size={"small"}
                                             onClick={() => navigate(`/elections/${election.id}/ballots/print`)}
-                                        />
-                                        <SpeedDialAction
-                                            icon={<PieChart/>}
-                                            tooltipTitle={"Calculate & Publish Results"}
-                                            onClick={() => calculateResult(election.id ?? "")}
-                                        />
-                                    </SpeedDial>
-
-                                </Grid>
-                            </Grid>
+                                            aria-label={"Print Ballots"}><Print/>&nbsp; Print Ballots</Button>
+                                    <Button size={"small"} onClick={() => calculateResult(election.id ?? "")}
+                                            aria-label={"Calculate & Publish Results"}><PieChart/>&nbsp;Publish Results</Button>
+                                </CardActions>
+                            </Card>
                         );
                     })}
                 </Stack>
             </Container>
-
         </>
-
     );
 }

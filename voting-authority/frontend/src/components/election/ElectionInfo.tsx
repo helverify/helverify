@@ -1,6 +1,7 @@
 import {ElectionInfoProps} from "./electionInfo";
-import {Box, Card, CardContent, Stack, Typography} from "@mui/material";
+import {Box, Card, CardContent, Grid, Stack, Typography} from "@mui/material";
 import {ElectionOptionDto} from "../../api/Api";
+import {CandidateInfo} from "./CandidateInfo";
 
 export const ElectionInfo = (props: ElectionInfoProps) => {
 
@@ -36,31 +37,38 @@ export const ElectionInfo = (props: ElectionInfoProps) => {
                         {isPropertySet(props.election.question) && (
                             <div>
                                 <Typography variant="h5">Question</Typography>
-                                <Typography color="text.secondary">{props.election.question ?? notAvailable}</Typography>
+                                <Typography
+                                    color="text.secondary">{props.election.question ?? notAvailable}</Typography>
                             </div>
                         )}
 
                         {options && (
                             <>
                                 <Typography variant="h5">Candidates / Options</Typography>
-                                {options.map((option, index) => {
-                                    return (
-                                        <Typography color="text.secondary" key={index}>{option.name}</Typography>
-                                    )
-                                })}
+                                <Grid container>
+                                    {options.map((option, index) => {
+                                        return (
+                                            <Grid item key={index}>
+                                                <CandidateInfo name={option.name ?? ""} key={index}/>
+                                            </Grid>
+                                        )
+                                    })}
+                                </Grid>
                             </>
                         )}
 
                         {isPropertySet(props.election.publicKey) && (
                             <div>
                                 <Typography variant="h5">Public Key</Typography>
-                                <Typography color="text.secondary" style={{wordBreak: "break-all"}}>{props.election.publicKey ?? notAvailable}</Typography>
+                                <Typography color="text.secondary"
+                                            style={{wordBreak: "break-all"}}>{props.election.publicKey ?? notAvailable}</Typography>
                             </div>
                         )}
                         {isPropertySet(props.election.contractAddress) && (
                             <div>
                                 <Typography variant="h5">Contract Address</Typography>
-                                <Typography color="text.secondary">{props.election.contractAddress ?? notAvailable}</Typography>
+                                <Typography
+                                    color="text.secondary">{props.election.contractAddress ?? notAvailable}</Typography>
                             </div>
                         )}
                     </Stack>

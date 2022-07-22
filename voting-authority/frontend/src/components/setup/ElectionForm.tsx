@@ -1,22 +1,25 @@
 import {
+    Box,
     Button,
-    Card, FormControl, FormHelperText,
-    Grid, IconButton, InputLabel,
+    FormControl, FormHelperText,
+    IconButton, InputLabel,
     List,
     ListItem,
-    ListItemText, ListSubheader, MenuItem, Select, SelectChangeEvent,
-    Stack, TextField
+    MenuItem, Select, SelectChangeEvent,
+    Stack, TextField, Typography
 } from "@mui/material";
 import {ElectionDto, ElectionOption, ElectionOptionDto} from "../../api/Api";
 import {useState} from "react";
 import {Add, DeleteForever} from "@mui/icons-material";
 import {dhGroups, DiffieHellmanGroup, SetupStepProps} from "./electionSetupStep";
 import {apiClient} from "../../api/apiClient";
+import {CandidateInfo} from "../election/CandidateInfo";
 
 export const ElectionForm = (props: SetupStepProps) => {
 
     const styleVariant = "standard";
     const stylingParams = {minWidth: 200};
+    const typographyStyle = {marginTop: "25px", marginBottom: "15px"};
 
     const [election, setElection] = useState<ElectionDto>({
         name: "",
@@ -38,7 +41,7 @@ export const ElectionForm = (props: SetupStepProps) => {
 
         let newElection = {...election};
 
-        if(election.options === undefined || election.options === null){
+        if (election.options === undefined || election.options === null) {
             newElection.options = [option];
         } else {
             newElection.options = [...election.options, option];
@@ -51,7 +54,7 @@ export const ElectionForm = (props: SetupStepProps) => {
 
     const removeOption = (index: number) => {
         let optionsClone: ElectionOptionDto[];
-        if(election.options === undefined || election.options === null){
+        if (election.options === undefined || election.options === null) {
             optionsClone = [];
         } else {
             optionsClone = [...election.options];
@@ -111,85 +114,88 @@ export const ElectionForm = (props: SetupStepProps) => {
         });
     }
 
+    const onKeyDown = (evnt: any) => {
+        if (evnt.keyCode === 13) { // https://stackoverflow.com/questions/43384039/how-to-get-the-textfield-value-when-enter-key-is-pressed-in-react
+            addOption(currentOption);
+        }
+    };
+
     let electionOptions = election.options ?? [];
 
     return (
         <>
-            <Grid container spacing={1}>
-                <Grid item xs={6}>
-                    <Card>
-                        <Stack spacing={1} sx={{m: 2}}>
-
-                            <FormControl variant={styleVariant} sx={stylingParams}>
-                                <TextField fullWidth id="election-name" name="name" label="Name" variant={styleVariant}
-                                           value={election?.name} onChange={handleChange}/>
-                            </FormControl>
-
-                            <FormControl variant={styleVariant} sx={stylingParams}>
-                                <TextField fullWidth id="election-question" name="question" label="Question"
-                                           variant={styleVariant} value={election?.question} onChange={handleChange}/>
-                            </FormControl>
-
-
-                            <FormControl variant={styleVariant} sx={stylingParams}>
-                                <Stack direction="row" spacing={1}>
-                                    <TextField fullWidth id="election-option" label="Add option / candidate"
-                                               variant={styleVariant} value={currentOption?.name}
-                                               onChange={handleCurrentOptionChange}/>
-                                    <Button id="election-option-add"
-                                            variant="outlined"
-                                            onClick={() => addOption(currentOption)}
-                                            disabled={currentOption.name === ""}
-                                    ><Add/></Button>
-                                </Stack>
-                            </FormControl>
-                            <FormControl variant={styleVariant} sx={stylingParams}>
-                                <InputLabel htmlFor="election-dh-group">Diffie-Hellman Group</InputLabel>
-                                <Select
-                                    id="election-dh-group"
-                                    onChange={setDhGroup}
-                                    value={diffieHellmanGroup.name}
+            <Stack direction="column" spacing={1}>
+                <Box>
+                    <Stack direction="column" spacing={1}>
+                        <Typography variant={"h5"} style={typographyStyle}>Election Parameters</Typography>
+                        <FormControl variant={styleVariant} sx={stylingParams}>
+                            <TextField fullWidth id="election-name" name="name" label="Name" variant={styleVariant}
+                                       value={election?.name} onChange={handleChange}/>
+                        </FormControl>
+                        <FormControl variant={styleVariant} sx={stylingParams}>
+                            <TextField fullWidth id="election-question" name="question" label="Question"
+                                       variant={styleVariant} value={election?.question} onChange={handleChange}/>
+                        </FormControl>
+                        <FormControl variant={styleVariant} sx={stylingParams}>
+                            <Stack direction="column">
+                                <TextField fullWidth id="election-option" label="Add option / candidate"
+                                           variant={styleVariant} value={currentOption?.name}
+                                           onChange={handleCurrentOptionChange}
+                                           onKeyDown={onKeyDown}
+                                           style={{marginBottom: "20px"}}
+                                />
+                                <Button id="election-option-add"
+                                        variant="outlined"
+                                        onClick={() => addOption(currentOption)}
+                                        disabled={currentOption.name === ""}
+                                        style={{marginBottom: "15px"}}
+                                ><Add/></Button>
+                            </Stack>
+                        </FormControl>
+                        <FormControl variant={styleVariant} sx={stylingParams}>
+                            <InputLabel htmlFor="election-dh-group">Diffie-Hellman Group</InputLabel>
+                            <Select
+                                id="election-dh-group"
+                                onChange={setDhGroup}
+                                value={diffieHellmanGroup.name}
+                            >
+                                <FormHelperText>Diffie-Hellman Group</FormHelperText>
+                                {dhGroups.map((dhGroup, index) => {
+                                    return (
+                                        <MenuItem key={index} value={dhGroup.name}>{dhGroup.name}</MenuItem>
+                                    );
+                                })}
+                            </Select>
+                        </FormControl>
+                        <FormControl>
+                            <TextField id="election-p" label="ElGamal Prime p" variant="standard"
+                                       value={election.p ?? ""} disabled/>
+                        </FormControl>
+                        <FormControl>
+                            <TextField id="election-q" label="ElGamal Generator g" variant="standard"
+                                       value={election.g ?? ""} disabled/>
+                        </FormControl>
+                    </Stack>
+                </Box>
+                <Box>
+                    <Typography variant={"h5"} style={typographyStyle}>Candidates / Options</Typography>
+                    <List>
+                        {electionOptions.map((option, index) => {
+                            return (
+                                <ListItem key={index}
+                                          secondaryAction={<IconButton
+                                              onClick={() => removeOption(index)}><DeleteForever/></IconButton>}
                                 >
-                                    <FormHelperText>Diffie-Hellman Group</FormHelperText>
-                                    {dhGroups.map((dhGroup, index) => {
-                                        return (
-                                            <MenuItem key={index} value={dhGroup.name}>{dhGroup.name}</MenuItem>
-                                        );
-                                    })}
-                                </Select>
-                            </FormControl>
-                            <FormControl>
-                                <TextField id="election-p" label="ElGamal Prime p" variant="standard"
-                                           value={election.p ?? ""} disabled/>
-                            </FormControl>
-                            <FormControl>
-                                <TextField id="election-q" label="ElGamal Generator g" variant="standard"
-                                           value={election.g ?? ""} disabled/>
-                            </FormControl>
-                            <FormControl>
-                                <Button variant="contained" onClick={saveElection}>Save Election</Button>
-                            </FormControl>
-                        </Stack>
-                    </Card>
-                </Grid>
-                <Grid item xs={6}>
-                    <Card>
-                        <List>
-                            <ListSubheader component="div">Candidates / Options</ListSubheader>
-                            {electionOptions.map((option, index) => {
-                                return (
-                                    <ListItem key={index}
-                                              secondaryAction={<IconButton
-                                                  onClick={() => removeOption(index)}><DeleteForever/></IconButton>}
-                                    >
-                                        <ListItemText>{option.name}</ListItemText>
-                                    </ListItem>
-                                )
-                            })}
-                        </List>
-                    </Card>
-                </Grid>
-            </Grid>
+                                    <CandidateInfo name={option.name ?? ""}/>
+                                </ListItem>
+                            )
+                        })}
+                    </List>
+                </Box>
+                <Box display="flex" alignItems="right" justifyContent="right">
+                    <Button variant="contained" onClick={saveElection}>Next</Button>
+                </Box>
+            </Stack>
         </>
     );
 };

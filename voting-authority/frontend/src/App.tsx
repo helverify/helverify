@@ -40,7 +40,7 @@ function App() {
                             <Typography variant={"button"}>helverify - Verifiable Postal Voting</Typography>
                         </Toolbar>
                     </AppBar>
-                    <div style={{marginTop :"75px"}}>
+                    <div style={{marginTop :"80px"}}>
                         <Routes>
                             <Route path="/">
                                 <Route index element={<Elections/>}/>

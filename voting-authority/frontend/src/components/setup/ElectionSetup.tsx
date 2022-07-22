@@ -1,4 +1,4 @@
-import {Box, Grid, Step, StepLabel, Stepper} from "@mui/material";
+import {Box, Container, Paper, Step, StepLabel, Stepper, Typography} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {ElectionSetupStep} from "./electionSetupStep";
 import {ElectionForm} from "./ElectionForm";
@@ -36,7 +36,11 @@ export function ElectionSetup(props: { steps: ElectionSetupStep[] }) {
     const stepComponent = () => {
         let comp;
         if (step < steps.length) {
-            comp = React.cloneElement(steps[step].component, {next: goToNextStep, election: election, blockchain: blockchain});
+            comp = React.cloneElement(steps[step].component, {
+                next: goToNextStep,
+                election: election,
+                blockchain: blockchain
+            });
         } else {
             comp = <></>;
         }
@@ -47,27 +51,28 @@ export function ElectionSetup(props: { steps: ElectionSetupStep[] }) {
 
     return (
         <>
-            <Box>
-                <Stepper activeStep={step}>
-                    {steps.map((s) => {
-                        return (
-                            <Step key={s.caption}>
-                                <StepLabel>{s.caption}</StepLabel>
-                            </Step>
-                        );
-                    })}
-                </Stepper>
-                <Grid container>
-                    <Grid item xs={9}>
-                        <Box sx={{m: 2}}>
-                            {stepComponent()}
-                        </Box>
-                    </Grid>
-                    <Grid item xs={3}>
+            <Container maxWidth="md">
+                <Paper variant="outlined" style={{minWidth: "450px"}}>
+                    <Typography variant="h4" align="center" sx={{m: 2}}>Election Setup</Typography>
+                    <Stepper activeStep={step} sx={{m: 1}} style={{marginTop: "30px", marginBottom: "10px"}}>
+                        {steps.map((s) => {
+                            return (
+                                <Step key={s.caption}>
+                                    <StepLabel>{s.caption}</StepLabel>
+                                </Step>
+                            );
+                        })}
+                    </Stepper>
+                    <Box sx={{m: 2}}>
+                        {stepComponent()}
+                    </Box>
+                </Paper>
+                <Paper variant="outlined" style={{minWidth: "450px", marginTop:"18px"}}>
+                    <Box>
                         {electionInfo}
-                    </Grid>
-                </Grid>
-            </Box>
+                    </Box>
+                </Paper>
+            </Container>
         </>
     );
 }

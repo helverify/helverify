@@ -1,6 +1,7 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {BallotForm} from "./BallotForm";
+import {Container, Paper, Typography} from "@mui/material";
 
 export const BallotPrintForm = () => {
     const [isLoading, setLoading] = useState(false);
@@ -25,7 +26,7 @@ export const BallotPrintForm = () => {
         downloadLink.href = url;
         downloadLink.target = "about:tab";
 
-        try{
+        try {
             downloadLink.click();
         } finally {
             setLoading(false);
@@ -35,9 +36,11 @@ export const BallotPrintForm = () => {
 
 
     return (
-        <>
-            <BallotForm buttonCaption="Print Ballots" buttonAction={printBallots} isLoading={isLoading}/>
-        </>
-
+        <Container maxWidth={"sm"}>
+            <Paper variant="outlined" style={{minWidth: "450px"}}>
+                <Typography variant="h4" align="center" sx={{m: 2}}>Create Ballots</Typography>
+                <BallotForm buttonCaption="Print Ballots" buttonAction={printBallots} isLoading={isLoading}/>
+            </Paper>
+        </Container>
     );
 }

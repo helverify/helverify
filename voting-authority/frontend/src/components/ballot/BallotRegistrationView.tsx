@@ -1,11 +1,11 @@
 import {CameraAlt, QrCodeScanner} from "@mui/icons-material";
 import {QrReader} from "react-qr-reader";
-import {useState} from "react";
+import React, {useState} from "react";
 import {
     Box,
     Button,
-    Card,
-    Stack
+    Card, Container, Paper,
+    Stack, Typography
 } from "@mui/material";
 import {apiClient} from "../../api/apiClient";
 import {ElectionDto, PrintBallotDto} from "../../api/Api";
@@ -36,25 +36,28 @@ export const BallotRegistrationView = () => {
 
     return (
         <>
-            <Stack direction={"column"} spacing={1}>
-                <ElectionInfo election={election}/>
-                <Stack direction={"row"} spacing={1} >
-                    <Card style={{width: "100%", maxWidth: "800px"}}>
+            <Container maxWidth={"md"}>
+                <Paper variant="outlined" style={{minWidth: "450px"}}>
+                    <Typography variant="h4" align="center" sx={{m: 2}}>Register Ballots</Typography>
+                    <Stack direction={"column"} spacing={1}>
+                        <ElectionInfo election={election}/>
                         <Stack direction={"column"} spacing={1} style={{width: "100%"}}>
-
                             {isCameraEnabled && (<QrReader
                                 onResult={(res, err) => {
                                     let text = res?.getText();
                                     if (!!text) {
                                         let data = JSON.parse(text);
 
-                                        const qrData: QrData = {electionId: data.ElectionId, ballotId: data.BallotId};
+                                        const qrData: QrData = {
+                                            electionId: data.ElectionId,
+                                            ballotId: data.BallotId
+                                        };
 
                                         loadElection(qrData);
                                         loadBallot(qrData);
                                     }
 
-                                    if(err && err.message){
+                                    if (err && err.message) {
                                         console.log(err.message)
                                     }
                                 }}
@@ -69,10 +72,11 @@ export const BallotRegistrationView = () => {
                             )}
                             <Button onClick={toggleCamera}><CameraAlt/></Button>
                         </Stack>
-                    </Card>
-                    <BallotChoiceForm ballot={ballot} electionId={election.id ?? ""} onSubmit={() => setBallot({})}/>
-                </Stack>
-            </Stack>
+                        <BallotChoiceForm ballot={ballot} electionId={election.id ?? ""}
+                                          onSubmit={() => setBallot({})}/>
+                    </Stack>
+                </Paper>
+            </Container>
         </>
     )
         ;

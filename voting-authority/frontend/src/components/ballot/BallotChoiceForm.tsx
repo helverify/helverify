@@ -1,5 +1,5 @@
 import {
-    Backdrop,
+    Backdrop, Box,
     Button,
     Card,
     CardContent,
@@ -72,40 +72,40 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
 
         const ballot = props.ballot;
 
-        if(ballot.options === undefined || ballot.options === null){
+        if (ballot.options === undefined || ballot.options === null) {
             throw new Error("Ballot options are not defined");
         }
 
         const options = ballot.options;
 
         // get correct short codes for column selection
-        let selection : string[] = [];
+        let selection: string[] = [];
         choices.forEach(choice => {
-            if(!options[choice]){
+            if (!options[choice]) {
                 throw new Error("Undefined option");
             }
 
             let shortCode;
 
-            if(column === 0){
+            if (column === 0) {
                 shortCode = options[choice].shortCode1
             } else {
                 shortCode = options[choice].shortCode2
             }
 
-            if(shortCode === undefined || shortCode === null){
+            if (shortCode === undefined || shortCode === null) {
                 throw new Error("Undefined short code");
             }
 
             selection.push(shortCode);
         });
 
-        let evidenceDto : EvidenceDto = {
-            selectedOptions : selection,
-            spoiltBallotIndex : 1-column
+        let evidenceDto: EvidenceDto = {
+            selectedOptions: selection,
+            spoiltBallotIndex: 1 - column
         }
 
-        if(ballot.ballotId === undefined || ballot.ballotId === null){
+        if (ballot.ballotId === undefined || ballot.ballotId === null) {
             throw new Error("BallotId not set");
         }
 
@@ -121,49 +121,49 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
     return (
         <>
             <Backdrop open={isLoading}>
-                <CircularProgress />
+                <CircularProgress/>
             </Backdrop>
-            <Card variant={"elevation"}>
-                <CardContent>
-                    <Stack direction={"column"} spacing={1} sx={{m: 1}}>
-                        <div>
-                            <Typography variant="h4">Ballot</Typography>
-                        </div>
-                        <div>
-                            <Typography style={{wordBreak: "break-all"}}>{ballot.ballotId}</Typography>
-                        </div>
-                        <div>
-                            <FormControl>
-                                <FormLabel>Column selection</FormLabel>
-                                <RadioGroup row value={column} onChange={handleColumnChange}>
-                                    <FormControlLabel control={<Radio/>} label={"1"} value={0}/>
-                                    <FormControlLabel control={<Radio/>} label={"2"} value={1}/>
-                                </RadioGroup>
-                            </FormControl>
+            <Box sx={{m: 2}}>
+                <Stack direction={"column"} spacing={1} sx={{m: 1}}>
+                    <div>
+                        <Typography variant="h4">Ballot</Typography>
+                    </div>
+                    <div>
+                        <Typography style={{wordBreak: "break-all"}}>{ballot.ballotId}</Typography>
+                    </div>
+                    <div>
+                        <FormControl>
+                            <FormLabel>Column selection</FormLabel>
+                            <RadioGroup row value={column} onChange={handleColumnChange}>
+                                <FormControlLabel control={<Radio/>} label={"1"} value={0}/>
+                                <FormControlLabel control={<Radio/>} label={"2"} value={1}/>
+                            </RadioGroup>
+                        </FormControl>
 
-                        </div>
-                        <div>
-                            <FormControl>
-                                <FormLabel>Candidates / Options</FormLabel>
-                                {ballot.options && ballot.options.map((opt: PrintOptionDto, index: number) => {
-                                    return (
-                                        <Stack key={index} direction={"row"}>
-                                            <Checkbox id={`${optionPrefix}${index}`}
-                                                      onChange={handleOptionChange}></Checkbox>
-                                            <p>{opt.name}</p>
-                                        </Stack>
+                    </div>
+                    <div>
+                        <FormControl>
+                            <FormLabel>Candidates / Options</FormLabel>
+                            {ballot.options && ballot.options.map((opt: PrintOptionDto, index: number) => {
+                                return (
+                                    <Stack key={index} direction={"row"}>
+                                        <Checkbox id={`${optionPrefix}${index}`}
+                                                  onChange={handleOptionChange}></Checkbox>
+                                        <p>{opt.name}</p>
+                                    </Stack>
 
-                                    );
-                                })}
-                            </FormControl>
-                        </div>
-                        <div>
-                            <Typography style={{wordBreak: "break-all"}}>{}</Typography>
-                        </div>
-                        <Button variant={"outlined"} onClick={handleSubmit}>Store Ballot Choices</Button>
-                    </Stack>
-                </CardContent>
-            </Card>
+                                );
+                            })}
+                        </FormControl>
+                    </div>
+                    <div>
+                        <Typography style={{wordBreak: "break-all"}}>{}</Typography>
+                    </div>
+                    <Button variant={"outlined"} onClick={handleSubmit}>Store Ballot Choices</Button>
+                </Stack>
+
+            </Box>
+
         </>
 
     );

@@ -1,10 +1,10 @@
 import {SetupStepProps} from "./electionSetupStep";
-import {Backdrop, Button, Card, CircularProgress, FormControl, Grid, Stack} from "@mui/material";
+import {Backdrop, Box, Button, CircularProgress, Stack, Typography} from "@mui/material";
 import {apiClient} from "../../api/apiClient";
 import {useState} from "react";
 
 export const ContractDeploymentForm = (props: SetupStepProps) => {
-
+    const typographyStyle = {marginTop: "25px", marginBottom: "15px"};
     const [isLoading, setLoading] = useState<boolean>(false);
 
     const deployContract = () => {
@@ -24,17 +24,16 @@ export const ContractDeploymentForm = (props: SetupStepProps) => {
             <Backdrop open={isLoading}>
                 <CircularProgress />
             </Backdrop>
-            <Grid container spacing={1}>
-                <Grid item xs={6}>
-                    <Card>
-                        <Stack spacing={1} sx={{m: 2}}>
-                            <FormControl>
-                                <Button variant="contained" onClick={deployContract}>Deploy Election Smart Contract</Button>
-                            </FormControl>
-                        </Stack>
-                    </Card>
-                </Grid>
-            </Grid>
+
+            <Stack>
+                <Box>
+                    <Typography variant={"h5"} style={typographyStyle}>Deploy Election Smart Contract</Typography>
+                </Box>
+                <Box display="flex" alignItems="right" justifyContent="right">
+                    <Button variant="contained" onClick={deployContract}>Next</Button>
+                </Box>
+            </Stack>
+
         </>
     );
 }
