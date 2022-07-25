@@ -19,6 +19,8 @@ import {useNavigate } from "react-router-dom";
 import {BallotCreateForm} from "./components/ballot/BallotCreateForm";
 import {BallotPrintForm} from "./components/ballot/BallotPrintForm";
 import {BallotRegistrationView} from "./components/ballot/BallotRegistrationView";
+import {ErrorBoundary} from "react-error-boundary";
+import {ErrorHandler} from "./ErrorHandler";
 
 function App() {
     const theme = createTheme({
@@ -40,20 +42,22 @@ function App() {
                             <Typography variant={"button"}>helverify - Verifiable Postal Voting</Typography>
                         </Toolbar>
                     </AppBar>
-                    <div style={{marginTop :"80px", marginBottom: "80px"}}>
-                        <Routes>
-                            <Route path="/">
-                                <Route index element={<Elections/>}/>
-                                <Route path="elections" element={<Elections/>}/>
-                                <Route path="elections/create" element={<ElectionSetup steps={setupSteps}/>}/>
-                                <Route path="elections/:electionId/ballots/create" element={<BallotCreateForm />}/>
-                                <Route path="elections/:electionId/ballots/print" element={<BallotPrintForm />}/>
-                                <Route path="ballots/register" element={<BallotRegistrationView/>}/>
-                                <Route path="setup"/>
-                                <Route path="tally"/>
-                            </Route>
-                        </Routes>
-                    </div>
+                    <ErrorBoundary FallbackComponent={ErrorHandler}>
+                        <div style={{marginTop :"80px", marginBottom: "80px"}}>
+                            <Routes>
+                                <Route path="/">
+                                    <Route index element={<Elections/>}/>
+                                    <Route path="elections" element={<Elections/>}/>
+                                    <Route path="elections/create" element={<ElectionSetup steps={setupSteps}/>}/>
+                                    <Route path="elections/:electionId/ballots/create" element={<BallotCreateForm />}/>
+                                    <Route path="elections/:electionId/ballots/print" element={<BallotPrintForm />}/>
+                                    <Route path="ballots/register" element={<BallotRegistrationView/>}/>
+                                    <Route path="setup"/>
+                                    <Route path="tally"/>
+                                </Route>
+                            </Routes>
+                        </div>
+                    </ErrorBoundary>
                     <Paper>
                         <BottomNavigation
                             showLabels

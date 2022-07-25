@@ -28,6 +28,7 @@ export const PublicKeyForm = (props: SetupStepProps) => {
             <Stack>
                 <Box>
                     <Typography variant={"h5"} style={typographyStyle}>Generate Public Key</Typography>
+                    <Typography>This step creates a public key for the election. The election public key is derived from the election public keys of all consensus node participating in the Blockchain consensus. </Typography>
                 </Box>
                 <Box display="flex" alignItems="right" justifyContent="right">
                     <Button variant="contained" onClick={generatePublicKey}>Next</Button>

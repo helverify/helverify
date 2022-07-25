@@ -25,9 +25,10 @@ export const ContractDeploymentForm = (props: SetupStepProps) => {
             <Stack>
                 <Box>
                     <Typography variant={"h5"} style={typographyStyle}>Deploy Election Smart Contract</Typography>
+                    <Typography>Almost done, this is the final step. The last thing we need to do is to deploy the election smart contract to the Blockchain in order to be able to use it as a public bulletin board for the election.</Typography>
                 </Box>
                 <Box display="flex" alignItems="right" justifyContent="right">
-                    <Button variant="contained" onClick={deployContract}>Deploy Smart Contract</Button>
+                    <Button variant="contained" onClick={deployContract}>Next</Button>
                 </Box>
             </Stack>
             <ProgressWithLabel isLoading={isLoading} label="Deploying Smart Contract"/>

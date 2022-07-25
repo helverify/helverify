@@ -22,13 +22,13 @@ export function ElectionSetup(props: { steps: ElectionSetupStep[] }) {
         if (step === steps.length) {
             navigate("/elections");
         }
-    })
+    }, [step, steps, navigate])
 
     const goToNextStep = (election: ElectionDto, blockchain: BlockchainDto) => {
         if (step < steps.length) {
-            setStep(step + 1)
             setElection(election);
             setBlockchain(blockchain);
+            setStep(step + 1)
         }
     };
 
@@ -72,6 +72,7 @@ export function ElectionSetup(props: { steps: ElectionSetupStep[] }) {
                     </Paper>
                 )}
             </Container>
+
         </>
     );
 }

@@ -9,7 +9,8 @@ import {DataGrid, GridColDef} from "@mui/x-data-grid";
 
 type ElectionResultsProps = {
     electionId: string,
-    isLoading: boolean
+    isLoading: boolean,
+    setError: (error: string | undefined) => void;
 }
 
 export const ElectionResults = (props: ElectionResultsProps) => {
@@ -19,20 +20,25 @@ export const ElectionResults = (props: ElectionResultsProps) => {
     const [electionResults, setElectionResults] = useState<ElectionResultsDto>({results: []});
 
     useEffect(() => {
-        if(props.isLoading){
-            return;
-        }
-        apiClient().api.electionsResultsDetail(props.electionId).then((result) => {
-            setElectionResults(result.data);
+            if (props.isLoading) {
+                return;
+            }
+            apiClient().api.electionsResultsDetail(props.electionId).then((result) => {
+                if(!!result.error){
+                    props.setError(result.error);
+                    return;
+                }
+                setElectionResults(result.data);
 
-            let optionColors: string[] = [];
-            result.data.results?.forEach(() => {
-                optionColors.push(randomColor())
+                let optionColors: string[] = [];
+                result.data.results?.forEach(() => {
+                    optionColors.push(randomColor())
+                });
+
+                setColors(optionColors);
             });
-
-            setColors(optionColors);
-        });
-    }, [props.electionId, props.isLoading]);
+        }, [props, props.electionId, props.isLoading]
+    );
 
     const results = electionResults.results !== undefined &&
     electionResults.results !== null &&
