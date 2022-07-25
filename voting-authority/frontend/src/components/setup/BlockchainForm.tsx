@@ -1,7 +1,7 @@
 import {SetupStepProps} from "./electionSetupStep";
 import {
-    Backdrop, Box,
-    Button, CircularProgress,
+    Box,
+    Button,
     FormControl,
     IconButton,
     List,
@@ -14,6 +14,7 @@ import {Add, DeleteForever} from "@mui/icons-material";
 import {BlockchainDto, RegistrationDto} from "../../api/Api";
 import {useEffect, useState} from "react";
 import {apiClient} from "../../api/apiClient";
+import {ProgressWithLabel} from "../progress/ProgressWithLabel";
 
 export const BlockchainForm = (props: SetupStepProps) => {
     const styleVariant = "standard";
@@ -113,9 +114,6 @@ export const BlockchainForm = (props: SetupStepProps) => {
 
     return (
         <>
-            <Backdrop open={isLoading}>
-                <CircularProgress/>
-            </Backdrop>
             <Box>
                 <Typography variant={"h5"} style={typographyStyle}>Blockchain Configuration</Typography>
                 <Stack direction="column" spacing={1}>
@@ -189,6 +187,7 @@ export const BlockchainForm = (props: SetupStepProps) => {
             <Box display="flex" alignItems="right" justifyContent="right">
                 <Button variant="contained" onClick={registerNodes}>Next</Button>
             </Box>
+            <ProgressWithLabel isLoading={isLoading} label="Setting up blockchain"/>
         </>
     );
 };

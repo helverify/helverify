@@ -8,7 +8,8 @@ import {BarChartOutlined, PieChartOutlined, TableRows} from "@mui/icons-material
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
 
 type ElectionResultsProps = {
-    electionId: string
+    electionId: string,
+    isLoading: boolean
 }
 
 export const ElectionResults = (props: ElectionResultsProps) => {
@@ -18,6 +19,9 @@ export const ElectionResults = (props: ElectionResultsProps) => {
     const [electionResults, setElectionResults] = useState<ElectionResultsDto>({results: []});
 
     useEffect(() => {
+        if(props.isLoading){
+            return;
+        }
         apiClient().api.electionsResultsDetail(props.electionId).then((result) => {
             setElectionResults(result.data);
 
@@ -28,7 +32,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
 
             setColors(optionColors);
         });
-    }, [props.electionId]);
+    }, [props.electionId, props.isLoading]);
 
     const results = electionResults.results !== undefined &&
     electionResults.results !== null &&

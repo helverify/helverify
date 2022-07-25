@@ -75,6 +75,5 @@ export const ElectionInfo = (props: ElectionInfoProps) => {
                 </CardContent>
             </Card>
         </Box>
-
     );
 }

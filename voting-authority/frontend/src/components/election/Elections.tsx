@@ -1,9 +1,8 @@
 import {useEffect, useState} from "react";
 import {
-    Backdrop, Button,
+    Button,
     Card, CardActions, CardContent,
     CardMedia,
-    CircularProgress,
     Container,
     Stack
 } from "@mui/material";
@@ -13,6 +12,7 @@ import {apiClient} from "../../api/apiClient";
 import {ElectionDto} from "../../api/Api";
 import {ElectionInfo} from "./ElectionInfo";
 import {ElectionResults} from "./ElectionResults";
+import {ProgressWithLabel} from "../progress/ProgressWithLabel";
 
 export function Elections() {
     const [elections, setElections] = useState<ElectionDto[]>([]);
@@ -38,9 +38,6 @@ export function Elections() {
 
     return (
         <>
-            <Backdrop open={isLoading}>
-                <CircularProgress/>
-            </Backdrop>
             <Container maxWidth={"md"}>
                 <Stack>
                     {elections.map((election, index) => {
@@ -50,7 +47,7 @@ export function Elections() {
                                     <ElectionInfo election={election}/>
                                 </CardMedia>
                                 <CardContent>
-                                    <ElectionResults electionId={election.id ?? ""}/>
+                                    <ElectionResults electionId={election.id ?? ""} isLoading={isLoading}/>
                                 </CardContent>
                                 <CardActions>
                                     <Button size={"small"}
@@ -58,7 +55,7 @@ export function Elections() {
                                             aria-label={"Create Ballots"}><Ballot/>&nbsp;Create Ballots</Button>
                                     <Button size={"small"}
                                             onClick={() => navigate(`/elections/${election.id}/ballots/print`)}
-                                            aria-label={"Print Ballots"}><Print/>&nbsp; Print Ballots</Button>
+                                            aria-label={"Print Ballots"}><Print/>&nbsp;Print Ballots</Button>
                                     <Button size={"small"} onClick={() => calculateResult(election.id ?? "")}
                                             aria-label={"Calculate & Publish Results"}><PieChart/>&nbsp;Publish Results</Button>
                                 </CardActions>
@@ -67,6 +64,7 @@ export function Elections() {
                     })}
                 </Stack>
             </Container>
+            <ProgressWithLabel isLoading={isLoading} label="Publishing election results" />
         </>
     );
 }

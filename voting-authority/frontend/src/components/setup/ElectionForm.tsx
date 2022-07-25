@@ -14,6 +14,7 @@ import {Add, DeleteForever} from "@mui/icons-material";
 import {dhGroups, DiffieHellmanGroup, SetupStepProps} from "./electionSetupStep";
 import {apiClient} from "../../api/apiClient";
 import {CandidateInfo} from "../election/CandidateInfo";
+import {ProgressWithLabel} from "../progress/ProgressWithLabel";
 
 export const ElectionForm = (props: SetupStepProps) => {
 
@@ -30,6 +31,7 @@ export const ElectionForm = (props: SetupStepProps) => {
         blockchainId: props.blockchain.id
     });
 
+    const [isLoading, setLoading] = useState<boolean>(false);
     const [currentOption, setCurrentOption] = useState<ElectionOptionDto>({name: ""});
     const [diffieHellmanGroup, setDiffieHellmanGroup] = useState<DiffieHellmanGroup>({name: "", p: "", g: ""});
 
@@ -109,7 +111,9 @@ export const ElectionForm = (props: SetupStepProps) => {
     }
 
     const saveElection = () => {
+        setLoading(true);
         apiClient().api.electionsCreate(election).then((result) => {
+            setLoading(false);
             props.next(result.data, props.blockchain);
         });
     }
@@ -195,6 +199,7 @@ export const ElectionForm = (props: SetupStepProps) => {
                 <Box display="flex" alignItems="right" justifyContent="right">
                     <Button variant="contained" onClick={saveElection}>Next</Button>
                 </Box>
+                <ProgressWithLabel isLoading={isLoading} label="Setting up election"/>
             </Stack>
         </>
     );

@@ -36,9 +36,8 @@ export const BallotCreateForm = () => {
         <Container maxWidth={"sm"}>
             <Paper variant="outlined" style={{minWidth: "450px"}}>
                 <Typography variant="h4" align="center" sx={{m: 2}}>Create Ballots</Typography>
-                <BallotForm buttonCaption="Create Ballots" buttonAction={createBallots} isLoading={isLoading}/>
+                <BallotForm buttonCaption="Create Ballots" buttonAction={createBallots} isLoading={isLoading} loadingLabel="Creating ballots"/>
             </Paper>
         </Container>
-
     );
 }

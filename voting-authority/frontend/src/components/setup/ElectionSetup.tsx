@@ -10,7 +10,6 @@ import {ContractDeploymentForm} from "./ContractDeploymentForm";
 import {ElectionInfo} from "../election/ElectionInfo";
 
 export function ElectionSetup(props: { steps: ElectionSetupStep[] }) {
-
     const navigate = useNavigate();
 
     const steps = props.steps;
@@ -47,8 +46,6 @@ export function ElectionSetup(props: { steps: ElectionSetupStep[] }) {
         return comp;
     }
 
-    const electionInfo = election.id !== "" ? <ElectionInfo election={election}/> : <></>;
-
     return (
         <>
             <Container maxWidth="md">
@@ -67,23 +64,37 @@ export function ElectionSetup(props: { steps: ElectionSetupStep[] }) {
                         {stepComponent()}
                     </Box>
                 </Paper>
-                <Paper variant="outlined" style={{minWidth: "450px", marginTop:"18px"}}>
-                    <Box>
-                        {electionInfo}
-                    </Box>
-                </Paper>
+                {election.id !== undefined && (
+                    <Paper variant="outlined" style={{minWidth: "450px", marginTop: "18px"}}>
+                        <Box>
+                            <ElectionInfo election={election}/>
+                        </Box>
+                    </Paper>
+                )}
             </Container>
         </>
     );
 }
 
 export const setupSteps: ElectionSetupStep[] = [
-    new ElectionSetupStep("Consensus Nodes", <BlockchainForm next={() => {
-    }} election={{}} blockchain={{}}/>),
-    new ElectionSetupStep("Election", <ElectionForm next={() => {
-    }} election={{}} blockchain={{}}/>),
-    new ElectionSetupStep("Public Key", <PublicKeyForm next={() => {
-    }} election={{}} blockchain={{}}/>),
-    new ElectionSetupStep("Contract Deployment", <ContractDeploymentForm next={() => {
-    }} election={{}} blockchain={{}}/>)
+    new ElectionSetupStep(
+        "Consensus Nodes",
+        <BlockchainForm next={() => {
+        }} election={{}} blockchain={{}}/>
+    ),
+    new ElectionSetupStep(
+        "Election",
+        <ElectionForm next={() => {
+        }} election={{}} blockchain={{}}/>
+    ),
+    new ElectionSetupStep(
+        "Public Key",
+        <PublicKeyForm next={() => {
+        }} election={{}} blockchain={{}}/>
+    ),
+    new ElectionSetupStep(
+        "Contract Deployment",
+        <ContractDeploymentForm next={() => {
+        }} election={{}} blockchain={{}}/>
+    )
 ];

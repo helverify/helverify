@@ -1,10 +1,7 @@
 import {
-    Backdrop, Box,
+    Box,
     Button,
-    Card,
-    CardContent,
     Checkbox,
-    CircularProgress,
     FormControl,
     FormControlLabel,
     FormLabel,
@@ -16,6 +13,8 @@ import {
 import {EvidenceDto, PrintBallotDto, PrintOptionDto} from "../../api/Api";
 import {useState} from "react";
 import {apiClient} from "../../api/apiClient";
+import {ProgressWithLabel} from "../progress/ProgressWithLabel";
+import {Save} from "@mui/icons-material";
 
 type BallotChoiceProps = {
     ballot: PrintBallotDto,
@@ -24,14 +23,12 @@ type BallotChoiceProps = {
 };
 
 export const BallotChoiceForm = (props: BallotChoiceProps) => {
-
     const optionPrefix: string = "option-";
     const ballot: PrintBallotDto = props.ballot;
 
     const [choices, setChoices] = useState<number[]>([]);
     const [column, setColumn] = useState<number>(-1);
     const [isLoading, setLoading] = useState<boolean>(false);
-
 
     const handleColumnChange = (evnt: any) => {
         let selectedColumn: number = parseInt(evnt.target.value);
@@ -120,9 +117,6 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
 
     return (
         <>
-            <Backdrop open={isLoading}>
-                <CircularProgress/>
-            </Backdrop>
             <Box sx={{m: 2}}>
                 <Stack direction={"column"} spacing={1} sx={{m: 1}}>
                     <div>
@@ -159,11 +153,13 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
                     <div>
                         <Typography style={{wordBreak: "break-all"}}>{}</Typography>
                     </div>
-                    <Button variant={"outlined"} onClick={handleSubmit}>Store Ballot Choices</Button>
+                    <Box display="flex" alignItems="right" justifyContent="right">
+                        <Button variant="contained" onClick={handleSubmit}><Save/>&nbsp; Save Ballot Choices</Button>
+                    </Box>
                 </Stack>
 
             </Box>
-
+            <ProgressWithLabel isLoading={isLoading} label={"Saving ballot choices"}/>
         </>
 
     );
