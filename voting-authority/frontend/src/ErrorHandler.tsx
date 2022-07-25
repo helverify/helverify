@@ -8,7 +8,7 @@ export const ErrorHandler = (props: FallbackProps) => {
             onClose={() => props.resetErrorBoundary()}
             autoHideDuration={5000}
         >
-            <Alert severity="error">{props.error}</Alert>
+            <Alert severity="error" variant="outlined">{props.error}</Alert>
         </Snackbar>
     );
 }

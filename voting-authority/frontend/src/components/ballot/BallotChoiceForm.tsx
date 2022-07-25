@@ -1,4 +1,5 @@
 import {
+    Alert,
     Box,
     Button,
     Checkbox,
@@ -6,7 +7,7 @@ import {
     FormControlLabel,
     FormLabel,
     Radio,
-    RadioGroup,
+    RadioGroup, Snackbar,
     Stack,
     Typography
 } from "@mui/material";
@@ -14,7 +15,6 @@ import {EvidenceDto, PrintBallotDto, PrintOptionDto} from "../../api/Api";
 import {useState} from "react";
 import {apiClient} from "../../api/apiClient";
 import {ProgressWithLabel} from "../progress/ProgressWithLabel";
-import {Save} from "@mui/icons-material";
 
 type BallotChoiceProps = {
     ballot: PrintBallotDto,
@@ -25,6 +25,9 @@ type BallotChoiceProps = {
 export const BallotChoiceForm = (props: BallotChoiceProps) => {
     const optionPrefix: string = "option-";
     const ballot: PrintBallotDto = props.ballot;
+
+    const [warning, setWarning] = useState<string>("");
+    const [error, setError] = useState<string>("");
 
     const [choices, setChoices] = useState<number[]>([]);
     const [column, setColumn] = useState<number>(-1);
@@ -60,17 +63,25 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
 
     const handleSubmit = () => {
         if (!(column === 0 || column === 1)) {
-            throw new Error("Column not selected");
+            setWarning("Column not selected");
+            return;
         }
 
         if (props.ballot === undefined || props.ballot === null) {
-            throw new Error("Ballot is not defined");
+            setWarning("Ballot is not defined");
+            return;
+        }
+
+        if(choices.length === 0){
+            setWarning("Please select the marked choices")
+            return;
         }
 
         const ballot = props.ballot;
 
         if (ballot.options === undefined || ballot.options === null) {
-            throw new Error("Ballot options are not defined");
+            setWarning("Ballot options are not defined");
+            return;
         }
 
         const options = ballot.options;
@@ -79,7 +90,8 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
         let selection: string[] = [];
         choices.forEach(choice => {
             if (!options[choice]) {
-                throw new Error("Undefined option");
+                setWarning("Undefined option");
+                return;
             }
 
             let shortCode;
@@ -91,7 +103,8 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
             }
 
             if (shortCode === undefined || shortCode === null) {
-                throw new Error("Undefined short code");
+                setWarning("Undefined short code");
+                return;
             }
 
             selection.push(shortCode);
@@ -103,22 +116,24 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
         }
 
         if (ballot.ballotId === undefined || ballot.ballotId === null) {
-            throw new Error("BallotId not set");
+            setWarning("BallotId not set");
+            return;
         }
 
         setLoading(true);
+
         apiClient().api.electionsBallotsEvidenceCreate(props.electionId, ballot.ballotId, evidenceDto).then(() => {
             setColumn(-1);
             setChoices([]);
             setLoading(false);
             props.onSubmit();
-        });
+        }, error => setError(error));
     };
 
     return (
         <>
             <Box sx={{m: 2}}>
-                <Stack direction={"column"} spacing={1} sx={{m: 1}}>
+                <Stack direction={"column"} spacing={1} sx={{m: 2}}>
                     <div>
                         <Typography variant="h4">Ballot</Typography>
                     </div>
@@ -150,17 +165,26 @@ export const BallotChoiceForm = (props: BallotChoiceProps) => {
                             })}
                         </FormControl>
                     </div>
-                    <div>
-                        <Typography style={{wordBreak: "break-all"}}>{}</Typography>
-                    </div>
                     <Box display="flex" alignItems="right" justifyContent="right">
-                        <Button variant="contained" onClick={handleSubmit}><Save/>&nbsp; Save Ballot Choices</Button>
+                        <Button variant="contained" onClick={handleSubmit}>Save Ballot Choices</Button>
                     </Box>
                 </Stack>
-
             </Box>
             <ProgressWithLabel isLoading={isLoading} label={"Saving ballot choices"}/>
+            <Snackbar
+                open={warning !== ""}
+                onClose={() => setWarning("")}
+                autoHideDuration={3000}
+            >
+                <Alert severity="warning">{warning}</Alert>
+            </Snackbar>
+            <Snackbar
+                open={error !== ""}
+                onClose={() => setError("")}
+                autoHideDuration={3000}
+            >
+                <Alert severity="error">{error}</Alert>
+            </Snackbar>
         </>
-
     );
 }
