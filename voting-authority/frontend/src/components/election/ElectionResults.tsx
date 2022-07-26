@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {apiClient} from "../../api/apiClient";
 import {ElectionResultDto, ElectionResultsDto} from "../../api/Api";
-import {BarChart, PieChart, Cell, Pie, Bar, XAxis, YAxis} from "recharts";
+import {BarChart, PieChart, Cell, Pie, Bar, XAxis, YAxis, ResponsiveContainer, Legend, Tooltip} from "recharts";
 import randomColor from "randomcolor";
 import {Box, Tab, Tabs, Typography} from "@mui/material";
 import {BarChartOutlined, PieChartOutlined, TableRows} from "@mui/icons-material";
@@ -24,7 +24,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
                 return;
             }
             apiClient().api.electionsResultsDetail(props.electionId).then((result) => {
-                if(!!result.error){
+                if (!!result.error) {
                     props.setError(result.error);
                     return;
                 }
@@ -46,7 +46,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
 
     // according to https://github.com/recharts/recharts/issues/1743
     const getLabel = (entry: ElectionResultDto) => {
-        return `${entry.optionName} (${entry.count})`;
+        return `${entry.count}`;
     };
 
     const handleTabChange = (event: any, value: number) => {
@@ -62,9 +62,6 @@ export const ElectionResults = (props: ElectionResultsProps) => {
         <>
             {results.length > 0 && (
                 <>
-                    <Box>
-                        <Typography variant={"h4"}>Results</Typography>
-                    </Box>
                     <Box display="flex" justifyContent={"right"} style={{marginBottom: "30px"}}>
                         <Tabs value={currentTab} onChange={handleTabChange}>
                             <Tab icon={<PieChartOutlined/>} value={0}/>
@@ -74,49 +71,53 @@ export const ElectionResults = (props: ElectionResultsProps) => {
                     </Box>
                     <Box>
                         {currentTab === 0 && (
-                            <PieChart
-                                width={800}
-                                height={600}
-                            >
-                                <Pie
-                                    data={results}
-                                    innerRadius={100}
-                                    outerRadius={150}
-                                    dataKey="count"
-                                    nameKey="optionName"
-                                    width={350}
-                                    height={250}
-                                    paddingAngle={3}
-                                    label={getLabel}
-                                >
-                                    {results.map((result, index) => {
-                                        return (<Cell key={`piechart-${index}`} fill={colors[index]}/>)
-                                    })}
-                                </Pie>
-                            </PieChart>
+                            <ResponsiveContainer height={400}>
+                                <PieChart>
+                                    <Tooltip/>
+                                    <Legend/>
+                                    <Pie
+                                        data={results}
+                                        innerRadius={"70%"}
+                                        outerRadius={"95%"}
+                                        dataKey="count"
+                                        nameKey="optionName"
+                                        paddingAngle={3}
+                                        label={getLabel}
+                                    >
+                                        {results.map((result, index) => {
+                                            return (
+                                                <Cell key={`piechart-${index}`} fill={colors[index]}/>
+                                            )
+                                        })}
+                                    </Pie>
+                                </PieChart>
+                            </ResponsiveContainer>
+
                         )}
                         {currentTab === 1 && (
+                            <ResponsiveContainer height={400}>
+                                <BarChart
+                                    data={results}
+                                    width={600}
 
-                            <BarChart
-                                data={results}
-                                width={800}
-                                height={600}
-                            >
-                                <XAxis
-                                    dataKey={"optionName"}
-                                    allowDecimals={false}
-                                />
-                                <YAxis
-                                    scale={"linear"}
-                                    allowDecimals={false}
-                                    interval={1}
-                                />
-                                <Bar dataKey="count">
-                                    {results.map((result, index) => {
-                                        return (<Cell key={`barchart-${index}`} fill={colors[index]}/>)
-                                    })}
-                                </Bar>
-                            </BarChart>
+                                >
+                                    <Tooltip/>
+                                    <XAxis
+                                        dataKey={"optionName"}
+                                        allowDecimals={false}
+                                    />
+                                    <YAxis
+                                        scale={"linear"}
+                                        allowDecimals={false}
+                                        interval={1}
+                                    />
+                                    <Bar dataKey="count">
+                                        {results.map((result, index) => {
+                                            return (<Cell key={`barchart-${index}`} fill={colors[index]}/>)
+                                        })}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
                         )}
                         {currentTab === 2 && (
                             <DataGrid

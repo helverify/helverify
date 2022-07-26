@@ -6,7 +6,7 @@ export type CandidateInfoProps = {
 
 export const CandidateInfo = (props: CandidateInfoProps) => {
     return(
-        <Stack direction="row">
+        <Stack direction="row" style={{marginTop: "5px"}}>
             <Avatar></Avatar>
             <Typography color="text.secondary" style={{marginLeft:"10px", marginRight:"10px", marginTop: "8px"}}>{props.name}</Typography>
         </Stack>

@@ -1,79 +1,95 @@
 import {useEffect, useState} from "react";
 import {
-    Button,
-    Card, CardActions, CardContent,
-    CardMedia,
+    Box,
     Container,
-    Stack
+    Divider,
+    Drawer,
+    IconButton,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
 } from "@mui/material";
-import {Ballot, PieChart, Print} from "@mui/icons-material";
-import {useNavigate} from "react-router-dom";
+import {ChevronLeft, HowToVote} from "@mui/icons-material";
 import {apiClient} from "../../api/apiClient";
 import {ElectionDto} from "../../api/Api";
-import {ElectionInfo} from "./ElectionInfo";
-import {ElectionResults} from "./ElectionResults";
-import {ProgressWithLabel} from "../progress/ProgressWithLabel";
+
+import {ElectionGrid} from "./ElectionGrid";
 import {useErrorHandler} from "react-error-boundary";
 
-export function Elections() {
+export type ElectionsProps = {
+    menuOpen: boolean;
+    toggleMenu: () => void;
+    closeMenu: () => void;
+}
+
+export function Elections(props: ElectionsProps) {
+    const widthOfDrawer = 300;
+
     const [elections, setElections] = useState<ElectionDto[]>([]);
 
-    const navigate = useNavigate();
-    const [isLoading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>();
     useErrorHandler(error);
 
+    const [selectedElection, setSelectedElection] = useState<ElectionDto>();
+
     useEffect(() => {
         apiClient().api.electionsList().then((result) => {
-            if(result.status !== 200){
+            if (result.status !== 200) {
                 setError(result.error);
             }
             setElections(result.data);
+
+            if (selectedElection === undefined) {
+                setSelectedElection(result.data[0] ?? undefined);
+            }
         });
     }, [])
 
-    const calculateResult = (electionId: string) => {
-        if (electionId === "") {
-            return;
-        }
-        setLoading(true);
-        apiClient().api.electionsTallyCreate(electionId).then((result) => {
-            setLoading(false);
-            if(result.status !== 200){
-                setError(result.error);
-            }
-        });
-    };
+
+    const contentDivStyle = {transform: "none", transition: "margin-left 225ms cubic-bezier(0, 0, 0.2, 1) 0ms"};
+
+
+    const electionContent = props.menuOpen ? {
+        marginLeft: widthOfDrawer,
+        ...contentDivStyle
+    } : contentDivStyle;
 
     return (
         <>
-            <Container maxWidth={"md"}>
-                <Stack>
+            <Drawer open={props.menuOpen} sx={{width: widthOfDrawer}} variant="persistent">
+                <Box justifyContent="right" alignItems="right" display="flex" style={{padding: "10px"}}>
+                    <IconButton onClick={props.toggleMenu} style={{marginTop: "60px"}}>
+                        <ChevronLeft/>
+                    </IconButton>
+                </Box>
+                <Divider/>
+                <List>
                     {elections.map((election, index) => {
                         return (
-                            <Card key={index} style={{marginTop: "18px"}}>
-                                <CardMedia>
-                                    <ElectionInfo election={election}/>
-                                </CardMedia>
-                                <CardContent>
-                                    <ElectionResults electionId={election.id ?? ""} isLoading={isLoading} setError={setError}/>
-                                </CardContent>
-                                <CardActions>
-                                    <Button size={"small"}
-                                            onClick={() => navigate(`/elections/${election.id}/ballots/create`)}
-                                            aria-label={"Create Ballots"}><Ballot/>&nbsp;Create Ballots</Button>
-                                    <Button size={"small"}
-                                            onClick={() => navigate(`/elections/${election.id}/ballots/print`)}
-                                            aria-label={"Print Ballots"}><Print/>&nbsp;Print Ballots</Button>
-                                    <Button size={"small"} onClick={() => calculateResult(election.id ?? "")}
-                                            aria-label={"Calculate & Publish Results"}><PieChart/>&nbsp;Publish Results</Button>
-                                </CardActions>
-                            </Card>
+                            <ListItem key={index}>
+                                <ListItemButton onClick={() => setSelectedElection(election)}>
+                                    <ListItemIcon>
+                                        <HowToVote/>
+                                    </ListItemIcon>
+                                    <ListItemText primary={election.name}/>
+                                </ListItemButton>
+                            </ListItem>
                         );
                     })}
-                </Stack>
-            </Container>
-            <ProgressWithLabel isLoading={isLoading} label="Publishing election results" />
+                </List>
+            </Drawer>
+            <div style={electionContent}>
+                <Box style={{flexGrow: 1, width: "100%"}}>
+                    {selectedElection !== undefined && (
+                        <ElectionGrid
+                            election={selectedElection}
+                        />
+                    )}
+                </Box>
+            </div>
+
         </>
     );
 }
