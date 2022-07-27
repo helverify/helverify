@@ -35,7 +35,7 @@ export const SpoiltBallotView = (props: SpoiltBallotViewProps) => {
     // sorting according to: https://www.w3schools.com/js/js_array_sort.asp
 
     return (
-        <Card sx={{m: 1}}>
+        <Card>
             <Box sx={{m: 2}}>
                 <Stack direction="column" spacing={1}>
                     <Typography variant={"h5"}>Spoilt Column Options</Typography>

@@ -8,7 +8,7 @@ export type CastBallotViewProps = {
 export const CastBallotView = (props: CastBallotViewProps) => {
 
     return (
-        <Card sx={{m: 1}}>
+        <Card>
             <Box sx={{m: 2}}>
                 <Stack direction="column" spacing={1}>
                     <Typography variant="h5">Your Choices</Typography>

@@ -9,8 +9,8 @@ export const AutomaticValidationStep = (props: ValidationStepProps) => {
     return(
         <Box>
             <Stack direction="column" spacing={1}>
-                <Typography variant={"h5"}>Automatic Validation</Typography>
-                <Typography>This verification step checks that your ballot has been generated and encrypted properly.</Typography>
+                <Typography variant={"h5"}>Ballot Authenticity</Typography>
+                <Typography>This verification step checks that your ballot has been generated and encrypted properly. It is recommended to perform this step as soon as you receive your ballot by mail.</Typography>
                 <BallotEncryptionCheck isLoading={isLoading} setLoading={setLoading} ballots={props.ballots} electionParameters={props.electionParameters} ballotId={props.ballotId ?? ""}/>
                 <Box display="flex" justifyContent="right" alignItems="right">
                     <Button variant="contained" onClick={props.next}>Next</Button>

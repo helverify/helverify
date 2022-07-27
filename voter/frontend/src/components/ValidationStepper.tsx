@@ -1,10 +1,7 @@
 import {
-    Backdrop,
     Box,
-    CircularProgress,
     Container,
     Paper,
-    Stack,
     Step,
     StepLabel,
     Stepper,
@@ -41,60 +38,62 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
     const [evidence, setEvidence] = useState<ResultEvidence>();
     const [electionParameters, setElectionParameters] = useState<ElectionParameters>();
 
-    const web3 = new Web3(process.env.REACT_APP_GETH_WS ?? "");
-
     const qrData = props.qrData;
 
+
+
     useEffect(() => {
-        if (props.qrData.electionId !== "") {
+        const web3 = new Web3(process.env.REACT_APP_GETH_WS ?? "");
+
+        const loadContractData = () => {
+            const electionContract = new web3.eth.Contract(ElectionABI, qrData.contractAddress);
+
+            const ballotService: BallotService = new BallotService(qrData.contractAddress);
+
+            const electionService: ElectionService = new ElectionService(qrData.contractAddress);
+
+            ballotService.getEncryptedBallots(qrData.ballotId).then((encryptedBallots) => {
+                setBallots(encryptedBallots);
+            });
+
+            electionContract.methods.getElectionParameters().call().then((result: any) => {
+                let cnPublicKeys: bigInt.BigInteger[] = [];
+
+                result.consensusNodePublicKeys.forEach((key: string) => {
+                    cnPublicKeys.push(bigInt(key, 16));
+                });
+
+                let electionParams: ElectionParameters = {
+                    p: BigNumberHelper.fromHexString(result.elGamalParameters.p),
+                    g: BigNumberHelper.fromHexString(result.elGamalParameters.g),
+                    publicKey: BigNumberHelper.fromHexString(result.publicKey),
+                    consensusNodePublicKeys: cnPublicKeys
+                };
+
+                setElectionParameters(electionParams);
+            });
+
+            ballotService.getCastBallot(qrData.ballotId).then((ballot: CastBallot) => {
+                setCastBallot(ballot);
+            })
+
+            ballotService.getSpoiltBallot(qrData.ballotId).then((ballot: SpoiltBallot) => {
+                setSpoiltBallot(ballot);
+            });
+
+            electionService.getFinalResults().then((results: ElectionResults) => {
+                setElectionResults(results);
+            });
+
+            electionService.getFinalResultEvidence().then((evidence: ResultEvidence) => {
+                setEvidence(evidence);
+            });
+        }
+
+        if (qrData.electionId !== "") {
             loadContractData();
         }
     }, [qrData])
-
-    const loadContractData = () => {
-        const electionContract = new web3.eth.Contract(ElectionABI, qrData.contractAddress);
-
-        const ballotService: BallotService = new BallotService(qrData.contractAddress);
-
-        const electionService: ElectionService = new ElectionService(qrData.contractAddress);
-
-        ballotService.getEncryptedBallots(qrData.ballotId).then((encryptedBallots) => {
-            setBallots(encryptedBallots);
-        });
-
-        electionContract.methods.getElectionParameters().call().then((result: any) => {
-            let cnPublicKeys: bigInt.BigInteger[] = [];
-
-            result.consensusNodePublicKeys.forEach((key: string) => {
-                cnPublicKeys.push(bigInt(key, 16));
-            });
-
-            let electionParams: ElectionParameters = {
-                p: BigNumberHelper.fromHexString(result.elGamalParameters.p),
-                g: BigNumberHelper.fromHexString(result.elGamalParameters.g),
-                publicKey: BigNumberHelper.fromHexString(result.publicKey),
-                consensusNodePublicKeys: cnPublicKeys
-            };
-
-            setElectionParameters(electionParams);
-        });
-
-        ballotService.getCastBallot(qrData.ballotId).then((ballot: CastBallot) => {
-            setCastBallot(ballot);
-        })
-
-        ballotService.getSpoiltBallot(qrData.ballotId).then((ballot: SpoiltBallot) => {
-            setSpoiltBallot(ballot);
-        });
-
-        electionService.getFinalResults().then((results: ElectionResults) => {
-            setElectionResults(results);
-        });
-
-        electionService.getFinalResultEvidence().then((evidence: ResultEvidence) => {
-            setEvidence(evidence);
-        });
-    }
 
     const goToNextStep = () => {
         if (step < steps.length) {
@@ -120,7 +119,7 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
 
     const steps: ValidationStep[] = [
         {
-            caption: "Automatic Validation",
+            caption: "Before Casting",
             component: <AutomaticValidationStep
                 previous={goToPreviousStep}
                 next={goToNextStep}
@@ -130,7 +129,7 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
             />
         },
         {
-            caption: "Manual Validation",
+            caption: "After Tallying",
             component: <ManualValidationStep
                 previous={goToPreviousStep}
                 next={goToNextStep}
