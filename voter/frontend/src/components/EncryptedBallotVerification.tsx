@@ -13,6 +13,8 @@ export type EncryptedBallotVerificationProps = {
 }
 
 export const EncryptedBallotVerification = (props: EncryptedBallotVerificationProps) => {
+    const textStyle = { marginTop: "5px"};
+
     const publicKey: bigInt.BigInteger = props.electionParameters.publicKey;
     const p: bigInt.BigInteger = props.electionParameters.p;
     const g: bigInt.BigInteger = props.electionParameters.g;
@@ -24,38 +26,37 @@ export const EncryptedBallotVerification = (props: EncryptedBallotVerificationPr
     const isBallotIdCorrect: boolean = props.ballot.verifyBallotId();
 
     useEffect(() => {
-        props.setValidity(areRowsValid && areColumnsValid && containsOnlyZeroOrOne && areShortCodesCorrect && isBallotIdCorrect);
+        const isValid: boolean = areRowsValid && areColumnsValid && containsOnlyZeroOrOne && areShortCodesCorrect && isBallotIdCorrect;
+
+        props.setValidity(isValid);
     }, []);
 
     return (
         <Box>
-            <Card variant="elevation">
-                <CardContent>
-                    <Stack direction="column">
-                        <div>
-                            <Typography color="text.secondary">Each encrypted option represents exactly one candidate (row sums up to 1)</Typography>
-                            <ValidityIcon isValid={areRowsValid}/>
-                        </div>
-                        <div>
-                            <Typography color="text.secondary">Each candidate is represented by exactly one encrypted option (column sums up to 1)</Typography>
-                            <ValidityIcon isValid={areColumnsValid}/>
-                        </div>
-                        <div>
-                            <Typography color="text.secondary">Each encrypted value is either an encryption of 0 or
-                                1</Typography>
-                            <ValidityIcon isValid={containsOnlyZeroOrOne}/>
-                        </div>
-                        <div>
-                            <Typography color="text.secondary">Are the short codes correct?</Typography>
-                            <ValidityIcon isValid={areShortCodesCorrect}/>
-                        </div>
-                        <div>
-                            <Typography color="text.secondary">Is the ballot ID correct?</Typography>
-                            <ValidityIcon isValid={isBallotIdCorrect}/>
-                        </div>
-                    </Stack>
-                </CardContent>
-            </Card>
+            <Stack direction="column" spacing={1}>
+                <Stack direction="row" spacing={1}>
+                    <ValidityIcon isValid={areRowsValid}/>
+                    <Typography style={textStyle}>Each encrypted option represents exactly one candidate (row sums
+                        up to 1)</Typography>
+                </Stack>
+                <Stack direction="row" spacing={1}>
+                    <ValidityIcon isValid={areColumnsValid}/>
+                    <Typography style={textStyle}>Each candidate is represented by exactly one encrypted option
+                        (column sums up to 1)</Typography>
+                </Stack>
+                <Stack direction="row" spacing={1}>
+                    <ValidityIcon isValid={containsOnlyZeroOrOne}/>
+                    <Typography style={textStyle}>Each encrypted value is either an encryption of 0 or 1</Typography>
+                </Stack>
+                <Stack direction="row" spacing={1}>
+                    <ValidityIcon isValid={areShortCodesCorrect}/>
+                    <Typography style={textStyle}>Are the short codes correct?</Typography>
+                </Stack>
+                <Stack direction="row" spacing={1}>
+                    <ValidityIcon isValid={isBallotIdCorrect}/>
+                    <Typography style={textStyle}>Is the ballot code correct?</Typography>
+                </Stack>
+            </Stack>
         </Box>
     );
 }
