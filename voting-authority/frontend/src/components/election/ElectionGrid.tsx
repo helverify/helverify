@@ -6,7 +6,7 @@ import {
     CardContent,
     CardHeader,
     Chip,
-    Grid, SpeedDial, SpeedDialAction,
+    Grid, Modal, SpeedDial, SpeedDialAction,
     TextField,
     Tooltip,
     Typography
@@ -18,8 +18,9 @@ import {ElectionResults} from "./ElectionResults";
 import {apiClient} from "../../api/apiClient";
 import {useState} from "react";
 import {useErrorHandler} from "react-error-boundary";
-import {useNavigate} from "react-router-dom";
 import {ProgressWithLabel} from "../progress/ProgressWithLabel";
+import {BallotCreateForm} from "../ballot/BallotCreateForm";
+import {BallotPrintForm} from "../ballot/BallotPrintForm";
 
 export type ElectionGridProps = {
     election: ElectionDto;
@@ -35,10 +36,26 @@ export const ElectionGrid = (props: ElectionGridProps) => {
 
     const [isLoading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>();
+    const [ballotCreateOpen, setBallotCreateOpen] = useState<boolean>(false);
+    const [ballotPrintOpen, setBallotPrintOpen] = useState<boolean>(false);
+
+    const openBallotCreateForm = () => {
+        setBallotCreateOpen(true);
+    }
+
+    const openBallotPrintForm = () => {
+        setBallotPrintOpen(true);
+    }
+
+    const closeBallotCreateForm = () => {
+        setBallotCreateOpen(false);
+    }
+
+    const closeBallotPrintForm = () => {
+        setBallotPrintOpen(false);
+    }
 
     useErrorHandler(error);
-
-    const navigate = useNavigate();
 
     const options = areOptionsSet(props.election.options) ? props.election.options : [];
 
@@ -197,12 +214,12 @@ export const ElectionGrid = (props: ElectionGridProps) => {
                 <SpeedDialAction
                     icon={<Ballot/>}
                     tooltipTitle={"Create Ballots"}
-                    onClick={() => navigate(`/elections/${props.election.id}/ballots/create`)}
+                    onClick={openBallotCreateForm}
                 />
                 <SpeedDialAction
                     icon={<Print/>}
                     tooltipTitle={"Print Ballots"}
-                    onClick={() => navigate(`/elections/${props.election.id}/ballots/print`)}
+                    onClick={openBallotPrintForm}
                 />
                 <SpeedDialAction
                     icon={<PieChart/>}
@@ -211,6 +228,16 @@ export const ElectionGrid = (props: ElectionGridProps) => {
                 />
             </SpeedDial>
             <ProgressWithLabel isLoading={isLoading} label="Publishing election results"/>
+            <Modal open={ballotCreateOpen} onClose={closeBallotCreateForm}>
+                <>
+                    <BallotCreateForm electionId={props.election.id ?? ""} close={closeBallotCreateForm}/>
+                </>
+            </Modal>
+            <Modal open={ballotPrintOpen} onClose={closeBallotPrintForm}>
+                <>
+                    <BallotPrintForm electionId={props.election.id ?? ""} close={closeBallotPrintForm}/>
+                </>
+            </Modal>
         </>
     );
 }

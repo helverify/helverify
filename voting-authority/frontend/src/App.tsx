@@ -8,7 +8,7 @@ import {
     Box, Container,
     createTheme,
     CssBaseline, IconButton,
-    Paper, Toolbar,
+    Toolbar,
     Typography
 } from "@mui/material";
 import {Add, DarkMode, HowToVote, LightMode, Menu, QrCodeScanner} from "@mui/icons-material";
@@ -16,8 +16,6 @@ import {Route, Routes} from "react-router-dom";
 import {ElectionSetup, setupSteps} from "./components/setup/ElectionSetup";
 import {ThemeProvider} from "@mui/material";
 import {useNavigate} from "react-router-dom";
-import {BallotCreateForm} from "./components/ballot/BallotCreateForm";
-import {BallotPrintForm} from "./components/ballot/BallotPrintForm";
 import {BallotRegistrationView} from "./components/ballot/BallotRegistrationView";
 import {ErrorBoundary} from "react-error-boundary";
 import {ErrorHandler} from "./ErrorHandler";
@@ -27,6 +25,7 @@ function App() {
 
     const [themeMode, setThemeMode] = useState(0);
     const [menuOpen, setMenuOpen] = useState<boolean>(true);
+    const [navigationItem, setNavigationItem] = useState<number>(0);
 
     const mode = themeMode === 0 ? "light" : "dark";
 
@@ -78,9 +77,6 @@ function App() {
                                                element={<Elections menuOpen={menuOpen} closeMenu={closeMenu}
                                                                    toggleMenu={toggleMenu}/>}/>
                                         <Route path="elections/create" element={<ElectionSetup steps={setupSteps}/>}/>
-                                        <Route path="elections/:electionId/ballots/create"
-                                               element={<BallotCreateForm/>}/>
-                                        <Route path="elections/:electionId/ballots/print" element={<BallotPrintForm/>}/>
                                         <Route path="ballots/register" element={<BallotRegistrationView/>}/>
                                         <Route path="setup"/>
                                         <Route path="tally"/>
@@ -88,19 +84,19 @@ function App() {
                                 </Routes>
                             </div>
                         </ErrorBoundary>
-                        <Paper>
-                            <BottomNavigation
-                                showLabels
-                                style={{position: "fixed", bottom: 0, left: 0, right: 0}}
-                            >
-                                <BottomNavigationAction label="Elections" icon={<HowToVote/>}
-                                                        onClick={() => navigate("/elections")}/>
-                                <BottomNavigationAction label="Setup" icon={<Add/>}
-                                                        onClick={() => navigate("/elections/create")}/>
-                                <BottomNavigationAction label="Ballot Registration" icon={<QrCodeScanner/>}
-                                                        onClick={() => navigate("/ballots/register")}/>
-                            </BottomNavigation>
-                        </Paper>
+                        <BottomNavigation
+                            showLabels
+                            style={{position: "fixed", bottom: 0, left: 0, right: 0}}
+                            value={navigationItem}
+                            onChange={(event, value) => setNavigationItem(value)}
+                        >
+                            <BottomNavigationAction label="Elections" icon={<HowToVote/>}
+                                                    onClick={() => navigate("/elections")}/>
+                            <BottomNavigationAction label="Setup" icon={<Add/>}
+                                                    onClick={() => navigate("/elections/create")}/>
+                            <BottomNavigationAction label="Ballot Registration" icon={<QrCodeScanner/>}
+                                                    onClick={() => navigate("/ballots/register")}/>
+                        </BottomNavigation>
                     </Box>
                 </Container>
             </ThemeProvider>

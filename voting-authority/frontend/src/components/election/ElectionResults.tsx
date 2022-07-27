@@ -3,7 +3,7 @@ import {apiClient} from "../../api/apiClient";
 import {ElectionResultDto, ElectionResultsDto} from "../../api/Api";
 import {BarChart, PieChart, Cell, Pie, Bar, XAxis, YAxis, ResponsiveContainer, Legend, Tooltip} from "recharts";
 import randomColor from "randomcolor";
-import {Box, Tab, Tabs, Typography} from "@mui/material";
+import {Box, Tab, Tabs} from "@mui/material";
 import {BarChartOutlined, PieChartOutlined, TableRows} from "@mui/icons-material";
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
 
@@ -54,8 +54,8 @@ export const ElectionResults = (props: ElectionResultsProps) => {
     }
 
     const dataGridColumns: GridColDef[] = [
-        {field: "optionName", headerName: "Candidate / Option", width: 500},
-        {field: "count", headerName: "Number of Votes", width: 300, align: "right"}
+        {field: "optionName", headerName: "Candidate / Option", flex: 1},
+        {field: "count", headerName: "Number of Votes", align: "right", flex: 1}
     ]
 
     return (

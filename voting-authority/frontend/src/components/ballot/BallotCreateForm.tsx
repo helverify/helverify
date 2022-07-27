@@ -1,25 +1,26 @@
 import {apiClient} from "../../api/apiClient";
 import React, {useState} from "react";
 import {BallotGenerationDto} from "../../api/Api";
-import {useNavigate, useParams} from "react-router-dom";
 import {BallotForm} from "./BallotForm";
-import {Container, Paper, Typography} from "@mui/material";
+import {Box, Container, Paper, Typography} from "@mui/material";
 
-export const BallotCreateForm = () => {
-    const [isLoading, setLoading] = useState(false);
+export type BallotCreateFormProps = {
+    electionId: string;
+    close: () => void;
+};
 
-    const navigate = useNavigate();
-
-    const {electionId} = useParams();
+export const BallotCreateForm = (props: BallotCreateFormProps) => {
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const createBallots = (numberOfBallots: number) => {
         setLoading(true);
 
-        if (electionId === undefined || electionId === null) {
-            navigate("/elections");
+        if (props.electionId === undefined || props.electionId === null) {
+            props.close();
+            return;
         }
 
-        const id: string = electionId ?? "";
+        const id: string = props.electionId ?? "";
 
         const ballotGenerationData: BallotGenerationDto = {
             numberOfBallots: numberOfBallots
@@ -27,17 +28,19 @@ export const BallotCreateForm = () => {
 
         apiClient().api.electionsBallotsCreate(id, ballotGenerationData).then(() => {
             setLoading(false);
-            navigate("/elections");
+            props.close();
         });
     };
 
-
     return (
-        <Container maxWidth={"sm"}>
-            <Paper variant="outlined" style={{minWidth: "450px"}}>
-                <Typography variant="h4" align="center" sx={{m: 2}}>Create Ballots</Typography>
-                <BallotForm buttonCaption="Create Ballots" buttonAction={createBallots} isLoading={isLoading} loadingLabel="Creating ballots"/>
-            </Paper>
+        <Container maxWidth={"xs"}>
+            <Box style={{ position: "fixed", top: "45%"}}>
+                <Paper variant="outlined" style={{minWidth: "450px"}}>
+                    <Typography variant="h4" align="center" sx={{m: 2}}>Create Ballots</Typography>
+                    <BallotForm buttonCaption="Create Ballots" buttonAction={createBallots} isLoading={isLoading}
+                                loadingLabel="Creating ballots"/>
+                </Paper>
+            </Box>
         </Container>
     );
 }
