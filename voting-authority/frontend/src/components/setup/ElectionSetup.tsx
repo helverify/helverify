@@ -33,7 +33,7 @@ export function ElectionSetup(props: { steps: ProcessStep[] }) {
                 navigate("/settings");
             }
         })
-    }, []);
+    }, [navigate]);
 
     const goToNextStep = (election: ElectionDto, blockchain: BlockchainDto) => {
         if (step < steps.length) {

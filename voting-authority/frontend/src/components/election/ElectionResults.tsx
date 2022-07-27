@@ -63,7 +63,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
         <>
             {results.length === 0 && (
                 <>
-                    <Typography>There currently are no results available for this election yet.</Typography>
+                    <Typography>There are no results available for this election yet.</Typography>
                 </>
             )}
             {results.length > 0 && (

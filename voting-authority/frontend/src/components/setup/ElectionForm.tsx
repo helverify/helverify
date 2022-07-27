@@ -9,13 +9,12 @@ import {
     Stack, TextField, Tooltip, Typography
 } from "@mui/material";
 import {ElectionDto, ElectionOption, ElectionOptionDto} from "../../api/Api";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Add, DeleteForever} from "@mui/icons-material";
 import {dhGroups, DiffieHellmanGroup, ProcessStepProps} from "./processStep";
 import {apiClient} from "../../api/apiClient";
 import {CandidateInfo} from "../election/CandidateInfo";
 import {ProgressWithLabel} from "../progress/ProgressWithLabel";
-import {useNavigate} from "react-router-dom";
 
 export const ElectionForm = (props: ProcessStepProps) => {
     const styleVariant = "standard";
@@ -30,8 +29,6 @@ export const ElectionForm = (props: ProcessStepProps) => {
         options: [],
         blockchainId: props.blockchain.id
     });
-
-    const navigate = useNavigate();
 
     const [isLoading, setLoading] = useState<boolean>(false);
     const [currentOption, setCurrentOption] = useState<ElectionOptionDto>({name: ""});

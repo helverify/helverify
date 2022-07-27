@@ -8,7 +8,7 @@ import {
     ListItem,
     ListItemButton,
     ListItemIcon,
-    ListItemText, SpeedDial, SpeedDialAction,
+    ListItemText
 } from "@mui/material";
 import {Add, ChevronLeft, HowToVote} from "@mui/icons-material";
 import {apiClient} from "../../api/apiClient";
@@ -45,7 +45,7 @@ export function Elections(props: ElectionsProps) {
                 setSelectedElection(result.data[0] ?? undefined);
             }
         });
-    }, [])
+    }, [selectedElection])
 
 
     const contentDivStyle = {transform: "none", transition: "margin-left 225ms cubic-bezier(0, 0, 0.2, 1) 0ms"};
