@@ -1,21 +1,21 @@
 import {QrReader} from "react-qr-reader";
 import React, {useState} from "react";
 import {
-    Alert,
+    Alert, Box,
     Container, Paper, Snackbar,
     Stack, Typography
 } from "@mui/material";
 import {apiClient} from "../../api/apiClient";
 import {ElectionDto, PrintBallotDto} from "../../api/Api";
-import {ElectionInfo} from "../election/ElectionInfo";
 import {BallotChoiceForm} from "./BallotChoiceForm";
+import {ElectionGrid} from "../election/ElectionGrid";
 
 type QrData = {
     electionId: string
     ballotId: string
 }
 
-export const BallotRegistrationView = () => {
+export const BallotScanningView = () => {
     const [election, setElection] = useState<ElectionDto>({});
     const [ballot, setBallot] = useState<PrintBallotDto>({});
     const [success, setSuccess] = useState<string>("");
@@ -73,8 +73,12 @@ export const BallotRegistrationView = () => {
                             )}
                         </Stack>
                     </Paper>
-                    <ElectionInfo election={election}/>
                 </Stack>
+                <Box style={{ marginTop: "10px"}}>
+                    {election.id !== undefined && (
+                        <ElectionGrid election={election} />
+                    )}
+                </Box>
             </Container>
             <Snackbar
                 open={success !== ""}

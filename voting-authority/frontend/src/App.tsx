@@ -11,12 +11,12 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import {Add, DarkMode, HowToVote, LightMode, Menu, QrCodeScanner} from "@mui/icons-material";
+import {DarkMode, HowToVote, LightMode, Menu, QrCodeScanner, Settings} from "@mui/icons-material";
 import {Route, Routes} from "react-router-dom";
-import {ElectionSetup, setupSteps} from "./components/setup/ElectionSetup";
+import {ElectionSetup, setupSteps, settingsSteps} from "./components/setup/ElectionSetup";
 import {ThemeProvider} from "@mui/material";
 import {useNavigate} from "react-router-dom";
-import {BallotRegistrationView} from "./components/ballot/BallotRegistrationView";
+import {BallotScanningView} from "./components/ballot/BallotScanningView";
 import {ErrorBoundary} from "react-error-boundary";
 import {ErrorHandler} from "./ErrorHandler";
 
@@ -76,8 +76,9 @@ function App() {
                                         <Route path="elections"
                                                element={<Elections menuOpen={menuOpen} closeMenu={closeMenu}
                                                                    toggleMenu={toggleMenu}/>}/>
+                                        <Route path="settings" element={<ElectionSetup steps={settingsSteps}/>}/>
                                         <Route path="elections/create" element={<ElectionSetup steps={setupSteps}/>}/>
-                                        <Route path="ballots/register" element={<BallotRegistrationView/>}/>
+                                        <Route path="ballots/scan" element={<BallotScanningView/>}/>
                                         <Route path="setup"/>
                                         <Route path="tally"/>
                                     </Route>
@@ -92,10 +93,10 @@ function App() {
                         >
                             <BottomNavigationAction label="Elections" icon={<HowToVote/>}
                                                     onClick={() => navigate("/elections")}/>
-                            <BottomNavigationAction label="Setup" icon={<Add/>}
-                                                    onClick={() => navigate("/elections/create")}/>
-                            <BottomNavigationAction label="Ballot Registration" icon={<QrCodeScanner/>}
-                                                    onClick={() => navigate("/ballots/register")}/>
+                            <BottomNavigationAction label="Blockchain Settings" icon={<Settings/>}
+                                                    onClick={() => navigate("/settings")}/>
+                            <BottomNavigationAction label="Ballot Scanning" icon={<QrCodeScanner/>}
+                                                    onClick={() => navigate("/ballots/scan")}/>
                         </BottomNavigation>
                     </Box>
                 </Container>

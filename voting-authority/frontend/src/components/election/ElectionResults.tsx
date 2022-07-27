@@ -3,7 +3,7 @@ import {apiClient} from "../../api/apiClient";
 import {ElectionResultDto, ElectionResultsDto} from "../../api/Api";
 import {BarChart, PieChart, Cell, Pie, Bar, XAxis, YAxis, ResponsiveContainer, Legend, Tooltip} from "recharts";
 import randomColor from "randomcolor";
-import {Box, Tab, Tabs} from "@mui/material";
+import {Box, Tab, Tabs, Typography} from "@mui/material";
 import {BarChartOutlined, PieChartOutlined, TableRows} from "@mui/icons-material";
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
 
@@ -28,6 +28,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
                     props.setError(result.error);
                     return;
                 }
+
                 setElectionResults(result.data);
 
                 let optionColors: string[] = [];
@@ -60,6 +61,11 @@ export const ElectionResults = (props: ElectionResultsProps) => {
 
     return (
         <>
+            {results.length === 0 && (
+                <>
+                    <Typography>There currently are no results available for this election yet.</Typography>
+                </>
+            )}
             {results.length > 0 && (
                 <>
                     <Box display="flex" justifyContent={"right"} style={{marginBottom: "30px"}}>

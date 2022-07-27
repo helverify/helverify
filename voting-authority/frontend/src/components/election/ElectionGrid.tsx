@@ -1,18 +1,18 @@
 import {ElectionDto, ElectionOptionDto} from "../../api/Api";
 import {
     Avatar,
-    Box,
-    Card,
+    Box, Button,
+    Card, CardActions,
     CardContent,
     CardHeader,
-    Chip,
-    Grid, Modal, SpeedDial, SpeedDialAction,
+    Chip, Divider,
+    Grid, Modal,
     TextField,
     Tooltip,
     Typography
 } from "@mui/material";
 
-import {Ballot, Functions, HowToVote, Key, Link, MoreHoriz, PieChart, Print} from "@mui/icons-material";
+import {Ballot, Functions, HowToVote, Key, Link, PieChart, Print} from "@mui/icons-material";
 import {ClipboardCopy} from "../../ClipboardCopy";
 import {ElectionResults} from "./ElectionResults";
 import {apiClient} from "../../api/apiClient";
@@ -93,9 +93,27 @@ export const ElectionGrid = (props: ElectionGridProps) => {
                         <CardContent>
                             <Typography>{props.election.question}</Typography>
                         </CardContent>
+                        <Divider/>
+                        <CardActions>
+                            <Button size={"medium"}
+                                    onClick={openBallotCreateForm}
+                                    aria-label={"Create Ballots"}
+                                    variant="contained"
+                            ><Ballot/>&nbsp;Create Ballots</Button>
+                            <Button size={"medium"}
+                                    onClick={openBallotPrintForm}
+                                    aria-label={"Print Ballots"}
+                                    variant="contained"
+                            ><Print/>&nbsp;Print Ballots</Button>
+
+                            <Button size={"medium"}
+                                    onClick={() => calculateResult(props.election.id ?? "")}
+                                    aria-label={"Calculate & Publish Results"}
+                                    variant="contained"
+                            ><PieChart/>&nbsp;Publish Results</Button>
+                        </CardActions>
                     </Card>
                 </Grid>
-
                 <Grid item style={gridItemStyle} xs={12} sm={12} md={12} lg={6} xl={6}>
                     <Card style={cardItemStyle}>
                         <CardHeader title={
@@ -133,7 +151,6 @@ export const ElectionGrid = (props: ElectionGridProps) => {
                         </CardContent>
                     </Card>
                 </Grid>
-
                 <Grid item xs={12} sm={12} md={6} lg={3} xl={3} style={gridItemStyle}>
                     <Card style={cardItemStyle}>
                         <CardHeader title={
@@ -178,13 +195,12 @@ export const ElectionGrid = (props: ElectionGridProps) => {
                                     variant="standard"
                                     value={props.election.contractAddress}
                                     disabled/>
-                                <ClipboardCopy message={"Copied contract address to clipboard."} value={props.election.contractAddress ?? ""}/>
+                                <ClipboardCopy message={"Copied contract address to clipboard."}
+                                               value={props.election.contractAddress ?? ""}/>
                             </Box>
                         </CardContent>
                     </Card>
                 </Grid>
-
-
 
                 <Grid item xs={12} sm={12} md={12} lg={12} xl={12} style={gridItemStyle}>
                     <Card style={cardItemStyle}>
@@ -198,35 +214,17 @@ export const ElectionGrid = (props: ElectionGridProps) => {
                         >
                         </CardHeader>
                         <CardContent>
-                            <Box >
-                                <ElectionResults electionId={props.election.id ?? ""} isLoading={isLoading}
-                                                              setError={setError}/>
+                            <Box>
+                                <ElectionResults
+                                    electionId={props.election.id ?? ""}
+                                    isLoading={isLoading}
+                                    setError={setError}/>
                             </Box>
                         </CardContent>
                     </Card>
                 </Grid>
             </Grid>
-            <SpeedDial
-                ariaLabel={"Election Actions"}
-                icon={<MoreHoriz/>}
-                sx={{ position: "fixed", right: "20px", bottom: "60px"}}
-            >
-                <SpeedDialAction
-                    icon={<Ballot/>}
-                    tooltipTitle={"Create Ballots"}
-                    onClick={openBallotCreateForm}
-                />
-                <SpeedDialAction
-                    icon={<Print/>}
-                    tooltipTitle={"Print Ballots"}
-                    onClick={openBallotPrintForm}
-                />
-                <SpeedDialAction
-                    icon={<PieChart/>}
-                    tooltipTitle={"Calculate & Publish Results"}
-                    onClick={() => calculateResult(props.election.id ?? "")}
-                />
-            </SpeedDial>
+
             <ProgressWithLabel isLoading={isLoading} label="Publishing election results"/>
             <Modal open={ballotCreateOpen} onClose={closeBallotCreateForm}>
                 <>

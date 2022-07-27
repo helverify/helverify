@@ -16,8 +16,8 @@ import {CandidateInfo} from "./CandidateInfo";
 import {ClipboardCopy} from "../../ClipboardCopy";
 
 export const ElectionInfo = (props: ElectionInfoProps) => {
-
     const notAvailable: string = "n/a";
+    const headerStyle = { marginTop: "10px", marginBottom: "6px"};
 
     if (props.election.id === undefined) {
         return (<></>);
@@ -49,16 +49,16 @@ export const ElectionInfo = (props: ElectionInfoProps) => {
                             </Box>
                             <Divider/>
                             {isPropertySet(props.election.question) && (
-                                <div>
-                                    <Typography variant="h5">Question</Typography>
+                                <Box>
+                                    <Typography variant="h5" style={headerStyle}>Question</Typography>
                                     <Typography
                                         color="text.secondary">{props.election.question ?? notAvailable}</Typography>
-                                </div>
+                                </Box>
                             )}
                             <Divider/>
                             {options && (
-                                <>
-                                    <Typography variant="h5">Candidates / Options</Typography>
+                                <Box>
+                                    <Typography variant="h5" style={headerStyle}>Candidates / Options</Typography>
                                     <Grid container>
                                         {options.map((option, index) => {
                                             return (
@@ -68,12 +68,12 @@ export const ElectionInfo = (props: ElectionInfoProps) => {
                                             )
                                         })}
                                     </Grid>
-                                </>
+                                </Box>
                             )}
                             <Divider/>
                             {isPropertySet(props.election.publicKey) && (
                                 <div>
-                                    <Typography variant="h5">Public Key</Typography>
+                                    <Typography variant="h5" style={headerStyle}>Public Key</Typography>
                                     <Box display="flex" justifyContent="space-between">
                                         <TextField
                                             fullWidth
@@ -86,7 +86,7 @@ export const ElectionInfo = (props: ElectionInfoProps) => {
                             )}
                             {isPropertySet(props.election.contractAddress) && (
                                 <div>
-                                    <Typography variant="h5">Contract Address</Typography>
+                                    <Typography variant="h5" style={headerStyle}>Contract Address</Typography>
                                     <Box display="flex" justifyContent="space-between">
                                         <TextField
                                             fullWidth

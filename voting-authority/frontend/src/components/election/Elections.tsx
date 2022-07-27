@@ -1,22 +1,22 @@
 import {useEffect, useState} from "react";
 import {
     Box,
-    Container,
     Divider,
-    Drawer,
+    Drawer, Fab,
     IconButton,
     List,
     ListItem,
     ListItemButton,
     ListItemIcon,
-    ListItemText,
+    ListItemText, SpeedDial, SpeedDialAction,
 } from "@mui/material";
-import {ChevronLeft, HowToVote} from "@mui/icons-material";
+import {Add, ChevronLeft, HowToVote} from "@mui/icons-material";
 import {apiClient} from "../../api/apiClient";
 import {ElectionDto} from "../../api/Api";
 
 import {ElectionGrid} from "./ElectionGrid";
 import {useErrorHandler} from "react-error-boundary";
+import {useNavigate} from "react-router-dom";
 
 export type ElectionsProps = {
     menuOpen: boolean;
@@ -28,11 +28,11 @@ export function Elections(props: ElectionsProps) {
     const widthOfDrawer = 300;
 
     const [elections, setElections] = useState<ElectionDto[]>([]);
-
-    const [error, setError] = useState<string>();
-    useErrorHandler(error);
-
     const [selectedElection, setSelectedElection] = useState<ElectionDto>();
+    const [error, setError] = useState<string>();
+
+    useErrorHandler(error);
+    const navigate = useNavigate();
 
     useEffect(() => {
         apiClient().api.electionsList().then((result) => {
@@ -89,7 +89,14 @@ export function Elections(props: ElectionsProps) {
                     )}
                 </Box>
             </div>
-
+            <Fab
+                variant="circular"
+                color={"success"}
+                style={{ position: "fixed", bottom: "60px", right: "30px"}}
+                onClick={() => navigate("/elections/create")}
+            >
+                <Add/>
+            </Fab>
         </>
     );
 }

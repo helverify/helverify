@@ -1,10 +1,10 @@
-import {SetupStepProps} from "./electionSetupStep";
+import {ProcessStepProps} from "./processStep";
 import {Box, Button, Stack, Typography} from "@mui/material";
 import {apiClient} from "../../api/apiClient";
 import {useState} from "react";
 import {ProgressWithLabel} from "../progress/ProgressWithLabel";
 
-export const PublicKeyForm = (props: SetupStepProps) => {
+export const PublicKeyForm = (props: ProcessStepProps) => {
     const typographyStyle = {marginTop: "25px", marginBottom: "15px"};
 
     const [isLoading, setLoading] = useState<boolean>(false);

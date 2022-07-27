@@ -9,15 +9,15 @@ import {
     Stack, TextField, Tooltip, Typography
 } from "@mui/material";
 import {ElectionDto, ElectionOption, ElectionOptionDto} from "../../api/Api";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Add, DeleteForever} from "@mui/icons-material";
-import {dhGroups, DiffieHellmanGroup, SetupStepProps} from "./electionSetupStep";
+import {dhGroups, DiffieHellmanGroup, ProcessStepProps} from "./processStep";
 import {apiClient} from "../../api/apiClient";
 import {CandidateInfo} from "../election/CandidateInfo";
 import {ProgressWithLabel} from "../progress/ProgressWithLabel";
+import {useNavigate} from "react-router-dom";
 
-export const ElectionForm = (props: SetupStepProps) => {
-
+export const ElectionForm = (props: ProcessStepProps) => {
     const styleVariant = "standard";
     const stylingParams = {minWidth: 200};
     const typographyStyle = {marginTop: "25px", marginBottom: "15px"};
@@ -30,6 +30,8 @@ export const ElectionForm = (props: SetupStepProps) => {
         options: [],
         blockchainId: props.blockchain.id
     });
+
+    const navigate = useNavigate();
 
     const [isLoading, setLoading] = useState<boolean>(false);
     const [currentOption, setCurrentOption] = useState<ElectionOptionDto>({name: ""});
@@ -137,7 +139,8 @@ export const ElectionForm = (props: SetupStepProps) => {
             <Stack direction="column" spacing={1}>
                 <Box>
                     <Typography variant={"h5"} style={typographyStyle}>Election Parameters</Typography>
-                    <Typography>In this step, you can specify all the parameters of your election or vote, including the question to vote on as well as the options or candidates.</Typography>
+                    <Typography>In this step, you can specify all the parameters of your election or vote, including the
+                        question to vote on as well as the options or candidates.</Typography>
                     <Stack direction="column" spacing={1} style={{marginTop: "10px"}}>
                         <FormControl variant={styleVariant} sx={stylingParams}>
                             <Tooltip title={"Name of your new election"} arrow>
@@ -195,7 +198,8 @@ export const ElectionForm = (props: SetupStepProps) => {
                         </FormControl>
                         <FormControl variant={styleVariant} sx={stylingParams}>
                             <InputLabel htmlFor="election-dh-group">Diffie-Hellman Group</InputLabel>
-                            <Tooltip title={"Diffie-Hellman parameters used for the ElGamal cryptosystem."} placement="top" arrow>
+                            <Tooltip title={"Diffie-Hellman parameters used for the ElGamal cryptosystem."}
+                                     placement="top" arrow>
                                 <Select
                                     id="election-dh-group"
                                     onChange={setDhGroup}

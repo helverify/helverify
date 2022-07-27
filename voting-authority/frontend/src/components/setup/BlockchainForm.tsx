@@ -1,4 +1,4 @@
-import {SetupStepProps} from "./electionSetupStep";
+import {ProcessStepProps} from "./processStep";
 import {
     Box,
     Button,
@@ -16,7 +16,7 @@ import {useEffect, useState} from "react";
 import {apiClient} from "../../api/apiClient";
 import {ProgressWithLabel} from "../progress/ProgressWithLabel";
 
-export const BlockchainForm = (props: SetupStepProps) => {
+export const BlockchainForm = (props: ProcessStepProps) => {
     const styleVariant = "standard";
     const stylingParams = {width: "100%"};
     const typographyStyle = {marginTop: "25px", marginBottom: "15px"};
