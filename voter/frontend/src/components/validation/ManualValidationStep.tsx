@@ -1,5 +1,5 @@
 import {ValidationStepProps} from "./validationStep";
-import {Box, Button, Grid, Stack, Typography} from "@mui/material";
+import {Box, Grid, Stack, Typography} from "@mui/material";
 import {CastBallotView} from "../CastBallotView";
 import {CastBallot} from "../../ballot/castBallot";
 import {SpoiltBallot} from "../../ballot/spoiltBallot";
@@ -11,6 +11,7 @@ export type ManualValidationStepProps = ValidationStepProps & {
 }
 
 export const ManualValidationStep = (props: ManualValidationStepProps) => {
+
     return (
         <Box>
             <Stack direction="column" spacing={1}>
@@ -37,14 +38,6 @@ export const ManualValidationStep = (props: ManualValidationStepProps) => {
                         </Grid>
                     )}
                 </Grid>
-                <Stack direction="row" spacing={1} style={{marginTop: "10px"}}>
-                    <Box display="flex" justifyContent="left" alignItems="left" flexGrow={1}>
-                        <Button onClick={props.previous} variant="outlined">Previous</Button>
-                    </Box>
-                    <Box display="flex" justifyContent="right" alignItems="right">
-                        <Button onClick={props.next} variant="contained">Next</Button>
-                    </Box>
-                </Stack>
             </Stack>
         </Box>
     );

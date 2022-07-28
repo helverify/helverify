@@ -7,8 +7,6 @@ export type ValidationStep = {
 };
 
 export type ValidationStepProps = {
-    previous: () => void;
-    next: () => void;
     ballots: EncryptedBallot[] | undefined;
     electionParameters: ElectionParameters | undefined;
     ballotId: string | undefined;

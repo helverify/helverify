@@ -4,10 +4,10 @@ import {
     AccordionDetails,
     Box,
     Stack,
-    Typography, Backdrop, CircularProgress, Divider, Tooltip
+    Typography, Divider, Tooltip, Backdrop, CircularProgress
 } from "@mui/material";
 import {EncryptedBallotVerification} from "./EncryptedBallotVerification";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {EncryptedBallot} from "../ballot/encryptedBallot";
 import {ElectionParameters} from "../election/election";
 import {HashHelper} from "../helper/hashHelper";
@@ -18,8 +18,6 @@ export type BallotEncryptionCheckProps = {
     ballots: EncryptedBallot[] | undefined;
     electionParameters: ElectionParameters | undefined;
     ballotId: string;
-    isLoading: boolean;
-    setLoading: (isLoading: boolean) => void;
 }
 
 export const BallotEncryptionCheck = (props: BallotEncryptionCheckProps) => {
@@ -33,8 +31,6 @@ export const BallotEncryptionCheck = (props: BallotEncryptionCheckProps) => {
 
     const hasBallots = ballots?.length === 2 && electionParameters !== undefined;
 
-    const [isBallot1Verifying, setBallot1Verifying] = useState<boolean>(true);
-    const [isBallot2Verifying, setBallot2Verifying] = useState<boolean>(true);
     const [isBallot1Valid, setBallot1Valid] = useState<boolean>();
     const [isBallot2Valid, setBallot2Valid] = useState<boolean>();
 
@@ -48,31 +44,27 @@ export const BallotEncryptionCheck = (props: BallotEncryptionCheckProps) => {
 
     const handleBallot1Change = (isValid: boolean) => {
         setBallot1Valid(isValid);
-        setBallot1Verifying(false);
     }
 
     const handleBallot2Change = (isValid: boolean) => {
         setBallot2Valid(isValid);
-        setBallot2Verifying(false);
     }
 
     const isBallotValid = () => {
         return isBallot1Valid && isBallot2Valid && isBallotIdCorrect()
     };
 
-    const isDoneVerfying = () => {
-        return !(isBallot1Verifying || isBallot2Verifying);
-    }
-
-    useEffect(() => {
-        props.setLoading(true);
-        if(isDoneVerfying()){
-            props.setLoading(false);
-        }
-    })
-
     return (
         <>
+            {!hasBallots && (
+                <Backdrop open={true}>
+                    <Stack direction="row" spacing={1}>
+                        <Typography variant="overline" style={{ marginTop: "4px"}}>Verifying Ballot Integrity ...</Typography>
+                        <CircularProgress />
+                    </Stack>
+                </Backdrop>
+            )}
+
             <Box>
                 {hasBallots && (
                     <>
@@ -138,13 +130,6 @@ export const BallotEncryptionCheck = (props: BallotEncryptionCheckProps) => {
                     </>
                 )}
             </Box>
-            <Backdrop open={props.isLoading}>
-                <Stack direction="row" spacing={1}>
-                    <Typography variant="overline" style={{marginTop: "4px"}}>Verifying Ballot Encryption
-                        ...</Typography>
-                    <CircularProgress/>
-                </Stack>
-            </Backdrop>
         </>
     );
 }

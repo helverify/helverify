@@ -3,6 +3,7 @@ import {BigNumberHelper} from "../helper/bigNumberHelper";
 import {ProofOfZeroOrOne} from "../cryptography/proofOfZeroOrOne";
 import bigInt from "big-integer";
 import {HashHelper} from "../helper/hashHelper";
+import {ElectionParameters} from "../election/election";
 
 /**
  * Represents an encrypted ballot
@@ -46,19 +47,31 @@ export class EncryptedBallot {
     /**
      * Verifies that all the short codes are matching the encryptions they have been derived from.
      */
-    verifyShortCodes(){
+    verifyShortCodes() {
         return this.encryptedOptions.every(eo => eo.verifyShortCode());
     }
 
     /**
      * Verifies that the ballot code has been correctly derived from the encryptions.
      */
-    verifyBallotId(){
+    verifyBallotId() {
         const ciphers: Cipher[] = this.encryptedOptions.flatMap(eo => eo.values.map(v => v.cipher));
 
         const hash: string = HashHelper.getCipherHash(ciphers);
 
         return hash === this.ballotCode;
+    }
+
+    verifyRowProofs(electionParameters: ElectionParameters): boolean {
+        return this.rowProofs.every(rp => rp.verify(electionParameters.publicKey, electionParameters.p, electionParameters.g));
+    }
+
+    verifyColumnProofs(electionParameters: ElectionParameters): boolean {
+        return this.columnProofs.every(cp => cp.verify(electionParameters.publicKey, electionParameters.p, electionParameters.g));
+    }
+
+    verifyContainsOnlyZeroOrOne(electionParameters: ElectionParameters): boolean {
+        return this.encryptedOptions.every(eo => eo.values.every(v => v.verifyProof(electionParameters.publicKey, electionParameters.p, electionParameters.g)));
     }
 }
 
@@ -90,7 +103,7 @@ export class EncryptedOption {
     /**
      * Verifies that the short code provided actually corresponds to the first two characters of the encryption's SHA-256 hash.
      */
-    verifyShortCode(): boolean{
+    verifyShortCode(): boolean {
         let hash = HashHelper.getCipherHash(this.values.map(v => v.cipher));
 
         return hash.substring(0, 2) === this.shortCode;

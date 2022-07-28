@@ -16,7 +16,7 @@ export class ResultEvidence {
      * Constructor
      * @param decryptedResults Decrypted shares used to derive the final result
      */
-    constructor(decryptedResults: DecryptedResult[]){
+    constructor(decryptedResults: DecryptedResult[]) {
         this.decryptedResults = decryptedResults;
     }
 
@@ -25,8 +25,11 @@ export class ResultEvidence {
      * @param p ElGamal parameter p
      * @param g ElGamal parameter g
      */
-    verifyDecryptionProofs(p: bigInt.BigInteger, g: bigInt.BigInteger):boolean {
-        return this.decryptedResults.every(decRes => decRes.verifyShareProofs(p, g));
+    verifyDecryptionProofs(p: bigInt.BigInteger, g: bigInt.BigInteger): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            const isValid: boolean = this.decryptedResults.every(decRes => decRes.verifyShareProofs(p, g));
+            resolve(isValid);
+        });
     }
 }
 
@@ -67,7 +70,7 @@ export class DecryptedResult {
      * @param p ElGamal parameter p
      * @param g ElGamal parameter g
      */
-    verifyShareProofs(p: bigInt.BigInteger, g: bigInt.BigInteger):boolean{
+    verifyShareProofs(p: bigInt.BigInteger, g: bigInt.BigInteger): boolean {
         return this.decryptedShares.every(share => share.verifyProof(this.cipherText, p, g));
     }
 }
@@ -110,7 +113,7 @@ export class DecryptedShare {
      * @param p ElGamal parameter p
      * @param g ElGamal parameter g
      */
-    verifyProof(cipher: Cipher, p: bigInt.BigInteger, g: bigInt.BigInteger): boolean{
+    verifyProof(cipher: Cipher, p: bigInt.BigInteger, g: bigInt.BigInteger): boolean {
         return this.proofOfDecryption.verify(cipher.c, cipher.d, this.publicKeyShare, p, g);
     }
 }

@@ -1,7 +1,7 @@
 import {
-    Box,
-    Container,
-    Paper,
+    Box, Button,
+    Container, Divider,
+    Paper, Stack,
     Step,
     StepLabel,
     Stepper,
@@ -24,6 +24,7 @@ import {CastBallot} from "../ballot/castBallot";
 import {SpoiltBallot} from "../ballot/spoiltBallot";
 import {ResultEvidence} from "../election/resultEvidence";
 import Web3 from "web3";
+import {SummaryStep} from "./validation/SummaryStep";
 
 export type ValidationStepperProps = {
     qrData: QrData;
@@ -39,8 +40,6 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
     const [electionParameters, setElectionParameters] = useState<ElectionParameters>();
 
     const qrData = props.qrData;
-
-
 
     useEffect(() => {
         const web3 = new Web3(process.env.REACT_APP_GETH_WS ?? "");
@@ -97,13 +96,13 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
 
     const goToNextStep = () => {
         if (step < steps.length) {
-            setStep(step + 1)
+            setStep((step) => step + 1);
         }
     };
 
     const goToPreviousStep = () => {
         if (step > 0) {
-            setStep(step - 1)
+            setStep((step) => step - 1);
         }
     };
 
@@ -121,8 +120,6 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
         {
             caption: "Before Casting",
             component: <AutomaticValidationStep
-                previous={goToPreviousStep}
-                next={goToNextStep}
                 ballots={ballots}
                 ballotId={qrData.ballotId}
                 electionParameters={electionParameters}
@@ -131,8 +128,6 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
         {
             caption: "After Tallying",
             component: <ManualValidationStep
-                previous={goToPreviousStep}
-                next={goToNextStep}
                 ballots={ballots}
                 ballotId={qrData.ballotId}
                 electionParameters={electionParameters}
@@ -143,8 +138,6 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
         {
             caption: "Results",
             component: <ResultsStep
-                previous={goToPreviousStep}
-                next={goToNextStep}
                 ballots={ballots}
                 ballotId={qrData.ballotId}
                 electionParameters={electionParameters}
@@ -154,9 +147,12 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
         },
         {
             caption: "Summary",
-            component: <Typography>Test</Typography>
+            component: <SummaryStep
+                ballots={ballots}
+                electionParameters={electionParameters}
+                ballotId={qrData.ballotId}
+            />
         }
-
     ];
 
     return (
@@ -164,19 +160,34 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
             {electionParameters !== undefined && (
                 <Container maxWidth="lg">
                     <Paper variant="outlined" style={{minWidth: "450px"}}>
-                        <Typography variant="h4" align="center" sx={{m: 2}}>Verification</Typography>
-                        <Stepper activeStep={step} style={{marginTop: "30px", marginBottom: "10px"}} sx={{m: 1}}>
-                            {steps.map((s) => {
-                                return (
-                                    <Step key={s.caption}>
-                                        <StepLabel>{s.caption}</StepLabel>
-                                    </Step>
-                                );
-                            })}
-                        </Stepper>
-                        <Box sx={{m: 2}}>
-                            {stepComponent()}
-                        </Box>
+                        <Stack direction="column" spacing={1} sx={{p: 2}}>
+                            <Typography variant="h4" align="center" sx={{m: 2}}>Verification</Typography>
+                            <Stepper activeStep={step} style={{marginTop: "30px", marginBottom: "10px"}} sx={{m: 1}}>
+                                {steps.map((s) => {
+                                    return (
+                                        <Step key={s.caption}>
+                                            <StepLabel>{s.caption}</StepLabel>
+                                        </Step>
+                                    );
+                                })}
+                            </Stepper>
+                            <Box sx={{m: 2}}>
+                                {stepComponent()}
+                            </Box>
+                            <Divider/>
+                            <Stack direction="row" spacing={1} style={{marginTop: "10px"}}>
+                                <Box display="flex" justifyContent="left" alignItems="left" flexGrow={1}>
+                                    {step > 0 && (
+                                        <Button onClick={goToPreviousStep} variant="outlined">Previous</Button>
+                                    )}
+                                </Box>
+                                <Box display="flex" justifyContent="right" alignItems="right">
+                                    {step < steps.length - 1 && (
+                                        <Button onClick={goToNextStep} variant="contained">Next</Button>
+                                    )}
+                                </Box>
+                            </Stack>
+                        </Stack>
                     </Paper>
                 </Container>
             )}

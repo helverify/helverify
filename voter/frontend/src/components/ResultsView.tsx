@@ -17,7 +17,6 @@ export const ResultsView = (props: ResultsViewProps) => {
     const [electionResults, setElectionResults] = useState<ElectionResults>({results: []});
 
     useEffect(() => {
-
         setElectionResults(props.electionResults);
 
         let optionColors: string[] = [];
@@ -26,8 +25,7 @@ export const ResultsView = (props: ResultsViewProps) => {
         });
 
         setColors(optionColors);
-
-    }, [props.electionResults]);
+    }, [props, props.electionResults]);
 
     const results: OptionTally[] = electionResults.results !== undefined &&
     electionResults.results !== null &&
@@ -47,7 +45,7 @@ export const ResultsView = (props: ResultsViewProps) => {
             <Box sx={{m: 2}}>
                     {results.length === 0 && (
                         <>
-                            <Typography>There are no results available for this election yet.</Typography>
+                            <Typography color={"text.secondary"}>Loading Results...</Typography>
                         </>
                     )}
                     {results.length > 0 && (
