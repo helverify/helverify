@@ -16,11 +16,9 @@ export const EvidenceView = (props: EvidenceViewProps) => {
     return (
         <Card>
             <Box sx={{m: 1}}>
-                <Stack spacing={1}>
-                    <Typography variant="h4">Result</Typography>
-                    <Typography variant="h5">Correctness</Typography>
-                    <Typography color="text.secondary">Have the final results been decrypted correctly?</Typography>
+                <Stack spacing={1} direction="row">
                     <ValidityIcon isValid={props.electionEvidence.verifyDecryptionProofs(p, g)}/>
+                    <Typography style={{ marginTop: "5px"}}>Have the final results been decrypted correctly?</Typography>
                 </Stack>
             </Box>
         </Card>

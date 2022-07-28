@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import {
     AppBar, Box,
@@ -11,10 +11,7 @@ import {
     Toolbar,
     Typography
 } from '@mui/material';
-import Web3 from "web3";
-import {ElectionABI} from "./contract/electionContract";
 import {QrReader} from "react-qr-reader";
-import {ElectionParameters, ElectionResults} from "./election/election";
 import {DarkMode, HowToVote, LightMode} from "@mui/icons-material";
 import {ValidationStepper} from "./components/ValidationStepper";
 import {QrData} from "./helper/qrData";

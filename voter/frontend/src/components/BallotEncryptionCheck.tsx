@@ -4,7 +4,7 @@ import {
     AccordionDetails,
     Box,
     Stack,
-    Typography, Backdrop, CircularProgress, Divider, Chip, Tooltip, Toolbar
+    Typography, Backdrop, CircularProgress, Divider, Tooltip
 } from "@mui/material";
 import {EncryptedBallotVerification} from "./EncryptedBallotVerification";
 import React, {useEffect, useState} from "react";
@@ -76,7 +76,6 @@ export const BallotEncryptionCheck = (props: BallotEncryptionCheckProps) => {
             <Box>
                 {hasBallots && (
                     <>
-
                         <Accordion>
                             <AccordionSummary
                                 expandIcon={<ExpandMore/>}

@@ -15,8 +15,8 @@ export const CastBallotView = (props: CastBallotViewProps) => {
                     <Grid container spacing={1}>
                         {props.ballot.selection.map((selection, index) => {
                             return (
-                                <Grid item>
-                                    <Avatar key={index} style={{
+                                <Grid item key={index}>
+                                    <Avatar style={{
                                         backgroundColor: "#3a3a3a",
                                         color: "#FFFFFF"
                                     }}>

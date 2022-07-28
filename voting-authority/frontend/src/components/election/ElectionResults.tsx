@@ -80,7 +80,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
                             <ResponsiveContainer height={400}>
                                 <PieChart>
                                     <Tooltip/>
-                                    <Legend/>
+                                    <Legend formatter={(value) => (<Typography color={"#000000"} display={"inline"}>{value}</Typography>)}/>
                                     <Pie
                                         data={results}
                                         innerRadius={"70%"}

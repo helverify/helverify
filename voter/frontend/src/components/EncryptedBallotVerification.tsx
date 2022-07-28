@@ -1,6 +1,6 @@
 import {EncryptedBallot} from "../ballot/encryptedBallot";
 import {ElectionParameters} from "../election/election";
-import {Box, Card, CardContent, Typography, Stack} from "@mui/material";
+import {Box, Typography, Stack} from "@mui/material";
 import bigInt from "big-integer";
 import {useEffect} from "react";
 import {ValidityIcon} from "./ValidityIcon";
@@ -29,7 +29,7 @@ export const EncryptedBallotVerification = (props: EncryptedBallotVerificationPr
         const isValid: boolean = areRowsValid && areColumnsValid && containsOnlyZeroOrOne && areShortCodesCorrect && isBallotIdCorrect;
 
         props.setValidity(isValid);
-    }, []);
+    }, [props, areColumnsValid, areRowsValid, areShortCodesCorrect, containsOnlyZeroOrOne, isBallotIdCorrect]);
 
     return (
         <Box>

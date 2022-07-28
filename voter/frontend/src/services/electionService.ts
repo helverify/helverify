@@ -34,7 +34,7 @@ export class ElectionService {
 
         const optionTallies : OptionTally[] = results.map((r) => {
            const name: string = r[0];
-           const count: number = r[1];
+           const count: number = parseInt(r[1].toString());
 
            return new OptionTally(name, count);
         });

@@ -25,7 +25,6 @@ export const ManualValidationStep = (props: ManualValidationStepProps) => {
                             <Box sx={{m: 1, marginLeft: 0}} marginRight={{xs: 0, sm: 1}}>
                                 <CastBallotView ballot={props.castBallot}/>
                             </Box>
-
                         </Grid>
                     )}
                     {props.spoiltBallot !== undefined && props.electionParameters !== undefined && props.ballots !== undefined && (

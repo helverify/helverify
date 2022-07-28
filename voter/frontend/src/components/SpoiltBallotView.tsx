@@ -1,13 +1,9 @@
 import {SpoiltBallot} from "../ballot/spoiltBallot";
 import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
     Avatar,
     Box,
     Card,
     Divider,
-    Grid,
     Stack,
     Typography
 } from "@mui/material";
@@ -15,7 +11,6 @@ import {EncryptedBallot} from "../ballot/encryptedBallot";
 import {ElectionParameters} from "../election/election";
 import {ValidityIcon} from "./ValidityIcon";
 import {BallotService} from "../services/ballotService";
-import {ExpandMore} from "@mui/icons-material";
 import React from "react";
 
 export type SpoiltBallotViewProps = {
@@ -49,7 +44,6 @@ export const SpoiltBallotView = (props: SpoiltBallotViewProps) => {
                                     <Typography variant="h6" fontWeight={"bold"}>{o.shortCode}</Typography>
                                 </Avatar>
                                 <Typography variant="h6">{o.name}</Typography>
-
                             </Stack>
                         )
                     })}

@@ -162,7 +162,7 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
     return (
         <>
             {electionParameters !== undefined && (
-                <Container maxWidth="md">
+                <Container maxWidth="lg">
                     <Paper variant="outlined" style={{minWidth: "450px"}}>
                         <Typography variant="h4" align="center" sx={{m: 2}}>Verification</Typography>
                         <Stepper activeStep={step} style={{marginTop: "30px", marginBottom: "10px"}} sx={{m: 1}}>
