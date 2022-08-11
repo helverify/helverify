@@ -5,7 +5,7 @@ import {
     Card,
     Container,
     createTheme,
-    CssBaseline, IconButton,
+    CssBaseline, IconButton, List, ListItem, ListItemButton, ListItemText,
     Stack,
     ThemeProvider,
     Toolbar,
@@ -42,33 +42,44 @@ function App() {
                     <Toolbar>
                         <HowToVote style={{marginRight: "10px"}}/>
                         <Typography variant={"button"} sx={{flexGrow: 1}}>helverify - Verifiable Postal Voting</Typography>
+                        <List>
+                            <ListItem>
+                                <ListItemButton href={"/ballot_instructions.pdf"}>
+                                    <ListItemText>Instructions</ListItemText>
+                                </ListItemButton>
+                            </ListItem>
+                        </List>
                         <IconButton onClick={switchThemeMode}>
                             {themeMode === 0 ? <DarkMode/> : <LightMode/>}
                         </IconButton>
                     </Toolbar>
                 </AppBar>
                 <Container maxWidth={"xl"} style={{flexGrow: 1, width: "100%"}}>
-                    <Box style={{marginTop: "80px", marginBottom: "80px"}}>
+                    <Box style={{marginTop: "120px", marginBottom: "80px"}}>
                         <Stack direction="column" spacing={1}>
                             {!hasBallot && (
-                                <Card style={{width: "100%", maxWidth: "800px"}}>
-                                    <QrReader
-                                        onResult={(result, error) => {
-                                            let text = result?.getText();
-                                            if (!!text) {
-                                                let data = JSON.parse(text);
+                                <Card>
+                                    <Box sx={{m:1}}>
+                                        <Typography variant={"h4"}>Ballot Verification</Typography>
+                                        <Typography>Please scan the QR code on your ballot to start the verification process.</Typography>
+                                        <QrReader
+                                            onResult={(result, error) => {
+                                                let text = result?.getText();
+                                                if (!!text) {
+                                                    let data = JSON.parse(text);
 
-                                                const qrData: QrData = {
-                                                    electionId: data.ElectionId,
-                                                    ballotId: data.BallotId,
-                                                    contractAddress: data.ContractAddress
-                                                };
-                                                setQrData(qrData);
-                                            }
-                                        }}
-                                        constraints={{facingMode: "environment"}}
-                                        containerStyle={{width: "100%"}}
-                                    />
+                                                    const qrData: QrData = {
+                                                        electionId: data.ElectionId,
+                                                        ballotId: data.BallotId,
+                                                        contractAddress: data.ContractAddress
+                                                    };
+                                                    setQrData(qrData);
+                                                }
+                                            }}
+                                            constraints={{facingMode: "environment"}}
+                                            containerStyle={{width: "100%"}}
+                                        />
+                                    </Box>
                                 </Card>
                             )}
                             {hasBallot && (
@@ -76,29 +87,6 @@ function App() {
                                     qrData={qrData}
                                 />
                             )}
-                            {/*<EncryptedBallotsView*/}
-                            {/*    ballotId={qrData.ballotId}*/}
-                            {/*    ballots={ballots}*/}
-                            {/*    electionParameters={electionParameters}*/}
-                            {/*/>*/}
-                            {/*<Stack*/}
-                            {/*    direction="column"*/}
-                            {/*    spacing={1}*/}
-                            {/*    style={{width: "100%", maxWidth: "1200px"}}*/}
-                            {/*>*/}
-                            {/*    {castBallot !== undefined && (*/}
-                            {/*        <CastBallotView ballot={castBallot}/>*/}
-                            {/*    )}*/}
-                            {/*    {spoiltBallot !== undefined && electionParameters !== undefined && ballots !== undefined && (*/}
-                            {/*        <SpoiltBallotView ballot={spoiltBallot} electionParameters={electionParameters} encryptions={ballots}/>*/}
-                            {/*    )}*/}
-                            {/*    {electionResults !== undefined && (*/}
-                            {/*        <ResultsView electionResults={electionResults}/>*/}
-                            {/*    )}*/}
-                            {/*    {evidence !== undefined && electionParameters !== undefined  && (*/}
-                            {/*        <EvidenceView electionEvidence={evidence} electionParameters={electionParameters}/>*/}
-                            {/*    )}*/}
-                            {/*</Stack>*/}
                         </Stack>
                     </Box>
                 </Container>
