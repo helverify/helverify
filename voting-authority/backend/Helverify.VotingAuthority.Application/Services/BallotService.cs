@@ -44,7 +44,11 @@ namespace Helverify.VotingAuthority.Application.Services
         public async Task<PaperBallot> GetAsync(string ballotId) => await _ballotRepository.GetAsync(ballotId);
 
         /// <inheritdoc cref="IBallotService.GetAsync(int {numberOfBallots})"/>
-        public async Task<IList<PaperBallot>> GetAsync(int numberOfBallots) => (await _ballotRepository.GetAsync()).Where(b => !b.Printed).Take(numberOfBallots).ToList();
+        public async Task<IList<PaperBallot>> GetAsync(Election election, int numberOfBallots)
+        {
+            return (await (_ballotRepository as PaperBallotRepository).GetByElectionAsync(election))
+                .Where(b => !b.Printed).Take(numberOfBallots).ToList();
+        }
 
         /// <inheritdoc cref="IBallotService.CreateBallots"/>
         public async Task CreateBallots(Election election, int numberOfBallots)
@@ -53,29 +57,57 @@ namespace Helverify.VotingAuthority.Application.Services
 
             ConcurrentQueue<PaperBallot> paperBallots = new ConcurrentQueue<PaperBallot>();
 
-            Parallel.For(0, numberOfBallots, (_) =>
+            Console.WriteLine($"Begin parallel encrypt {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+            Parallel.For(0, numberOfBallots, (i) =>
             {
+                if (i % 100 == 0)
+                {
+                    Console.WriteLine($"Begin encrypt ballot {i} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+                }
                 VirtualBallot ballot1 = ballotTemplate.Encrypt();
                 VirtualBallot ballot2 = ballotTemplate.Encrypt();
 
+                if (i % 100 == 0)
+                {
+                    Console.WriteLine($"End encrypt ballot {i} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+                }
+
                 PaperBallot paperBallot = new PaperBallot(election, ballot1, ballot2);
 
+                if (i % 100 == 0)
+                {
+                    Console.WriteLine($"Begin ballot ipfs store {i} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+                }
                 _publishedBallotRepository.StoreVirtualBallot(ballot1);
                 _publishedBallotRepository.StoreVirtualBallot(ballot2);
 
+                if (i % 100 == 0)
+                {
+                    Console.WriteLine($"End ballot ipfs store {i} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+                }
+
                 paperBallots.Enqueue(paperBallot);
             });
+            Console.WriteLine($"End parallel encrypt {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
 
+            Console.WriteLine($"Begin MongoDb InsertMany {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
             await (_ballotRepository as PaperBallotRepository)!.InsertMany(paperBallots.ToArray());
+            Console.WriteLine($"End MongoDb InsertMany {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
 
+            Console.WriteLine($"Begin SC store {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
             int partitionSize = 60;
+
+            IList<Task> tasks = new List<Task>();
 
             for (int i = 0; i < paperBallots.Count; i += partitionSize)
             {
                 IList<PaperBallot> partition = paperBallots.Skip(i).Take(partitionSize).ToList();
 
-                await _contractRepository.StoreBallotsAsync(election, partition);
+                tasks.Add(_contractRepository.StoreBallotsAsync(election, partition));
             }
+
+            Task.WaitAll(tasks.ToArray());
+            Console.WriteLine($"End SC store {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
         }
 
         /// <inheritdoc cref="IBallotService.PublishBallotEvidence"/>

@@ -43,6 +43,7 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
         {
             CreateMap<PaperBallot, PrintBallotDao>()
                 .ForMember(dest => dest.BallotId, opt => opt.MapFrom(src => src.BallotId))
+                .ForMember(dest => dest.ElectionId, opt => opt.MapFrom(src => src.Election.Id))
                 .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options))
                 .ForMember(dest => dest.Printed, opt => opt.MapFrom(src => src.Printed)); 
 

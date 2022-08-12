@@ -155,6 +155,17 @@ namespace Helverify.VotingAuthority.Application.Services
             return electionResults;
         }
 
+        /// <inheritdoc cref="IElectionService.GetElectionNumbersAsync"/>
+        public async Task<ElectionNumbers> GetElectionNumbersAsync(string electionId)
+        {
+            Election election = await GetAsync(electionId);
+
+            int numberOfBallots = await _contractRepository.GetNumberOfBallotsAsync(election);
+            int numberOfCastBallots = await _contractRepository.GetNumberOfCastBallotsAsync(election);
+
+            return new ElectionNumbers(numberOfBallots, numberOfCastBallots);
+        }
+
         /// <summary>
         /// Decrypts a single ciphertext cooperatively
         /// </summary>

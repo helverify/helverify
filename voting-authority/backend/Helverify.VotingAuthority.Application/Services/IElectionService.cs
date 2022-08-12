@@ -70,4 +70,11 @@ public interface IElectionService
     /// <param name="electionId">Election identifier</param>
     /// <returns></returns>
     Task<ElectionResults> GetResultsAsync(string electionId);
+
+    /// <summary>
+    /// Retrieves election statistics (ballot numbers)
+    /// </summary>
+    /// <param name="electionId">Election identifier</param>
+    /// <returns></returns>
+    Task<ElectionNumbers> GetElectionNumbersAsync(string electionId);
 }

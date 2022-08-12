@@ -28,6 +28,8 @@ namespace Helverify.VotingAuthority.Domain.Template
         /// </summary>
         public PaperBallot PaperBallot { get; }
 
+        private byte[] _qrCode;
+
 
         static PaperBallotTemplate()
         {
@@ -43,6 +45,7 @@ namespace Helverify.VotingAuthority.Domain.Template
         {
             Election = election;
             PaperBallot = paperBallot;
+            _qrCode = GenerateQrCode();
         }
 
         /// <inheritdoc cref="IDocument.GetMetadata"/>
@@ -51,7 +54,16 @@ namespace Helverify.VotingAuthority.Domain.Template
         /// <inheritdoc cref="IDocument.Compose"/>
         public void Compose(IDocumentContainer container)
         {
-            container.Page(page =>
+            // Page 1: ballot original
+            container.Page(CreateBallotPage(false));
+
+            // Page 2: ballot copy
+            container.Page(CreateBallotPage(true));
+        }
+
+        private Action<PageDescriptor> CreateBallotPage(bool isCopy)
+        {
+            return page =>
             {
                 page.Size(PageSizes.A5.Landscape());
                 page.Margin(1, Unit.Centimetre);
@@ -60,9 +72,8 @@ namespace Helverify.VotingAuthority.Domain.Template
 
                 page.Header().Element(ComposeHeader);
 
-                page.Content().Element(ComposeContent);
-
-            });
+                page.Content().Element(container1 => ComposeContent(container1, isCopy));
+            };
         }
 
         private void ComposeHeader(IContainer container)
@@ -76,17 +87,26 @@ namespace Helverify.VotingAuthority.Domain.Template
 
                     c.Item().Text(Election.Question).SemiBold();
                 });
-                r.ConstantItem(80).Height(80).Image(GenerateQrCode());
+                r.ConstantItem(80).Height(80).Image(_qrCode);
             });
         }
 
-        private void ComposeContent(IContainer container)
+        private void ComposeContent(IContainer container, bool isCopy)
         {
             container.Column(c =>
             {
+                if (isCopy)
+                {
+                    c.Item().Element(ComposeCopy);
+                }
                 c.Item().Element(ComposeChoices);
                 c.Item().Element(ComposeBallotCode);
             });
+        }
+
+        private void ComposeCopy(IContainer container)
+        {
+            container.Unconstrained().PaddingHorizontal(5.5f, Unit.Centimetre).Text("COPY").FontSize(100).FontColor("#d95d5d");
         }
 
         private void ComposeChoices(IContainer container)

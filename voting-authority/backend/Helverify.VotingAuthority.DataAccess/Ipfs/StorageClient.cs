@@ -31,7 +31,7 @@ namespace Helverify.VotingAuthority.DataAccess.Ipfs
             string json = JsonConvert.SerializeObject(obj, _serializerSettings);
 
             IFileSystemNode fileSystemNode = await _ipfsClient.FileSystem.AddTextAsync(json);
-            
+
             return fileSystemNode.Id.ToString();
         }
 

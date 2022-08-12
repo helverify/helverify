@@ -47,7 +47,7 @@ namespace Helverify.VotingAuthority.Backend.Controllers
         {
             Election election = await _electionService.GetAsync(electionId);
 
-            IList<PaperBallot> paperBallots = await _ballotService.GetAsync(numberOfBallots);
+            IList<PaperBallot> paperBallots = await _ballotService.GetAsync(election, numberOfBallots);
 
             if (!paperBallots.Any())
             {

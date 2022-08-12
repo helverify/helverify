@@ -1,31 +1,31 @@
-import {SetupStepProps} from "./electionSetupStep";
+import {ProcessStepProps} from "./processStep";
 import {
-    Backdrop,
-    Button, Card, CircularProgress,
+    Box,
+    Button,
     FormControl,
-    Grid,
     IconButton,
     List,
     ListItem,
     ListItemText,
-    ListSubheader,
     Stack,
-    TextField
+    TextField, Tooltip, Typography
 } from "@mui/material";
 import {Add, DeleteForever} from "@mui/icons-material";
 import {BlockchainDto, RegistrationDto} from "../../api/Api";
 import {useEffect, useState} from "react";
 import {apiClient} from "../../api/apiClient";
+import {ProgressWithLabel} from "../progress/ProgressWithLabel";
 
-export const BlockchainForm = (props: SetupStepProps) => {
+export const BlockchainForm = (props: ProcessStepProps) => {
     const styleVariant = "standard";
-    const stylingParams = {minWidth: 200};
+    const stylingParams = {width: "100%"};
+    const typographyStyle = {marginTop: "25px", marginBottom: "15px"};
 
     const [isBlockchainDefined, setIsBlockchainDefined] = useState<boolean>(false);
 
     const [isLoading, setLoading] = useState<boolean>(false);
 
-    const [blockchain, setBlockchain] = useState<BlockchainDto>({ name: "", registrations: []});
+    const [blockchain, setBlockchain] = useState<BlockchainDto>({name: "", registrations: []});
 
     const [currentRegistration, setCurrentRegistration] = useState<RegistrationDto>({name: "", endpoint: ""});
 
@@ -60,7 +60,7 @@ export const BlockchainForm = (props: SetupStepProps) => {
     }
 
     const updateBlockchain = (newRegistrations: RegistrationDto[]) => {
-        let newBlockchain: BlockchainDto = { registrations: newRegistrations};
+        let newBlockchain: BlockchainDto = {registrations: newRegistrations};
 
         setBlockchain((oldBlockchain) => ({...oldBlockchain, ...newBlockchain}));
     }
@@ -81,10 +81,15 @@ export const BlockchainForm = (props: SetupStepProps) => {
         updateBlockchain(registrationsClone);
     }
 
+    const isBlockchainValid = () => {
+        return blockchain.name !== undefined && blockchain.name !== null && blockchain.name.length > 0
+            && blockchain.registrations !== undefined && blockchain.registrations !== null && blockchain.registrations.length > 0;
+    }
+
     const registerNodes = () => {
-        if(isBlockchainDefined){
-            console.log(blockchain);
+        if (isBlockchainDefined) {
             props.next({}, blockchain);
+            return;
         }
 
         setLoading(true);
@@ -96,9 +101,15 @@ export const BlockchainForm = (props: SetupStepProps) => {
         });
     }
 
+    const onKeyDown = (evnt: any) => {
+        if (evnt.keyCode === 13) { // https://stackoverflow.com/questions/43384039/how-to-get-the-textfield-value-when-enter-key-is-pressed-in-react
+            addRegistration();
+        }
+    };
+
     useEffect(() => {
         apiClient().api.blockchainList().then((result) => {
-            if(result.data.id !== undefined && result.data.id !== null){
+            if (result.data.id !== undefined && result.data.id !== null) {
                 setBlockchain(result.data);
                 setRegistrations(result.data.registrations ?? []);
                 setIsBlockchainDefined(true);
@@ -108,80 +119,93 @@ export const BlockchainForm = (props: SetupStepProps) => {
 
     return (
         <>
-            <Backdrop open={isLoading}>
-                <CircularProgress />
-            </Backdrop>
-            <Grid container spacing={1}>
-                <Grid item xs={6}>
-                    <Card>
-                        <Stack direction="column" spacing={1} sx={{m: 2}}>
-                            <FormControl>
-                                <FormControl>
-                                    <TextField fullWidth id="blockchain-name"
+            <Box>
+                <Typography variant={"h5"} style={typographyStyle}>Blockchain Configuration</Typography>
+                <Typography>The first step we need to perform is to set up a Proof-of-Authority Blockchain network. For this purpose, you need to specify which consensus nodes are supposed to run the network. Note that this step can be skipped if you have already set up a Blockchain network before.</Typography>
+                <Stack direction="column" spacing={1} style={{marginTop: "10px"}}>
+                    <FormControl variant={styleVariant} sx={stylingParams}>
+                        <Tooltip
+                            title={"Please provide a name for the new Blockchain."}
+                            arrow
+                        >
+                            <TextField fullWidth
+                                       required
+                                       id="blockchain-name"
+                                       name="name"
+                                       label="Blockchain Name"
+                                       variant={styleVariant}
+                                       value={blockchain.name}
+                                       onChange={handleBlockchainChange}
+                                       disabled={isBlockchainDefined}
+                            />
+                        </Tooltip>
+                        <Stack direction="column" spacing={1}>
+                            <Typography variant={"h5"} style={typographyStyle}>Consensus Nodes</Typography>
+                            <Stack direction="row" spacing={1} style={{marginBottom: "15px"}}>
+                                <Tooltip
+                                    title={"Name a particular consensus node (e.g., name of the municipality running the consensus node)"}
+                                    arrow
+                                >
+                                    <TextField fullWidth id="consensus-node-name"
+                                               required
                                                name="name"
+                                               label="Name"
                                                variant={styleVariant}
-                                               value={blockchain.name}
-                                               onChange={handleBlockchainChange}
+                                               value={currentRegistration.name}
+                                               onChange={handleChange}
                                                disabled={isBlockchainDefined}
                                     />
-                                </FormControl>
-                                <Stack direction="row" spacing={1} sx={{m: 2}}>
-                                    <FormControl variant={styleVariant} sx={stylingParams}>
-                                        <TextField fullWidth id="consensus-node-name"
-                                                   name="name"
-                                                   label="Name"
-                                                   variant={styleVariant}
-                                                   value={currentRegistration.name}
-                                                   onChange={handleChange}
-                                                   disabled={isBlockchainDefined}
-                                        />
-                                    </FormControl>
-                                    <FormControl variant={styleVariant} sx={stylingParams}>
-                                        <TextField
-                                            fullWidth
-                                            id="consensus-node-endpoint"
-                                            name="endpoint"
-                                            label="Endpoint"
-                                            variant={styleVariant}
-                                            value={currentRegistration.endpoint}
-                                            onChange={handleChange}
-                                            disabled={isBlockchainDefined}
-                                        />
-                                    </FormControl>
-                                    <FormControl variant={styleVariant}>
-                                        <Button id="consensus-node-add"
-                                                variant="outlined"
-                                                onClick={addRegistration}
-                                                disabled={isBlockchainDefined}
-                                        ><Add/></Button>
-                                    </FormControl>
-                                </Stack>
-                                <Button variant="contained" onClick={registerNodes}>Next</Button>
-                            </FormControl>
+                                </Tooltip>
+                                <Tooltip
+                                    title={"Endpoint address of a consensus node. If you want to connect to a local docker network, use \"host.docker.internal\" instead of \"localhost\" as a hostname."}
+                                    arrow
+                                >
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        id="consensus-node-endpoint"
+                                        name="endpoint"
+                                        label="Endpoint"
+                                        variant={styleVariant}
+                                        value={currentRegistration.endpoint}
+                                        onChange={handleChange}
+                                        onKeyDown={onKeyDown}
+                                        disabled={isBlockchainDefined}
+                                    />
+                                </Tooltip>
+                            </Stack>
+                            <Button id="consensus-node-add"
+                                    variant="outlined"
+                                    onClick={addRegistration}
+                                    disabled={isBlockchainDefined}
+                            ><Add/></Button>
                         </Stack>
-                    </Card>
-                </Grid>
-                <Grid item xs={6}>
-                    <Card>
-                        <List>
-                            <ListSubheader component="div">Consensus Nodes</ListSubheader>
-                            {registrations.map((node, index) => {
-                                return (
-                                    <ListItem key={index}
-                                              secondaryAction={<IconButton
-                                                  disabled={isBlockchainDefined}
-                                                  onClick={() => removeRegistration(index)}>
-                                                  <DeleteForever/>
-                                              </IconButton>}
-                                    >
-                                        <ListItemText>{node.name} - {node.endpoint}</ListItemText>
-                                    </ListItem>
-                                )
-                            })}
-                        </List>
-                    </Card>
-                </Grid>
-            </Grid>
+                    </FormControl>
+                </Stack>
+            </Box>
+            <Box>
+                <List>
+                    {registrations.map((node, index) => {
+                        return (
+                            <ListItem key={index}
+                                      secondaryAction={
+                                          <IconButton
+                                              disabled={isBlockchainDefined}
+                                              onClick={() => removeRegistration(index)}>
+                                              <DeleteForever/>
+                                          </IconButton>
+                                      }
+                            >
+                                <ListItemText>{node.name} - {node.endpoint}</ListItemText>
+                            </ListItem>
+                        )
+                    })}
+                </List>
+            </Box>
+            <Box display="flex" alignItems="right" justifyContent="right">
+                <Button variant="contained" onClick={registerNodes} disabled={!isBlockchainValid()}>Next</Button>
+            </Box>
+            <ProgressWithLabel isLoading={isLoading} label="Setting up blockchain"/>
         </>
     );
 };

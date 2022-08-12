@@ -1,9 +1,17 @@
 import {SpoiltBallot} from "../ballot/spoiltBallot";
-import {Avatar, Box, Card, Stack, Typography} from "@mui/material";
+import {
+    Avatar,
+    Box,
+    Card,
+    Divider,
+    Stack,
+    Typography
+} from "@mui/material";
 import {EncryptedBallot} from "../ballot/encryptedBallot";
 import {ElectionParameters} from "../election/election";
 import {ValidityIcon} from "./ValidityIcon";
 import {BallotService} from "../services/ballotService";
+import React from "react";
 
 export type SpoiltBallotViewProps = {
     ballot: SpoiltBallot;
@@ -23,27 +31,28 @@ export const SpoiltBallotView = (props: SpoiltBallotViewProps) => {
 
     return (
         <Card>
-            <Box sx={{m: 1}}>
+            <Box sx={{m: 2}}>
                 <Stack direction="column" spacing={1}>
-                    <Typography variant={"h4"}>Spoilt Ballot</Typography>
-                    <Typography variant={"h5"}>Options</Typography>
+                    <Typography variant={"h5"}>Spoilt Column Options</Typography>
                     {props.ballot.options.sort((a, b) => a.position - b.position).map((o, index) => {
                         return (
                             <Stack key={index} direction="row" spacing={2}>
-                                <Avatar style={{
+                                <Avatar key={index} style={{
                                     backgroundColor: "#3a3a3a",
-                                    color: "#FFFFFF",
-                                    width: "25px",
-                                    height: "25px"
+                                    color: "#FFFFFF"
                                 }}>
-                                    <Typography variant="overline">{o.shortCode}</Typography>
+                                    <Typography variant="h6" fontWeight={"bold"}>{o.shortCode}</Typography>
                                 </Avatar>
-                                <Typography color="text.secondary">{o.name}</Typography>
+                                <Typography variant="h6">{o.name}</Typography>
                             </Stack>
                         )
                     })}
-                    <Typography variant="h5">Correct re-encryption?</Typography>
-                    <ValidityIcon isValid={verifyEncryption()}/>
+                    <Divider/>
+                    <Stack direction="row" spacing={1}>
+                        <ValidityIcon isValid={verifyEncryption()}/>
+                        <Typography style={{marginTop: "5px"}}>Does re-encrypting the spoilt column result in the same
+                            encryption?</Typography>
+                    </Stack>
                 </Stack>
             </Box>
         </Card>

@@ -121,7 +121,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             };
 
             PaperBallot paperBallot = (await contract.QueryDeserializingToObjectAsync<RetrieveBallotFunction, RetrieveBallotOutputDTO>(retrieveBallotFunction)).ReturnValue1;
-            
+
             return new List<PublishedBallot>
             {
                 new ()
@@ -175,10 +175,22 @@ namespace Helverify.VotingAuthority.Domain.Repository
             ContractHandler contract = await GetContractHandlerAsync(election);
 
             GetNumberOfBallotsFunction getNumberOfBallotsFunction = new GetNumberOfBallotsFunction();
-            
+
             int numberOfBallots = await contract.QueryAsync<GetNumberOfBallotsFunction, int>(getNumberOfBallotsFunction);
 
             return numberOfBallots;
+        }
+
+        /// <inheritdoc cref="IElectionContractRepository.GetNumberOfCastBallotsAsync"/>
+        public async Task<int> GetNumberOfCastBallotsAsync(Election election)
+        {
+            ContractHandler contract = await GetContractHandlerAsync(election);
+
+            GetNumberOfCastBallotsFunction getNumberOfCastBallotsFunction = new GetNumberOfCastBallotsFunction();
+
+            int numberOfCastBallots = await contract.QueryAsync<GetNumberOfCastBallotsFunction, int>(getNumberOfCastBallotsFunction);
+
+            return numberOfCastBallots;
         }
 
         /// <inheritdoc cref="IElectionContractRepository.GetCastBallotAsync"/>
@@ -213,7 +225,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             ContractHandler contract = await GetContractHandlerAsync(election);
 
             List<Result> contractResults = new List<Result>();
-            
+
             for (int i = 0; i < results.Count; i++)
             {
                 contractResults.Add(new Result
@@ -239,15 +251,23 @@ namespace Helverify.VotingAuthority.Domain.Repository
 
             GetResultsFunction getResultsFunction = new GetResultsFunction();
 
-            GetResultsOutputDTO getResultsOutputDto = await contract.QueryAsync<GetResultsFunction, GetResultsOutputDTO>(getResultsFunction);
+            try
+            {
+                GetResultsOutputDTO getResultsOutputDto =
+                    await contract.QueryAsync<GetResultsFunction, GetResultsOutputDTO>(getResultsFunction);
 
-            List<Result> resultsDto = getResultsOutputDto.ReturnValue1;
+                List<Result> resultsDto = getResultsOutputDto.ReturnValue1;
 
-            IList<ElectionResult> electionResults = _mapper.Map<IList<ElectionResult>>(resultsDto);
+                IList<ElectionResult> electionResults = _mapper.Map<IList<ElectionResult>>(resultsDto);
 
-            return new ElectionResults(electionResults);
+                return new ElectionResults(electionResults);
+            }
+            catch (Exception)
+            {
+                return new ElectionResults(new List<ElectionResult>());
+            }
         }
-        
+
         private async Task<ContractHandler> GetContractHandlerAsync(Election election)
         {
             IWeb3 web3 = _web3Loader.Web3Instance;

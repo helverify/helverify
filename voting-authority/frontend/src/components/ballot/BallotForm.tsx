@@ -1,6 +1,13 @@
-import {BallotFormProps} from "./ballotForm";
-import {useState} from "react";
-import {Backdrop, Button, Card, CircularProgress, FormControl, Grid, Stack, TextField} from "@mui/material";
+import React, {useState} from "react";
+import {Box, Button, FormControl, Stack, TextField} from "@mui/material";
+import {ProgressWithLabel} from "../progress/ProgressWithLabel";
+
+export type BallotFormProps = {
+    buttonCaption: string,
+    loadingLabel: string,
+    buttonAction: (numberOfBallots: number) => void,
+    isLoading: boolean
+}
 
 export const BallotForm = (props: BallotFormProps) => {
 
@@ -19,26 +26,19 @@ export const BallotForm = (props: BallotFormProps) => {
 
     return (
         <>
-            <Backdrop open={props.isLoading}>
-                <CircularProgress/>
-            </Backdrop>
-            <Grid container spacing={1}>
-
-                <Card>
-                    <Stack direction="column" spacing={1} sx={{m: 2}}>
-                        <FormControl>
-                            <TextField id="numberOfBallots"
-                                       label="Number of Ballots"
-                                       variant={styleVariant}
-                                       value={numberOfBallots}
-                                       onChange={handleChange}/>
-                        </FormControl>
-                        <FormControl>
-                            <Button variant="contained" onClick={submit}>{props.buttonCaption}</Button>
-                        </FormControl>
-                    </Stack>
-                </Card>
-            </Grid>
+            <Stack direction="column" spacing={1} sx={{m: 2}}>
+                <FormControl>
+                    <TextField id="numberOfBallots"
+                               label="Number of Ballots"
+                               variant={styleVariant}
+                               value={numberOfBallots}
+                               onChange={handleChange}/>
+                </FormControl>
+                <Box display="flex" alignItems="right" justifyContent="right">
+                    <Button variant="contained" onClick={submit}>{props.buttonCaption}</Button>
+                </Box>
+            </Stack>
+            <ProgressWithLabel isLoading={props.isLoading} label={props.loadingLabel}/>
         </>
     );
 };
