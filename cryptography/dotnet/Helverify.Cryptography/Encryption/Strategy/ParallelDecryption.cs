@@ -18,7 +18,7 @@ namespace Helverify.Cryptography.Encryption.Strategy
 
             try
             {
-                Parallel.For(0, 10000000, new ParallelOptions { MaxDegreeOfParallelism = 4, CancellationToken = tokenSource.Token }, (i, _) =>
+                Parallel.For(0, 10000000, new ParallelOptions { CancellationToken = tokenSource.Token }, (i, _) =>
                 {
                     BigInteger exponent = new BigInteger(i.ToString(), 10);
                     BigInteger candidate = g.ModPow(exponent, p).Mod(p);
