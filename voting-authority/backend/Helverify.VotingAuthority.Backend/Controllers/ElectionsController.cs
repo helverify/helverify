@@ -179,5 +179,21 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             return Ok(electionResultsDto);
         }
+
+        /// <summary>
+        /// Returns the current election statistics, such as ballot counts.
+        /// </summary>
+        /// <param name="id">Election identifier</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{id}/statistics")]
+        public async Task<ActionResult<ElectionStatisticsDto>> GetElectionStatistics([FromRoute] string id)
+        {
+            ElectionNumbers electionNumbers = await _electionService.GetElectionNumbersAsync(id);
+
+            ElectionStatisticsDto electionStatisticsDto = _mapper.Map<ElectionStatisticsDto>(electionNumbers);
+
+            return Ok(electionStatisticsDto);
+        }
     }
 }

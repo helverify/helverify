@@ -77,6 +77,13 @@ public interface IElectionContractRepository
     Task<int> GetNumberOfBallotsAsync(Election election);
 
     /// <summary>
+    /// Returns the number of cast ballots registered on the smart contract.
+    /// </summary>
+    /// <param name="election">Election</param>
+    /// <returns></returns>
+    Task<int> GetNumberOfCastBallotsAsync(Election election);
+
+    /// <summary>
     /// Returns the selection and storage location of a cast ballot.
     /// </summary>
     /// <param name="ballotId">Ballot identifier</param>

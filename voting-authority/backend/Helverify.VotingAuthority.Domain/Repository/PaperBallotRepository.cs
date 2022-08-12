@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Helverify.VotingAuthority.DataAccess.Dao;
 using Helverify.VotingAuthority.DataAccess.Database;
+using Helverify.VotingAuthority.Domain.Model;
 using Helverify.VotingAuthority.Domain.Model.Paper;
 using MongoDB.Driver;
 
@@ -52,6 +53,20 @@ namespace Helverify.VotingAuthority.Domain.Repository
 
             IList<PaperBallot> paperBallots = _mapper.Map<IList<PaperBallot>>(printBallotDaos);
             
+            return paperBallots;
+        }
+
+        /// <summary>
+        /// Load paper ballots by election
+        /// </summary>
+        /// <param name="election">Current election</param>
+        /// <returns></returns>
+        public async Task<IList<PaperBallot>> GetByElectionAsync(Election election)
+        {
+            IList<PrintBallotDao> printBallotDaos = (await _mongoService.Collection.FindAsync(pb => pb.ElectionId == election.Id)).ToList();
+
+            IList<PaperBallot> paperBallots = _mapper.Map<IList<PaperBallot>>(printBallotDaos);
+
             return paperBallots;
         }
 

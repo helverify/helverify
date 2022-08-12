@@ -52,11 +52,13 @@ contract Election {
 
     mapping(string => CastBallot) public castBallots;
 
-    Result[] public results;
-
     mapping(uint => string) public options;
 
+    Result[] public results;
+
     string public resultEvidenceIpfs;
+
+    uint public numberOfCastBallots;
     
     constructor (){
         votingAuthority = msg.sender;
@@ -117,6 +119,10 @@ contract Election {
             revert("Ballot code provided does not match with stored ballot information.");
         }
 
+        if(bytes(castBallots[ballotId].ballotId).length == 0){
+            numberOfCastBallots++; // only increment number of cast ballots the first time the choice is registered
+        }
+
         castBallots[ballotId] = CastBallot(ballotId, ballotCode, ballotIpfs, shortCodes);
     }
 
@@ -168,6 +174,10 @@ contract Election {
 
     function getNumberOfBallots() public view returns (uint) {
         return ballotIds.length;
+    }
+
+    function getNumberOfCastBallots() public view returns (uint) {
+        return numberOfCastBallots;
     }
 
     function getResults() public view returns (Result[] memory){

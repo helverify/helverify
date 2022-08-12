@@ -34,6 +34,8 @@ namespace Helverify.VotingAuthority.Application.Services
 
             foreach (PaperBallot paperBallot in paperBallots)
             {
+                paperBallot.Election = election;
+
                 await _ballotRepository.UpdateAsync(paperBallot.BallotId, paperBallot);
             }
 

@@ -181,6 +181,18 @@ namespace Helverify.VotingAuthority.Domain.Repository
             return numberOfBallots;
         }
 
+        /// <inheritdoc cref="IElectionContractRepository.GetNumberOfCastBallotsAsync"/>
+        public async Task<int> GetNumberOfCastBallotsAsync(Election election)
+        {
+            ContractHandler contract = await GetContractHandlerAsync(election);
+
+            GetNumberOfCastBallotsFunction getNumberOfCastBallotsFunction = new GetNumberOfCastBallotsFunction();
+
+            int numberOfCastBallots = await contract.QueryAsync<GetNumberOfCastBallotsFunction, int>(getNumberOfCastBallotsFunction);
+
+            return numberOfCastBallots;
+        }
+
         /// <inheritdoc cref="IElectionContractRepository.GetCastBallotAsync"/>
         public async Task<Tuple<PublishedBallot, IList<string>>> GetCastBallotAsync(Election election, string ballotId)
         {

@@ -18,9 +18,10 @@ public interface IBallotService
     /// <summary>
     /// Returns the specified number of unprinted ballots
     /// </summary>
+    /// <param name="election">Current election</param>
     /// <param name="numberOfBallots">Number of ballots to print</param>
     /// <returns></returns>
-    Task<IList<PaperBallot>> GetAsync(int numberOfBallots);
+    Task<IList<PaperBallot>> GetAsync(Election election, int numberOfBallots);
 
     /// <summary>
     /// Generates the specified number of new ballots.
