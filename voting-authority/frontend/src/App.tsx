@@ -95,7 +95,7 @@ function App() {
                                                     onClick={() => navigate("/elections")}/>
                             <BottomNavigationAction label="Blockchain Settings" icon={<Settings/>}
                                                     onClick={() => navigate("/settings")}/>
-                            <BottomNavigationAction label="Ballot Scanning" icon={<QrCodeScanner/>}
+                            <BottomNavigationAction label="Tallying" icon={<QrCodeScanner/>}
                                                     onClick={() => navigate("/ballots/scan")}/>
                         </BottomNavigation>
                     </Box>

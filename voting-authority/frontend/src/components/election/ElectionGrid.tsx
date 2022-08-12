@@ -1,24 +1,26 @@
 import {ElectionDto, ElectionOptionDto} from "../../api/Api";
 import {
     Avatar,
-    Box, Button,
-    Card, CardActions,
+    Box,
+    Button,
+    Card,
+    CardActions,
     CardContent,
     CardHeader,
-    Chip, Divider,
-    Grid, Modal,
+    Chip,
+    Divider,
+    Grid,
+    Modal,
     TextField,
     Tooltip,
     Typography
 } from "@mui/material";
 
-import {Ballot, Functions, HowToVote, Key, Link, PieChart, Print} from "@mui/icons-material";
+import {Ballot, Functions, HowToVote, Key, Link, Print} from "@mui/icons-material";
 import {ClipboardCopy} from "../../ClipboardCopy";
 import {ElectionResults} from "./ElectionResults";
-import {apiClient} from "../../api/apiClient";
 import {useState} from "react";
 import {useErrorHandler} from "react-error-boundary";
-import {ProgressWithLabel} from "../progress/ProgressWithLabel";
 import {BallotCreateForm} from "../ballot/BallotCreateForm";
 import {BallotPrintForm} from "../ballot/BallotPrintForm";
 
@@ -34,7 +36,6 @@ export const ElectionGrid = (props: ElectionGridProps) => {
         return !(property === undefined || property === null || property.length === 0);
     }
 
-    const [isLoading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>();
     const [ballotCreateOpen, setBallotCreateOpen] = useState<boolean>(false);
     const [ballotPrintOpen, setBallotPrintOpen] = useState<boolean>(false);
@@ -58,19 +59,6 @@ export const ElectionGrid = (props: ElectionGridProps) => {
     useErrorHandler(error);
 
     const options = areOptionsSet(props.election.options) ? props.election.options : [];
-
-    const calculateResult = (electionId: string) => {
-        if (electionId === "") {
-            return;
-        }
-        setLoading(true);
-        apiClient().api.electionsTallyCreate(electionId).then((result) => {
-            setLoading(false);
-            if (result.status !== 200) {
-                setError(result.error);
-            }
-        });
-    };
 
     return (
         <>
@@ -105,12 +93,6 @@ export const ElectionGrid = (props: ElectionGridProps) => {
                                     aria-label={"Print Ballots"}
                                     variant="contained"
                             ><Print/>&nbsp;Print Ballots</Button>
-
-                            <Button size={"medium"}
-                                    onClick={() => calculateResult(props.election.id ?? "")}
-                                    aria-label={"Calculate & Publish Results"}
-                                    variant="contained"
-                            ><PieChart/>&nbsp;Publish Results</Button>
                         </CardActions>
                     </Card>
                 </Grid>
@@ -175,8 +157,6 @@ export const ElectionGrid = (props: ElectionGridProps) => {
                         </CardContent>
                     </Card>
                 </Grid>
-
-
                 <Grid item xs={12} sm={12} md={6} lg={3} xl={3} style={gridItemStyle}>
                     <Card style={cardItemStyle}>
                         <CardHeader title={
@@ -201,7 +181,6 @@ export const ElectionGrid = (props: ElectionGridProps) => {
                         </CardContent>
                     </Card>
                 </Grid>
-
                 <Grid item xs={12} sm={12} md={12} lg={12} xl={12} style={gridItemStyle}>
                     <Card style={cardItemStyle}>
                         <CardHeader title={
@@ -217,15 +196,12 @@ export const ElectionGrid = (props: ElectionGridProps) => {
                             <Box>
                                 <ElectionResults
                                     electionId={props.election.id ?? ""}
-                                    isLoading={isLoading}
                                     setError={setError}/>
                             </Box>
                         </CardContent>
                     </Card>
                 </Grid>
             </Grid>
-
-            <ProgressWithLabel isLoading={isLoading} label="Publishing election results"/>
             <Modal open={ballotCreateOpen} onClose={closeBallotCreateForm}>
                 <>
                     <BallotCreateForm electionId={props.election.id ?? ""} close={closeBallotCreateForm}/>

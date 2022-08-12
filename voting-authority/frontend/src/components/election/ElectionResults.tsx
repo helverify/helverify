@@ -9,7 +9,6 @@ import {DataGrid, GridColDef} from "@mui/x-data-grid";
 
 type ElectionResultsProps = {
     electionId: string,
-    isLoading: boolean,
     setError: (error: string | undefined) => void;
 }
 
@@ -20,9 +19,6 @@ export const ElectionResults = (props: ElectionResultsProps) => {
     const [electionResults, setElectionResults] = useState<ElectionResultsDto>({results: []});
 
     useEffect(() => {
-            if (props.isLoading) {
-                return;
-            }
             apiClient().api.electionsResultsDetail(props.electionId).then((result) => {
                 if (!!result.error) {
                     props.setError(result.error);
@@ -38,7 +34,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
 
                 setColors(optionColors);
             });
-        }, [props, props.electionId, props.isLoading]
+        }, [props, props.electionId]
     );
 
     const results = electionResults.results !== undefined &&
