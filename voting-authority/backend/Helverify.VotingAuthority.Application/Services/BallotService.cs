@@ -57,44 +57,21 @@ namespace Helverify.VotingAuthority.Application.Services
 
             ConcurrentQueue<PaperBallot> paperBallots = new ConcurrentQueue<PaperBallot>();
 
-            Console.WriteLine($"Begin parallel encrypt {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
             Parallel.For(0, numberOfBallots, (i) =>
             {
-                if (i % 100 == 0)
-                {
-                    Console.WriteLine($"Begin encrypt ballot {i} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
-                }
                 VirtualBallot ballot1 = ballotTemplate.Encrypt();
                 VirtualBallot ballot2 = ballotTemplate.Encrypt();
-
-                if (i % 100 == 0)
-                {
-                    Console.WriteLine($"End encrypt ballot {i} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
-                }
-
+                
                 PaperBallot paperBallot = new PaperBallot(election, ballot1, ballot2);
-
-                if (i % 100 == 0)
-                {
-                    Console.WriteLine($"Begin ballot ipfs store {i} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
-                }
+                
                 _publishedBallotRepository.StoreVirtualBallot(ballot1);
                 _publishedBallotRepository.StoreVirtualBallot(ballot2);
 
-                if (i % 100 == 0)
-                {
-                    Console.WriteLine($"End ballot ipfs store {i} {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
-                }
-
                 paperBallots.Enqueue(paperBallot);
             });
-            Console.WriteLine($"End parallel encrypt {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
-
-            Console.WriteLine($"Begin MongoDb InsertMany {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+            
             await (_ballotRepository as PaperBallotRepository)!.InsertMany(paperBallots.ToArray());
-            Console.WriteLine($"End MongoDb InsertMany {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
-
-            Console.WriteLine($"Begin SC store {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+            
             int partitionSize = 60;
 
             IList<Task> tasks = new List<Task>();
@@ -107,7 +84,6 @@ namespace Helverify.VotingAuthority.Application.Services
             }
 
             Task.WaitAll(tasks.ToArray());
-            Console.WriteLine($"End SC store {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
         }
 
         /// <inheritdoc cref="IBallotService.PublishBallotEvidence"/>
@@ -127,10 +103,9 @@ namespace Helverify.VotingAuthority.Application.Services
             {
                 throw ex;
             }
-            Console.WriteLine($"DEBUG -- Before decrypt ballot: {DateTime.Now:hh:mm:ss.FFF}");
+            
             VirtualBallot virtualBallot = await DecryptBallot(election, ballotId, spoiltBallotIndex);
-            Console.WriteLine($"DEBUG -- After decrypt ballot: {DateTime.Now:hh:mm:ss.FFF}");
-
+            
             string cid = _publishedBallotRepository.StoreSpoiltBallot(virtualBallot, paperBallot.GetRandomness(spoiltBallotIndex));
             
             await _contractRepository.SpoilBallotAsync(paperBallot.BallotId, virtualBallot.Code, election, cid);

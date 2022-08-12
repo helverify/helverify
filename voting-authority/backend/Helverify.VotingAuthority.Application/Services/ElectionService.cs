@@ -211,7 +211,6 @@ namespace Helverify.VotingAuthority.Application.Services
 
             while (index < numberOfBallots)
             {
-                Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} BEGIN - Partition {index}");
                 Tuple<IList<string>, int> result =
                     await _contractRepository.GetBallotIdsAsync(election, index, partitionSize);
 
@@ -222,26 +221,19 @@ namespace Helverify.VotingAuthority.Application.Services
                         return;
                     }
 
-                    Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} BEGIN - GetCastBallot {ballotId}");
                     Tuple<PublishedBallot, IList<string>> ballotResult =
                         await _contractRepository.GetCastBallotAsync(election, ballotId);
-                    Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} END - GetCastBallot {ballotId}");
-
+                
                     if (!string.IsNullOrEmpty(ballotResult.Item1.IpfsCid))
                     {
-                        Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} BEGIN - RetrieveVirtualBallot {ballotId}");
                         VirtualBallot virtualBallot =
                             _publishedBallotRepository.RetrieveVirtualBallot(ballotResult.Item1.IpfsCid);
-                        Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} END - RetrieveVirtualBallot {ballotId}");
-
-                        Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} BEGIN - GetSelectedEncryptions {ballotId}");
+                        
                         Parallel.ForEach(virtualBallot.GetSelectedEncryptions(ballotResult.Item2),
                             (selectedEncryption, _) => { selectedEncryptedOptions.Enqueue(selectedEncryption); });
-                        Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} END - GetSelectedEncryptions {ballotId}");
                     }
                 });
 
-                Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} END - Partition {index}");
                 index += partitionSize;
             }
 
