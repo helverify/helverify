@@ -167,6 +167,23 @@ export interface ElectionResultsDto {
 }
 
 /**
+ * Election statistics
+ */
+export interface ElectionStatisticsDto {
+    /**
+     * Number of ballots created in total
+     * @format int32
+     */
+    numberOfBallotsTotal?: number;
+
+    /**
+     * Number of ballots already cast
+     * @format int32
+     */
+    numberOfBallotsCast?: number;
+}
+
+/**
  * Parameters for publishing voting evidence.
  */
 export interface EvidenceDto {
@@ -695,6 +712,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         electionsResultsDetail: (id: string, params: RequestParams = {}) =>
             this.request<ElectionResultsDto, any>({
                 path: `/api/elections/${id}/results`,
+                method: "GET",
+                format: "json",
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Elections
+         * @name ElectionsStatisticsDetail
+         * @summary Returns the current election statistics, such as ballot counts.
+         * @request GET:/api/elections/{id}/statistics
+         */
+        electionsStatisticsDetail: (id: string, params: RequestParams = {}) =>
+            this.request<ElectionStatisticsDto, any>({
+                path: `/api/elections/${id}/statistics`,
                 method: "GET",
                 format: "json",
                 ...params,
