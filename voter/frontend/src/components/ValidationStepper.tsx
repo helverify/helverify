@@ -39,6 +39,10 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
     const [evidence, setEvidence] = useState<ResultEvidence>();
     const [electionParameters, setElectionParameters] = useState<ElectionParameters>();
 
+    const [isCaI, setCaI] = useState<boolean>(false);
+    const [isRaC, setRaC] = useState<boolean>(false);
+    const [isTaR, setTaR] = useState<boolean>(false);
+
     const qrData = props.qrData;
 
     useEffect(() => {
@@ -123,6 +127,8 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
                 ballots={ballots}
                 ballotId={qrData.ballotId}
                 electionParameters={electionParameters}
+                isCaI={isCaI}
+                setCaI={(value: boolean) => setCaI(value)}
             />
         },
         {
@@ -133,6 +139,8 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
                 electionParameters={electionParameters}
                 castBallot={castBallot}
                 spoiltBallot={spoiltBallot}
+                isRaC={isRaC}
+                setRaC={(value:boolean) => setRaC(value)}
             />
         },
         {
@@ -143,6 +151,7 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
                 electionParameters={electionParameters}
                 electionResults={electionResults}
                 evidence={evidence}
+                setTaR={(value: boolean) => setTaR(value)}
             />
         },
         {
@@ -151,6 +160,9 @@ export const ValidationStepper = (props: ValidationStepperProps) => {
                 ballots={ballots}
                 electionParameters={electionParameters}
                 ballotId={qrData.ballotId}
+                isCaI={isCaI}
+                isRaC={isRaC}
+                isTaR={isTaR}
             />
         }
     ];

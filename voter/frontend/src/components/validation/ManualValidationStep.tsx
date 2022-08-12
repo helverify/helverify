@@ -1,5 +1,5 @@
 import {ValidationStepProps} from "./validationStep";
-import {Box, Grid, Stack, Typography} from "@mui/material";
+import {Box, Checkbox, Grid, Stack, Typography} from "@mui/material";
 import {CastBallotView} from "../CastBallotView";
 import {CastBallot} from "../../ballot/castBallot";
 import {SpoiltBallot} from "../../ballot/spoiltBallot";
@@ -8,9 +8,15 @@ import {SpoiltBallotView} from "../SpoiltBallotView";
 export type ManualValidationStepProps = ValidationStepProps & {
     castBallot: CastBallot | undefined;
     spoiltBallot: SpoiltBallot | undefined;
+    isRaC: boolean;
+    setRaC: (value: boolean) => void;
 }
 
 export const ManualValidationStep = (props: ManualValidationStepProps) => {
+
+    const handleCheckBoxChange = (event: any) => {
+        props.setRaC(event.target.checked);
+    }
 
     return (
         <Box>
@@ -38,6 +44,10 @@ export const ManualValidationStep = (props: ManualValidationStepProps) => {
                         </Grid>
                     )}
                 </Grid>
+                <Box display={"flex"} alignItems={"center"}>
+                    <Checkbox onChange={handleCheckBoxChange} checked={props.isRaC}/>
+                    <Typography>I confirm that the selected short codes are identical to my selections on the ballot.</Typography>
+                </Box>
             </Stack>
         </Box>
     );

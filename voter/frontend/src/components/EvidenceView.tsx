@@ -8,6 +8,7 @@ import React, {useEffect, useState} from "react";
 export type EvidenceViewProps = {
     electionParameters: ElectionParameters;
     electionEvidence: ResultEvidence;
+    setTaR: (value: boolean) => void;
 }
 
 export const EvidenceView = (props: EvidenceViewProps) => {
@@ -19,6 +20,7 @@ export const EvidenceView = (props: EvidenceViewProps) => {
 
         props.electionEvidence.verifyDecryptionProofs(p, g).then((valid) => {
             setIsValid(valid);
+            props.setTaR(valid);
         });
     }, [props])
 

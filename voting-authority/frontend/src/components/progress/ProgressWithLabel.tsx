@@ -8,7 +8,7 @@ export type ProgressWithLabelProps = {
 export const ProgressWithLabel = (props: ProgressWithLabelProps) => {
     return(
         <>
-            <Backdrop open={props.isLoading}>
+            <Backdrop open={props.isLoading} style={{zIndex: 99}}>
                 <Stack direction="row" spacing={1}>
                     <Typography variant="overline" style={{ marginTop: "4px"}}>{props.label} ...</Typography>
                     <CircularProgress />

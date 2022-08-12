@@ -3,11 +3,13 @@ import {Avatar, Theme} from "@mui/material";
 import React from "react";
 
 export type ValidityIconProps = {
-    isValid: boolean | undefined;
+    isValid: boolean | undefined,
+    size?: number | undefined
 }
 
 export const ValidityIcon = (props: ValidityIconProps) => {
-    const checkStyle = {color: "#00ac00"};
+    const size = `${props.size ?? 30}px`;
+    const checkStyle = {color: "#00ac00", fontSize: size};
     const xmarkStyle = {color: "#ff2913"};
 
     const getThemeStyle = (theme: Theme) => {
@@ -28,7 +30,7 @@ export const ValidityIcon = (props: ValidityIconProps) => {
     return (
         <>
             {props.isValid !== undefined && (
-                <Avatar style={{width: "30px", height: "30px"}} sx={getThemeStyle}>
+                <Avatar style={{width: size, height: size}} sx={getThemeStyle}>
                     {props.isValid ? <Check style={checkStyle}/> :
                         <Close style={xmarkStyle}/>}
                 </Avatar>

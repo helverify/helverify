@@ -9,6 +9,7 @@ import React from "react";
 export type ResultsStepProps = ValidationStepProps & {
     electionResults: ElectionResults | undefined;
     evidence: ResultEvidence | undefined;
+    setTaR: (value: boolean) => void;
 }
 
 export const ResultsStep = (props: ResultsStepProps) => {
@@ -30,6 +31,7 @@ export const ResultsStep = (props: ResultsStepProps) => {
                         <EvidenceView
                             electionEvidence={props.evidence}
                             electionParameters={props.electionParameters}
+                            setTaR={props.setTaR}
                         />
                     </Box>
                 )}
