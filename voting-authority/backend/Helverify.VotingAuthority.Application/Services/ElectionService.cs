@@ -1,4 +1,5 @@
-﻿using Helverify.Cryptography.Encryption;
+﻿using System.Collections.Concurrent;
+using Helverify.Cryptography.Encryption;
 using Helverify.VotingAuthority.DataAccess.Dto;
 using Helverify.VotingAuthority.DataAccess.Ethereum;
 using Helverify.VotingAuthority.Domain.Model;
@@ -56,7 +57,7 @@ namespace Helverify.VotingAuthority.Application.Services
             Election election = await _electionRepository.GetAsync(electionId);
 
             election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
-            
+
             return election;
         }
 
@@ -116,19 +117,20 @@ namespace Helverify.VotingAuthority.Application.Services
         /// <inheritdoc cref="IElectionService.CalculateTallyAsync"/>
         public async Task<IList<DecryptedValue>> CalculateTallyAsync(string electionId)
         {
+            
             Election election = await GetAsync(electionId);
 
             int numberOfBallots = await _contractRepository.GetNumberOfBallotsAsync(election);
-
+            
             int index = 0;
             int partitionSize = 100;
 
             IList<EncryptedOption> selectedEncryptedOptions = await GetEncryptedOptionsAsync(index, numberOfBallots, election, partitionSize);
-
+            
             Tally tally = new Tally(selectedEncryptedOptions);
 
             IList<ElGamalCipher> encryptedResults = tally.CalculateCipherResult(election);
-
+            
             IList<DecryptedValue> results = new List<DecryptedValue>();
 
             foreach (ElGamalCipher cipher in encryptedResults)
@@ -137,11 +139,11 @@ namespace Helverify.VotingAuthority.Application.Services
 
                 results.Add(decryptedValue);
             }
-
+            
             string evidenceCid = _publishedBallotRepository.StoreDecryptedResults(results);
-
+            
             await _contractRepository.PublishResults(election, results, evidenceCid).ConfigureAwait(false);
-
+            
             return results;
         }
 
@@ -202,38 +204,48 @@ namespace Helverify.VotingAuthority.Application.Services
             };
         }
 
-        private async Task<IList<EncryptedOption>> GetEncryptedOptionsAsync(int index, int numberOfBallots, Election election, int partitionSize)
+        private async Task<IList<EncryptedOption>> GetEncryptedOptionsAsync(int index, int numberOfBallots,
+            Election election, int partitionSize)
         {
-            List<EncryptedOption> selectedEncryptedOptions = new List<EncryptedOption>();
+            ConcurrentQueue<EncryptedOption> selectedEncryptedOptions = new ConcurrentQueue<EncryptedOption>();
 
             while (index < numberOfBallots)
             {
-                Tuple<IList<string>, int> result = await _contractRepository.GetBallotIdsAsync(election, index, partitionSize);
+                Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} BEGIN - Partition {index}");
+                Tuple<IList<string>, int> result =
+                    await _contractRepository.GetBallotIdsAsync(election, index, partitionSize);
 
-                foreach (string ballotId in result.Item1)
+                await Parallel.ForEachAsync(result.Item1, async (ballotId, _) =>
                 {
                     if (string.IsNullOrEmpty(ballotId))
                     {
-                        break;
+                        return;
                     }
 
+                    Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} BEGIN - GetCastBallot {ballotId}");
                     Tuple<PublishedBallot, IList<string>> ballotResult =
                         await _contractRepository.GetCastBallotAsync(election, ballotId);
+                    Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} END - GetCastBallot {ballotId}");
 
-                    if (string.IsNullOrEmpty(ballotResult.Item1.IpfsCid))
+                    if (!string.IsNullOrEmpty(ballotResult.Item1.IpfsCid))
                     {
-                        continue;
+                        Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} BEGIN - RetrieveVirtualBallot {ballotId}");
+                        VirtualBallot virtualBallot =
+                            _publishedBallotRepository.RetrieveVirtualBallot(ballotResult.Item1.IpfsCid);
+                        Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} END - RetrieveVirtualBallot {ballotId}");
+
+                        Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} BEGIN - GetSelectedEncryptions {ballotId}");
+                        Parallel.ForEach(virtualBallot.GetSelectedEncryptions(ballotResult.Item2),
+                            (selectedEncryption, _) => { selectedEncryptedOptions.Enqueue(selectedEncryption); });
+                        Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} END - GetSelectedEncryptions {ballotId}");
                     }
+                });
 
-                    VirtualBallot virtualBallot = _publishedBallotRepository.RetrieveVirtualBallot(ballotResult.Item1.IpfsCid);
-
-                    selectedEncryptedOptions.AddRange(virtualBallot.GetSelectedEncryptions(ballotResult.Item2));
-                }
-
+                Console.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} END - Partition {index}");
                 index += partitionSize;
             }
 
-            return selectedEncryptedOptions;
+            return selectedEncryptedOptions.ToList();
         }
     }
 }

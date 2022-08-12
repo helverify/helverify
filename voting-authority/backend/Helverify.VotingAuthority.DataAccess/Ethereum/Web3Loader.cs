@@ -50,6 +50,8 @@ namespace Helverify.VotingAuthority.DataAccess.Ethereum
             instance.Eth.TransactionManager.UseLegacyAsDefault = true;
             
             Web3Instance = instance;
+
+            Task.Run(() => Web3Instance.Personal.UnlockAccount.SendRequestAsync(Account.Address, Password, 0)).Wait();
         }
     }
 }
