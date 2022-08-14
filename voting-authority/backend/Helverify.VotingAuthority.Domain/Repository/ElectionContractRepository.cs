@@ -87,7 +87,37 @@ namespace Helverify.VotingAuthority.Domain.Repository
                 Ballots = ballots
             };
 
-            await contract.SendRequestAsync(storeBallotFunction);
+            await WithRetry(async() => await contract.SendRequestAsync(storeBallotFunction));
+        }
+
+        /// <summary>
+        /// Retry pattern according to: https://docs.microsoft.com/en-us/azure/architecture/patterns/retry
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        private async Task WithRetry(Func<Task> action)
+        {
+            int tries = 0;
+
+            while (true)
+            {
+                try
+                {
+                    await action();
+
+                    break;
+                }
+                catch (Exception)
+                {
+                    if (tries > 10)
+                    {
+                        throw;
+                    }
+
+                    await Task.Delay(200);
+                    tries++;
+                }
+            }
         }
 
         /// <inheritdoc cref="IElectionContractRepository.GetBallotIdsAsync"/>

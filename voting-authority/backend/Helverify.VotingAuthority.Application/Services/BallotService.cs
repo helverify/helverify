@@ -55,35 +55,31 @@ namespace Helverify.VotingAuthority.Application.Services
         {
             BallotTemplate ballotTemplate = election.GenerateBallotTemplate();
 
-            ConcurrentQueue<PaperBallot> paperBallots = new ConcurrentQueue<PaperBallot>();
+            int partitionSize = 100;
 
-            Parallel.For(0, numberOfBallots, (i) =>
+            for (int i = 0; i < numberOfBallots; i += partitionSize)
             {
-                VirtualBallot ballot1 = ballotTemplate.Encrypt();
-                VirtualBallot ballot2 = ballotTemplate.Encrypt();
-                
-                PaperBallot paperBallot = new PaperBallot(election, ballot1, ballot2);
-                
-                _publishedBallotRepository.StoreVirtualBallot(ballot1);
-                _publishedBallotRepository.StoreVirtualBallot(ballot2);
+                ConcurrentQueue<PaperBallot> paperBallots = new ConcurrentQueue<PaperBallot>();
 
-                paperBallots.Enqueue(paperBallot);
-            });
-            
-            await (_ballotRepository as PaperBallotRepository)!.InsertMany(paperBallots.ToArray());
-            
-            int partitionSize = 60;
+                int endIndex = (i + partitionSize) <= numberOfBallots ? partitionSize : (numberOfBallots % partitionSize);
 
-            IList<Task> tasks = new List<Task>();
+                Parallel.For(0, endIndex, (_) =>
+                {
+                    VirtualBallot ballot1 = ballotTemplate.Encrypt();
+                    VirtualBallot ballot2 = ballotTemplate.Encrypt();
 
-            for (int i = 0; i < paperBallots.Count; i += partitionSize)
-            {
-                IList<PaperBallot> partition = paperBallots.Skip(i).Take(partitionSize).ToList();
+                    PaperBallot paperBallot = new PaperBallot(election, ballot1, ballot2);
 
-                tasks.Add(_contractRepository.StoreBallotsAsync(election, partition));
+                    _publishedBallotRepository.StoreVirtualBallot(ballot1);
+                    _publishedBallotRepository.StoreVirtualBallot(ballot2);
+
+                    paperBallots.Enqueue(paperBallot);
+                });
+
+                await (_ballotRepository as PaperBallotRepository)!.InsertMany(paperBallots.ToArray());
+
+                await _contractRepository.StoreBallotsAsync(election, paperBallots.ToList());
             }
-
-            Task.WaitAll(tasks.ToArray());
         }
 
         /// <inheritdoc cref="IBallotService.PublishBallotEvidence"/>
@@ -103,11 +99,11 @@ namespace Helverify.VotingAuthority.Application.Services
             {
                 throw ex;
             }
-            
+
             VirtualBallot virtualBallot = await DecryptBallot(election, ballotId, spoiltBallotIndex);
-            
+
             string cid = _publishedBallotRepository.StoreSpoiltBallot(virtualBallot, paperBallot.GetRandomness(spoiltBallotIndex));
-            
+
             await _contractRepository.SpoilBallotAsync(paperBallot.BallotId, virtualBallot.Code, election, cid);
         }
 
@@ -139,11 +135,11 @@ namespace Helverify.VotingAuthority.Application.Services
             election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
 
             List<OptionShare> optionShares = await GetOptionShares(election, ballot, ipfsCid);
-            
+
             BallotShares ballotShares = new BallotShares(optionShares);
-            
+
             ballot = ballotShares.CombineShares(election, ballot);
-            
+
             return ballot;
         }
 
@@ -169,7 +165,7 @@ namespace Helverify.VotingAuthority.Application.Services
                     optionShares.Enqueue(optionShare);
                 }
             });
-            
+
             return optionShares.ToList();
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System.ComponentModel;
+using System.IO.Abstractions;
 using Nethereum.JsonRpc.IpcClient;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
@@ -48,7 +49,9 @@ namespace Helverify.VotingAuthority.DataAccess.Ethereum
             IWeb3 instance = new Web3(Account, new UnixIpcClient(IpcPath));
             
             instance.Eth.TransactionManager.UseLegacyAsDefault = true;
-            
+            instance.Eth.TransactionManager.DefaultGas = 49000000;
+            instance.Eth.TransactionManager.DefaultGasPrice = 1;
+
             Web3Instance = instance;
 
             Task.Run(() => Web3Instance.Personal.UnlockAccount.SendRequestAsync(Account.Address, Password, 0)).Wait();
