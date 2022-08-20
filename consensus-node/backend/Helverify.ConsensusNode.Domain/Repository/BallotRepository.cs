@@ -31,7 +31,7 @@ namespace Helverify.ConsensusNode.Domain.Repository
             
             foreach (EncryptedOptionDao encryptedOption in ballot.EncryptedOptions)
             {
-                IList<CipherText> cipherTexts = _mapper.Map<IList<CipherText>>(encryptedOption.Values.Select(v => v.Cipher).ToList()); // TODO: mapping profile
+                IList<CipherText> cipherTexts = _mapper.Map<IList<CipherText>>(encryptedOption.Values.Select(v => v.Cipher).ToList());
 
                 cipherDictionary[encryptedOption.ShortCode] = cipherTexts;
             }

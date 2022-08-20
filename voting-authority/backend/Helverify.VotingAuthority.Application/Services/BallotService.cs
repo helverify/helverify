@@ -20,6 +20,7 @@ namespace Helverify.VotingAuthority.Application.Services
         private readonly IPublishedBallotRepository _publishedBallotRepository;
         private readonly IElectionContractRepository _contractRepository;
         private readonly IMapper _mapper;
+        private readonly Random _random;
 
         /// <summary>
         /// Constructor
@@ -38,6 +39,7 @@ namespace Helverify.VotingAuthority.Application.Services
             _publishedBallotRepository = publishedBallotRepository;
             _contractRepository = contractRepository;
             _mapper = mapper;
+            _random = new Random();
         }
 
         /// <inheritdoc cref="IBallotService.GetAsync(string {id})"/>
@@ -107,6 +109,54 @@ namespace Helverify.VotingAuthority.Application.Services
             await _contractRepository.SpoilBallotAsync(paperBallot.BallotId, virtualBallot.Code, election, cid);
         }
 
+        /// <inheritdoc cref="IBallotService.PublishRandomEvidence"/>
+        public async Task PublishRandomEvidence(Election election)
+        {
+            int numberOfBallots = await _contractRepository.GetNumberOfBallotsAsync(election);
+
+            int index = 0;
+            int partitionSize = 100;
+
+            while (index < numberOfBallots)
+            {
+                Tuple<IList<string>, int> result =
+                    await _contractRepository.GetBallotIdsAsync(election, index, partitionSize);
+
+                await Parallel.ForEachAsync(result.Item1, async (ballotId, _) =>
+                {
+                    if (string.IsNullOrEmpty(ballotId))
+                    {
+                        return;
+                    }
+
+                    PaperBallot paperBallot = await _ballotRepository.GetAsync(ballotId);
+
+                    int spoiltBallotIndex = _random.Next(0, 2);
+
+                    int selectedOption = _random.Next(0, paperBallot.Options.Count);
+
+                    PaperBallotOption option = paperBallot.Options[selectedOption];
+
+                    string shortCode = spoiltBallotIndex == 1 ? option.ShortCode1 : option.ShortCode2;
+
+                    paperBallot.Election = election;
+
+                    PublishedBallot ballot = (await _contractRepository.GetBallotAsync(election, ballotId))[1 - spoiltBallotIndex];
+
+                    try
+                    {
+                        await PublishSelections(paperBallot, new List<string> { shortCode }, ballot.BallotCode);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw ex;
+                    }
+                });
+
+                index += partitionSize;
+            }
+        }
+
         private async Task<VirtualBallot> DecryptBallot(Election election, string ballotId, int spoiltBallotIndex)
         {
             PublishedBallot publishedBallot = (await _contractRepository.GetBallotAsync(election, ballotId))[spoiltBallotIndex];
@@ -132,8 +182,6 @@ namespace Helverify.VotingAuthority.Application.Services
 
         private async Task<VirtualBallot> CoopDecryptBallot(VirtualBallot ballot, Election election, string ipfsCid)
         {
-            election.Blockchain = await _bcRepository.GetAsync(election.Blockchain.Id);
-
             List<OptionShare> optionShares = await GetOptionShares(election, ballot, ipfsCid);
 
             BallotShares ballotShares = new BallotShares(optionShares);

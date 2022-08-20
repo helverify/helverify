@@ -2,6 +2,7 @@
 using Helverify.Cryptography.Encryption;
 using Helverify.Cryptography.Encryption.Strategy;
 using Helverify.Cryptography.ZeroKnowledge;
+using Microsoft.Extensions.Caching.Memory;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
@@ -17,15 +18,18 @@ namespace Helverify.ConsensusNode.Domain.Model
         internal const string KeyPath = "/home/keys";
 
         private readonly IFileSystem _fileSystem;
+        private readonly IMemoryCache _cache;
         private readonly IElGamal _elGamal;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="fileSystem">File system abstraction</param>
-        public KeyPairHandler(IFileSystem fileSystem)
+        /// <param name="cache">Memory cache</param>
+        public KeyPairHandler(IFileSystem fileSystem, IMemoryCache cache)
         {
             _fileSystem = fileSystem;
+            _cache = cache;
             _elGamal = new ExponentialElGamal(new ParallelDecryption());
         }
 
@@ -63,13 +67,27 @@ namespace Helverify.ConsensusNode.Domain.Model
             SaveToDisk(keyPair.Private, electionId, PrivateKeyFileName);
         }
 
+        /// <summary>
+        /// Caching according to: https://docs.microsoft.com/en-us/aspnet/core/performance/caching/memory?view=aspnetcore-6.0
+        /// </summary>
+        /// <param name="electionId">Election identifier</param>
+        /// <param name="fileName">Key file name</param>
+        /// <returns></returns>
         private AsymmetricKeyParameter LoadFromDisk(string electionId, string fileName)
         {
-            using StreamReader streamReader = _fileSystem.File.OpenText(GetKeyPath(electionId, fileName));
+            string cacheKey = $"{electionId}{fileName}";
 
-            PemReader pemReader = new PemReader(streamReader);
+            if (!_cache.TryGetValue(cacheKey, out AsymmetricKeyParameter key))
+            {
+                using StreamReader streamReader = _fileSystem.File.OpenText(GetKeyPath(electionId, fileName));
 
-            AsymmetricKeyParameter key = (AsymmetricKeyParameter)pemReader.ReadObject();
+                PemReader pemReader = new PemReader(streamReader);
+
+                key = (AsymmetricKeyParameter)pemReader.ReadObject();
+
+                _cache.Set(cacheKey, key,
+                    new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(60)));
+            }
 
             return key;
         }

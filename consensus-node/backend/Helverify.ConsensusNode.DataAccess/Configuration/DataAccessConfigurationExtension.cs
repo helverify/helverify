@@ -2,6 +2,7 @@
 using Ipfs.Http;
 using Microsoft.Extensions.DependencyInjection;
 
+
 namespace Helverify.ConsensusNode.DataAccess.Configuration
 {
     /// <summary>
@@ -21,7 +22,7 @@ namespace Helverify.ConsensusNode.DataAccess.Configuration
 
             services.AddSingleton(_ => new IpfsClient(ipfsHost));
             services.AddScoped<IStorageClient, StorageClient>();
-            
+
             return services;
         }
     }

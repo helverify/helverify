@@ -21,6 +21,7 @@ namespace Helverify.ConsensusNode.Domain.Configuration
         /// <returns></returns>
         public static IServiceCollection AddDomainConfiguration(this IServiceCollection services)
         {
+            services.AddMemoryCache();
             services.AddDataAccessConfiguration();
             services.AddAutoMapper(cfg =>
             {

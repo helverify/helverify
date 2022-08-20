@@ -142,7 +142,7 @@ namespace Helverify.VotingAuthority.Application.Services
             
             string evidenceCid = _publishedBallotRepository.StoreDecryptedResults(results);
             
-            await _contractRepository.PublishResults(election, results, evidenceCid).ConfigureAwait(false);
+            await _contractRepository.PublishResults(election, results, evidenceCid);
             
             return results;
         }

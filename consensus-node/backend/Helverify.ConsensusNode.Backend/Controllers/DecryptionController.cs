@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Collections.Concurrent;
+using AutoMapper;
 using Helverify.ConsensusNode.Backend.Dto;
 using Helverify.ConsensusNode.Domain.Model;
 using Helverify.ConsensusNode.Domain.Repository;
@@ -12,7 +13,7 @@ namespace Helverify.ConsensusNode.Backend.Controllers
     /// </summary>
     [Route("api/decryption")]
     [ApiController]
-    public class DecryptionController: ControllerBase
+    public class DecryptionController : ControllerBase
     {
         private readonly IKeyPairHandler _keyPairHandler;
         private readonly IBallotRepository _ballotRepository;
@@ -41,7 +42,7 @@ namespace Helverify.ConsensusNode.Backend.Controllers
         public ActionResult<DecryptionShareDto> Post(EncryptedShareRequestDto requestDto)
         {
             AsymmetricCipherKeyPair keyPair = _keyPairHandler.LoadFromDisk(requestDto.ElectionId);
-            
+
             CipherText cipherText = _mapper.Map<CipherText>(requestDto);
 
             DecryptedShare decryptedShare = cipherText.Decrypt(keyPair);
@@ -66,9 +67,9 @@ namespace Helverify.ConsensusNode.Backend.Controllers
 
             BallotEncryption ballotEncryption = await _ballotRepository.GetBallotEncryptionAsync(requestDto.IpfsCid);
 
-            IDictionary<string, IList<DecryptionShareDto>> decryptedShares = new Dictionary<string, IList<DecryptionShareDto>>();
+            IDictionary<string, IList<DecryptionShareDto>> decryptedShares = new ConcurrentDictionary<string, IList<DecryptionShareDto>>();
 
-            foreach (string shortCode in ballotEncryption.Encryptions.Keys)
+            Parallel.ForEach(ballotEncryption.Encryptions.Keys, (shortCode) =>
             {
                 IList<DecryptionShareDto> shares = new List<DecryptionShareDto>();
 
@@ -82,7 +83,7 @@ namespace Helverify.ConsensusNode.Backend.Controllers
                 }
 
                 decryptedShares[shortCode] = shares;
-            }
+            });
             
             return new DecryptedBallotShareDto
             {
