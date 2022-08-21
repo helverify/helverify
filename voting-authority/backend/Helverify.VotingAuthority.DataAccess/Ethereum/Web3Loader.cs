@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.IO.Abstractions;
+using Nethereum.JsonRpc.Client;
 using Nethereum.JsonRpc.IpcClient;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;

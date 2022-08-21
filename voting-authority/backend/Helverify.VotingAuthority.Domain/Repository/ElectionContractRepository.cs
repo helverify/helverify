@@ -34,9 +34,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             ElectionDeployment electionDeployment = new ElectionDeployment();
 
             IWeb3 web3 = _web3Loader.Web3Instance;
-
-            //await UnlockAccountAsync();
-
+            
             return (await web3.Eth.GetContractDeploymentHandler<ElectionDeployment>().SendRequestAndWaitForReceiptAsync(electionDeployment)).ContractAddress;
         }
 
@@ -114,7 +112,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
                         throw;
                     }
 
-                    await Task.Delay(200);
+                    await Task.Delay(2000);
                     tries++;
                 }
             }
