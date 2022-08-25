@@ -48,7 +48,7 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
                 HomesteadBlock = 0,
                 PetersburgBlock = 0
             };
-            destination.GasLimit = "100000000";
+            destination.GasLimit = "180000000";
             
             destination.Difficulty = "1";
 

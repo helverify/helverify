@@ -50,7 +50,7 @@ namespace Helverify.VotingAuthority.DataAccess.Ethereum
             IWeb3 instance = new Web3(Account, new UnixIpcClient(IpcPath));
             
             instance.Eth.TransactionManager.UseLegacyAsDefault = true;
-            instance.Eth.TransactionManager.DefaultGas = 49000000;
+            instance.Eth.TransactionManager.DefaultGas = 50000000;
             instance.Eth.TransactionManager.DefaultGasPrice = 1;
 
             Web3Instance = instance;

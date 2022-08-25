@@ -55,6 +55,8 @@ namespace Helverify.VotingAuthority.Application.Services
         /// <inheritdoc cref="IBallotService.CreateBallots"/>
         public async Task CreateBallots(Election election, int numberOfBallots)
         {
+            Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} BEGIN BALLOT CREATE {numberOfBallots}");
+            
             BallotTemplate ballotTemplate = election.GenerateBallotTemplate();
 
             int partitionSize = 100;
@@ -82,6 +84,8 @@ namespace Helverify.VotingAuthority.Application.Services
 
                 await _contractRepository.StoreBallotsAsync(election, paperBallots.ToList());
             }
+
+            Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} END BALLOT CREATE {numberOfBallots}");
         }
 
         /// <inheritdoc cref="IBallotService.PublishBallotEvidence"/>

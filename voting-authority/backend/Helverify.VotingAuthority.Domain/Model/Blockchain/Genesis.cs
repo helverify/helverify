@@ -42,6 +42,6 @@ public sealed class Genesis
         Authorities = authorities;
         PrefundedAccounts = prefundedAccounts;
         CliqueEpoch = 30000;
-        CliquePeriod = 2;
+        CliquePeriod = 10;
     }
 }

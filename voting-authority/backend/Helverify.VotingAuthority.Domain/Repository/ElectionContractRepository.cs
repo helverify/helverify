@@ -84,7 +84,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
             {
                 Ballots = ballots
             };
-
+            
             await WithRetry(async() => await contract.SendRequestAsync(storeBallotFunction));
         }
 

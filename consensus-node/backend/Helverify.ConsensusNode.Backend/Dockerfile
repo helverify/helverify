@@ -1,10 +1,14 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.6-alpine3.16-amd64 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.8-focal-amd64 AS base
 
-RUN apk add geth
-RUN apk add bind-tools
-RUN apk add jq
+RUN apt-get update
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository -y ppa:ethereum/ethereum
+RUN apt-get update
+RUN apt-get install -y ethereum
+RUN apt-get install -y dnsutils
+RUN apt-get install -y jq
 
 #FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
@@ -27,4 +31,7 @@ RUN dotnet publish "Helverify.ConsensusNode.Backend.csproj" -c Release -o /app/p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+RUN chmod +x /app/scripts/*.sh
+
 ENTRYPOINT ["dotnet", "Helverify.ConsensusNode.Backend.dll"]

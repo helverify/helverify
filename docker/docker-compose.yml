@@ -188,7 +188,7 @@ services:
             - 4001:4001
             - 5001:5001
             - 8080:8080
-
+            
     ipfs-node2:
         image: ipfs/go-ipfs
         volumes: 
