@@ -123,37 +123,43 @@ namespace Helverify.VotingAuthority.Application.Services
 
             while (index < numberOfBallots)
             {
-                Tuple<IList<string>, int> result =
-                    await _contractRepository.GetBallotIdsAsync(election, index, partitionSize);
-
-                await Parallel.ForEachAsync(result.Item1, async (ballotId, _) =>
+                IList<PaperBallot> ballots = await (_ballotRepository as PaperBallotRepository)!.GetUncastedAsync(partitionSize, index);
+		
+                await Parallel.ForEachAsync(ballots, async (paperBallot, _) =>
                 {
+                    string ballotId = paperBallot.BallotId;
+                
                     if (string.IsNullOrEmpty(ballotId))
                     {
                         return;
                     }
 
-                    PaperBallot paperBallot = await _ballotRepository.GetAsync(ballotId);
+		    if(!paperBallot.Casted)
+		    {
+		        int spoiltBallotIndex = _random.Next(0, 2);
 
-                    int spoiltBallotIndex = _random.Next(0, 2);
+		        int selectedOption = _random.Next(0, paperBallot.Options.Count);
 
-                    int selectedOption = _random.Next(0, paperBallot.Options.Count);
+		        PaperBallotOption option = paperBallot.Options[selectedOption];
 
-                    PaperBallotOption option = paperBallot.Options[selectedOption];
+		        string shortCode = spoiltBallotIndex == 1 ? option.ShortCode1 : option.ShortCode2;
 
-                    string shortCode = spoiltBallotIndex == 1 ? option.ShortCode1 : option.ShortCode2;
+		        paperBallot.Election = election;
 
-                    paperBallot.Election = election;
+		        PublishedBallot ballot = (await _contractRepository.GetBallotAsync(election, ballotId))[1 - spoiltBallotIndex];
 
-                    PublishedBallot ballot = (await _contractRepository.GetBallotAsync(election, ballotId))[1 - spoiltBallotIndex];
-
-                    try
-                    {
-                        await PublishSelections(paperBallot, new List<string> { shortCode }, ballot.BallotCode);
-                    }
-                    catch (ArgumentException ex)
-                    {
-                        throw ex;
+		        try
+		        {
+		            await PublishSelections(paperBallot, new List<string> { shortCode }, ballot.BallotCode);
+		            
+		            paperBallot.Casted = true;
+		            
+		            await _ballotRepository.UpdateAsync(paperBallot.BallotId, paperBallot);
+		        }
+		        catch (ArgumentException ex)
+		        {
+		            throw ex;
+		        }
                     }
                 });
 

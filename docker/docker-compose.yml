@@ -8,7 +8,7 @@ services:
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: voting-authority
-    
+
     va-frontend:
         ports:
             - 3000:3000
@@ -19,32 +19,37 @@ services:
             dockerfile: ./Dockerfile
         depends_on:
             - va-backend
-    
+
     va-backend:
         ports:
             - 5000:5000
             - 8545:8545
             - 8546:8546
             - 30300:30300
-        environment: 
+        environment:
             - ASPNETCORE_URLS=http://+:5000
             - MongoDbConnectionString=mongodb://root:voting-authority@host.docker.internal:27017
             - BC_ACCOUNT_PWD=test3
             - PORT=30300
-            - IpfsHost=http://host.docker.internal:5001
+            - IpfsHost=http://172.17.0.1:5001
             - GethEndpoint=http://localhost:8545
         volumes:
             - ./va:/home
         build:
             context: ../voting-authority/backend/
-            dockerfile: Helverify.VotingAuthority.Backend/Dockerfile    
+            dockerfile: Helverify.VotingAuthority.Backend/Dockerfile
         links:
             - va-mongodb
             - consensus-backend1
             - consensus-backend2
         depends_on:
             - va-mongodb
-    
+            - ipfs-node1
+            - ipfs-node2
+            - ipfs-node3
+        extra_hosts:
+            - host.docker.internal:host-gateway
+
     voter-frontend:
         ports:
             - 3001:3000
@@ -57,52 +62,70 @@ services:
         depends_on:
             - va-backend # because of RPC endpoint
             - ipfs-node1 # because of IPFS endpoint
-    
+
     consensus-backend1:
         ports:
             - 5002:5000
             - 30301:30301
-        environment: 
+        environment:
             - ASPNETCORE_URLS=http://+:5000
             - BC_ACCOUNT_PWD=test1
             - PORT=30301
-            - IpfsHost=http://host.docker.internal:5001
-        volumes: 
+            - IpfsHost=http://172.17.0.1:5001
+        volumes:
             - ./consensus1:/home/
         build:
             context: ../consensus-node/backend/
             dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
-            
+        depends_on:
+            - ipfs-node1
+            - ipfs-node2
+            - ipfs-node3
+        extra_hosts:
+            - host.docker.internal:host-gateway
+
     consensus-backend2:
         ports:
             - 5003:5000
             - 30302:30302
-        environment: 
+        environment:
             - ASPNETCORE_URLS=http://+:5000
             - BC_ACCOUNT_PWD=test2
             - PORT=30302
-            - IpfsHost=http://host.docker.internal:5001
-        volumes: 
+            - IpfsHost=http://172.17.0.1:5001
+        volumes:
             - ./consensus2:/home/
         build:
             context: ../consensus-node/backend/
             dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
-    
+        depends_on:
+            - ipfs-node1
+            - ipfs-node2
+            - ipfs-node3
+        extra_hosts:
+            - host.docker.internal:host-gateway
+
     consensus-backend3:
         ports:
             - 5004:5000
             - 30303:30303
-        environment: 
+        environment:
             - ASPNETCORE_URLS=http://+:5000
             - BC_ACCOUNT_PWD=test3
             - PORT=30303
-            - IpfsHost=http://host.docker.internal:5001
-        volumes: 
+            - IpfsHost=http://172.17.0.1:5001
+        volumes:
             - ./consensus3:/home/
         build:
             context: ../consensus-node/backend/
             dockerfile: Helverify.ConsensusNode.Backend/Dockerfile
-            
+        depends_on:
+            - ipfs-node1
+            - ipfs-node2
+            - ipfs-node3
+        extra_hosts:
+            - host.docker.internal:host-gateway
+
     #consensus-backend4:
     #    ports:
     #        - 5005:5000
@@ -173,48 +196,50 @@ services:
     #    build:
     #        context: ../consensus-node/backend/
     #        dockerfile: Helverify.ConsensusNode.Backend/Dockerfile        
-    
+
     ipfs-node1:
         image: ipfs/go-ipfs
-        volumes: 
+        volumes:
             - ./ipfs1/export:/export
             - ./ipfs1/data:/data
             - ./ipfs1/home:/home/ipfs
-        environment: 
+        environment:
             - ipfs_staging=/export
             - ipfs_data=/data
             - IPFS_SWARM_KEY_FILE=/home/ipfs/swarm.key
         ports:
             - 4001:4001
-            - 5001:5001
+            - "172.17.0.1:5001:5001"
             - 8080:8080
-            
+        extra_hosts:
+            - host.docker.internal:host-gateway
+
     ipfs-node2:
         image: ipfs/go-ipfs
-        volumes: 
+        volumes:
             - ./ipfs2/export:/export
             - ./ipfs2/data:/data
             - ./ipfs2/home:/home/ipfs
-        environment: 
+        environment:
             - ipfs_staging=/export
             - ipfs_data=/data
             - IPFS_SWARM_KEY_FILE=/home/ipfs/swarm.key
         ports:
             - 4002:4001
-            
+
     ipfs-node3:
         image: ipfs/go-ipfs
-        volumes: 
+        volumes:
             - ./ipfs3/export:/export
             - ./ipfs3/data:/data
             - ./ipfs3/home:/home/ipfs
-        environment: 
+        environment:
             - ipfs_staging=/export
             - ipfs_data=/data
             - IPFS_SWARM_KEY_FILE=/home/ipfs/swarm.key
         ports:
             - 4003:4001
-                    
+
 # BC Configuration according to: 
 #  https://medium.com/coinmonks/private-ethereum-by-example-b77063bb634f
 #  https://geth.ethereum.org/docs/interface/private-network

@@ -103,6 +103,21 @@ namespace Helverify.VotingAuthority.Domain.Repository
 
             await _mongoService.Collection.InsertManyAsync(printBallotDaos);
         }
+        
+        /// <summary>
+        /// Paginated Paper Ballots for evaluation
+        /// </summary>
+        /// <param name="numberOfBallots">How many ballots to load</param>
+        /// <param name="skip">How many ballots to skip</param>
+        /// <returns></returns>
+        public async Task<IList<PaperBallot>> GetUncastedAsync(int numberOfBallots, int skip)
+        {
+	    IList<PrintBallotDao> printBallotDaos = await _mongoService.Collection.Find(b => !b.Casted).Skip(skip).Limit(numberOfBallots).ToListAsync();
+
+            IList<PaperBallot> paperBallots = _mapper.Map<IList<PaperBallot>>(printBallotDaos);
+
+            return paperBallots;
+        }
 
         private async Task<PrintBallotDao> GetSinglePrintBallot(string id)
         {
