@@ -20,6 +20,7 @@ The cryptographic primitives contained in this library is the following:
 
 ## Usage
 ### Example: ElGamal Encrypt and Decrypt
+
 ```csharp
 IElGamal elGamal = new ExponentialElGamal();
 
