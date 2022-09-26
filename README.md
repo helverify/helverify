@@ -59,7 +59,7 @@ For the development of Helverify, the following technologies were used:
 - [IPFS](https://ipfs.tech/) for storing encryptions and evidence
 
 ## Cryptography Library
-The cryptography library for C# is located at the `cryptography` folder. Check out the [dedicated README](cryptography/dotnet/Helverify.Cryptography/README.md) for further details.
+The cryptography library for C# is located at the `cryptography` folder. Check out the [dedicated README](cryptography/dotnet/Helverify.Cryptography/Readme.md) for further details.
 
 If you decide to make changes to the cryptography library, consider the following things:
 
