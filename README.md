@@ -23,6 +23,48 @@ To run Helverify, you need to set up the following environment:
 
 With these tools installed, you are ready to go.
 
+If you still want to try out Helverify on Windows, make the following adjustments to docker/docker-compose.yml:
+
+```yaml
+	...
+	va-backend:
+		...
+		environment:
+			...
+			- IpfsHost=http://host.docker.internal:5001 # instead of http://172.17.0.1:5001
+			...
+		...
+	consensus-node1:
+		...
+		environment:
+			...
+			- IpfsHost=http://host.docker.internal:5001 # instead of http://172.17.0.1:5001
+			...
+		...
+	consensus-node2:
+		...
+		environment:
+			...
+			- IpfsHost=http://host.docker.internal:5001 # instead of http://172.17.0.1:5001
+			...
+		...
+	consensus-node3:
+		...
+		environment:
+			...
+			- IpfsHost=http://host.docker.internal:5001 # instead of http://172.17.0.1:5001
+			...
+		...
+	...
+	ipfs-node1:
+		...
+		ports:
+			...
+			- 5001:5001 # instead of "172.17.0.1:5001:5001"
+			...
+	...
+```
+
 # Getting Started
 Getting Helverify up and running is quite straightforward: Using the following commands, an instance of Helverify with one Voting Authority, three Consensus Nodes, three IPFS nodes in a private swarm, a Voter frontend, and a MongoDB are launched:
 ```bash
@@ -34,14 +76,14 @@ By default, Helverify allocates the following Ports to the respective applicatio
 
 - [Voting Authority Frontend](http://localhost:3000): 3000
 - [Voting Authority Backend](http://localhost:5000): 5000
-    - SwaggerUI: http://localhost:5000/swagger/index.html
+  - SwaggerUI: http://localhost:5000/swagger/index.html
 - [Voter Frontend](http://localhost:3001): 3001
 - [Consensus Node 1](http://localhost:5002): 5002
-    - Swagger UI: http://localhost:5002/swagger/index.html
+  - Swagger UI: http://localhost:5002/swagger/index.html
 - [Consensus Node 2](http://localhost:5003): 5003
-    - Swagger UI: http://localhost:5003/swagger/index.html
+  - Swagger UI: http://localhost:5003/swagger/index.html
 - [Consensus Node 3](http://localhost:5004): 5004
-    - Swagger UI: http://localhost:5004/swagger/index.html
+  - Swagger UI: http://localhost:5004/swagger/index.html
 
 Further port allocations and services can be found in the [docker-compose.yml](docker/docker-compose.yml) file.
 
@@ -59,7 +101,7 @@ For the development of Helverify, the following technologies were used:
 - [IPFS](https://ipfs.tech/) for storing encryptions and evidence
 
 ## Cryptography Library
-The cryptography library for C# is located at the `cryptography` folder. Check out the [dedicated README](cryptography/dotnet/Helverify.Cryptography/Readme.md) for further details.
+The cryptography library for C# is located at the `cryptography` folder. Check out the [dedicated README](cryptography/dotnet/Helverify.Cryptography/README.md) for further details.
 
 If you decide to make changes to the cryptography library, consider the following things:
 
