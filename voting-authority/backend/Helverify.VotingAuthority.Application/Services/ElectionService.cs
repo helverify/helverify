@@ -118,29 +118,19 @@ namespace Helverify.VotingAuthority.Application.Services
         public async Task<IList<DecryptedValue>> CalculateTallyAsync(string electionId)
         {
             
-	    Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} START LoadElection (MongoDB)");
             Election election = await GetAsync(electionId);
-	    Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} END LoadElection (MongoDB)");
 
-	    Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} START GetNumberOfBallots (SC)");
             int numberOfBallots = await _contractRepository.GetNumberOfBallotsAsync(election);
-	    Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} END GetNumberOfBallots (SC)");
             
             int index = 0;
             int partitionSize = 100;
 
-	    Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} START GetEncryptedOptions (IPFS)");
             IList<EncryptedOption> selectedEncryptedOptions = await GetEncryptedOptionsAsync(index, numberOfBallots, election, partitionSize);
-	    Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} END GetEncryptedOptions (IPFS)");
             
-            Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} START CalculateCipherResult (Homomorphic Addition)");
             Tally tally = new Tally(selectedEncryptedOptions);
 
             IList<ElGamalCipher> encryptedResults = tally.CalculateCipherResult(election);
             
-            Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} END CalculateCipherResult (Homomorphic Addition)");
-            
-            Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} START DecryptAsync (Cooperative Decryption)");
             IList<DecryptedValue> results = new List<DecryptedValue>();
 
             foreach (ElGamalCipher cipher in encryptedResults)
@@ -149,15 +139,11 @@ namespace Helverify.VotingAuthority.Application.Services
 
                 results.Add(decryptedValue);
             }
-            Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} END DecryptAsync (Cooperative Decryption)");
-            
-            Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} START StoreDecryptedResults (IPFS)");
-            string evidenceCid = _publishedBallotRepository.StoreDecryptedResults(results);
-            Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} END StoreDecryptedResults (IPFS)");
 
-            Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} START PublishResults (SC)");            
+            string evidenceCid = _publishedBallotRepository.StoreDecryptedResults(results);
+
             await _contractRepository.PublishResults(election, results, evidenceCid);
-            Console.WriteLine($"{DateTime.Now:yyyy-mm-dd HH:mm:ss.fff} END PublishResults (SC)");            
+
             return results;
         }
 
