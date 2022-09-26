@@ -202,7 +202,7 @@ services:
         volumes:
             - ./ipfs1/export:/export
             - ./ipfs1/data:/data
-            - ./ipfs1/home:/home/ipfs
+            - ./ipfs1/home:/home
         environment:
             - ipfs_staging=/export
             - ipfs_data=/data
@@ -219,7 +219,7 @@ services:
         volumes:
             - ./ipfs2/export:/export
             - ./ipfs2/data:/data
-            - ./ipfs2/home:/home/ipfs
+            - ./ipfs2/home:/home
         environment:
             - ipfs_staging=/export
             - ipfs_data=/data
@@ -232,7 +232,7 @@ services:
         volumes:
             - ./ipfs3/export:/export
             - ./ipfs3/data:/data
-            - ./ipfs3/home:/home/ipfs
+            - ./ipfs3/home:/home
         environment:
             - ipfs_staging=/export
             - ipfs_data=/data
