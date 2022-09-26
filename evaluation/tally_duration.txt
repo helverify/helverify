@@ -1,0 +1,100 @@
++++ 2048-bit, 3 options, 1k ballots +++
+
+docker-va-backend-1          | 2022-52-07 08:52:48.859 START LoadElection (MongoDB)
+docker-va-backend-1          | 2022-52-07 08:52:48.861 END LoadElection (MongoDB)
+docker-va-backend-1          | 2022-52-07 08:52:48.861 START GetNumberOfBallots (SC)
+docker-va-backend-1          | 2022-52-07 08:52:48.862 END GetNumberOfBallots (SC)
+docker-va-backend-1          | 2022-52-07 08:52:48.862 START GetEncryptedOptions (IPFS)
+docker-va-backend-1          | 2022-52-07 08:52:49.233 END GetEncryptedOptions (IPFS)
+docker-va-backend-1          | 2022-52-07 08:52:49.233 START CalculateCipherResult (Homomorphic Addition)
+docker-va-backend-1          | 2022-52-07 08:52:51.958 END CalculateCipherResult (Homomorphic Addition)
+docker-va-backend-1          | 2022-52-07 08:52:51.958 START DecryptAsync (Cooperative Decryption)
+docker-va-backend-1          | 2022-52-07 08:52:53.377 END DecryptAsync (Cooperative Decryption)
+docker-va-backend-1          | 2022-52-07 08:52:53.377 START StoreDecryptedResults (IPFS)
+docker-va-backend-1          | 2022-52-07 08:52:53.454 END StoreDecryptedResults (IPFS)
+docker-va-backend-1          | 2022-52-07 08:52:53.454 START PublishResults (SC)
+docker-va-backend-1          | 2022-52-07 08:52:53.463 END PublishResults (SC)
+
+LoadElection (MongoDB): 2 ms
+GetNumberOfBallots (SC): 1 ms
+GetEncryptedOptions (IPFS): 371 ms
+CalculateCipherResult (Homomorphic Addition): 2725 ms
+DecryptAsync (Cooperative Decryption): 1419 ms
+StoreDecryptedResults (IPFS): 77 ms
+PublishResults (SC): 9 ms
+
++++ 4096-bit, 3 options, 1k ballots +++
+
+docker-va-backend-1          | 2022-58-07 08:58:51.177 START LoadElection (MongoDB)
+docker-va-backend-1          | 2022-58-07 08:58:51.179 END LoadElection (MongoDB)
+docker-va-backend-1          | 2022-58-07 08:58:51.179 START GetNumberOfBallots (SC)
+docker-va-backend-1          | 2022-58-07 08:58:51.179 END GetNumberOfBallots (SC)
+docker-va-backend-1          | 2022-58-07 08:58:51.179 START GetEncryptedOptions (IPFS)
+docker-va-backend-1          | 2022-58-07 08:58:52.080 END GetEncryptedOptions (IPFS)
+docker-va-backend-1          | 2022-58-07 08:58:52.080 START CalculateCipherResult (Homomorphic Addition)
+docker-va-backend-1          | 2022-59-07 08:59:02.325 END CalculateCipherResult (Homomorphic Addition)
+docker-va-backend-1          | 2022-59-07 08:59:02.325 START DecryptAsync (Cooperative Decryption)
+docker-va-backend-1          | 2022-59-07 08:59:11.798 END DecryptAsync (Cooperative Decryption)
+docker-va-backend-1          | 2022-59-07 08:59:11.798 START StoreDecryptedResults (IPFS)
+docker-va-backend-1          | 2022-59-07 08:59:11.867 END StoreDecryptedResults (IPFS)
+docker-va-backend-1          | 2022-59-07 08:59:11.867 START PublishResults (SC)
+docker-va-backend-1          | 2022-59-07 08:59:11.876 END PublishResults (SC)
+
+LoadElection (MongoDB): 2 ms
+GetNumberOfBallots (SC): 0 ms
+GetEncryptedOptions (IPFS): 901 ms
+CalculateCipherResult (Homomorphic Addition): 10245 ms
+DecryptAsync (Cooperative Decryption): 9473 ms
+StoreDecryptedResults (IPFS): 69 ms
+PublishResults (SC): 9 ms
+
++++ 2048-bit, 3 options, 10k ballots +++
+
+docker-va-backend-1          | 2022-20-07 09:20:54.743 START LoadElection (MongoDB)
+docker-va-backend-1          | 2022-20-07 09:20:54.745 END LoadElection (MongoDB)
+docker-va-backend-1          | 2022-20-07 09:20:54.745 START GetNumberOfBallots (SC)
+docker-va-backend-1          | 2022-20-07 09:20:54.745 END GetNumberOfBallots (SC)
+docker-va-backend-1          | 2022-20-07 09:20:54.745 START GetEncryptedOptions (IPFS)
+docker-va-backend-1          | 2022-20-07 09:20:58.763 END GetEncryptedOptions (IPFS)
+docker-va-backend-1          | 2022-20-07 09:20:58.763 START CalculateCipherResult (Homomorphic Addition)
+docker-va-backend-1          | 2022-21-07 09:21:26.330 END CalculateCipherResult (Homomorphic Addition)
+docker-va-backend-1          | 2022-21-07 09:21:26.330 START DecryptAsync (Cooperative Decryption)
+docker-va-backend-1          | 2022-21-07 09:21:29.674 END DecryptAsync (Cooperative Decryption)
+docker-va-backend-1          | 2022-21-07 09:21:29.674 START StoreDecryptedResults (IPFS)
+docker-va-backend-1          | 2022-21-07 09:21:29.711 END StoreDecryptedResults (IPFS)
+docker-va-backend-1          | 2022-21-07 09:21:29.711 START PublishResults (SC)
+docker-va-backend-1          | 2022-21-07 09:21:29.722 END PublishResults (SC)
+
+LoadElection (MongoDB): 2 ms
+GetNumberOfBallots (SC): 0 ms
+GetEncryptedOptions (IPFS): 4018 ms
+CalculateCipherResult (Homomorphic Addition): 27567 ms
+DecryptAsync (Cooperative Decryption): 3344 ms
+StoreDecryptedResults (IPFS): 37 ms
+PublishResults (SC): 11 ms
+
++++ 4096-bit, 3 options, 10k ballots +++
+
+docker-va-backend-1          | 2022-41-07 09:41:32.492 START LoadElection (MongoDB)
+docker-va-backend-1          | 2022-41-07 09:41:32.493 END LoadElection (MongoDB)
+docker-va-backend-1          | 2022-41-07 09:41:32.493 START GetNumberOfBallots (SC)
+docker-va-backend-1          | 2022-41-07 09:41:32.494 END GetNumberOfBallots (SC)
+docker-va-backend-1          | 2022-41-07 09:41:32.494 START GetEncryptedOptions (IPFS)
+docker-va-backend-1          | 2022-41-07 09:41:40.297 END GetEncryptedOptions (IPFS)
+docker-va-backend-1          | 2022-41-07 09:41:40.297 START CalculateCipherResult (Homomorphic Addition)
+docker-va-backend-1          | 2022-43-07 09:43:22.605 END CalculateCipherResult (Homomorphic Addition)
+docker-va-backend-1          | 2022-43-07 09:43:22.605 START DecryptAsync (Cooperative Decryption)
+docker-va-backend-1          | 2022-43-07 09:43:38.724 END DecryptAsync (Cooperative Decryption)
+docker-va-backend-1          | 2022-43-07 09:43:38.724 START StoreDecryptedResults (IPFS)
+docker-va-backend-1          | 2022-43-07 09:43:38.763 END StoreDecryptedResults (IPFS)
+docker-va-backend-1          | 2022-43-07 09:43:38.763 START PublishResults (SC)
+docker-va-backend-1          | 2022-43-07 09:43:38.775 END PublishResults (SC)
+
+LoadElection (MongoDB): 1 ms
+GetNumberOfBallots (SC): 1 ms
+GetEncryptedOptions (IPFS): 7803 ms
+CalculateCipherResult (Homomorphic Addition): 104308 ms
+DecryptAsync (Cooperative Decryption): 16119 ms
+StoreDecryptedResults (IPFS): 39 ms
+PublishResults (SC): 12 ms
+

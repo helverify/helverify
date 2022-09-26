@@ -1,13 +1,16 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.8-focal-amd64 AS base
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0.6-alpine3.16-amd64 AS base
-
-RUN apk add geth
-RUN apk add bind-tools
-RUN apk add jq
-RUN apk add fontconfig
-RUN apk add ttf-freefont
+RUN apt-get update
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository -y ppa:ethereum/ethereum
+RUN apt-get update
+RUN apt-get install -y ethereum
+RUN apt-get install -y dnsutils
+RUN apt-get install -y jq
+RUN apt-get install -y fontconfig
+RUN apt-get install -y fonts-freefont-ttf
 
 COPY Helverify.VotingAuthority.Backend/fonts /usr/share/fonts/TTF
 
@@ -32,5 +35,7 @@ RUN dotnet publish "Helverify.VotingAuthority.Backend.csproj" -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+RUN chmod +x /app/scripts/*.sh
 
 ENTRYPOINT ["dotnet", "Helverify.VotingAuthority.Backend.dll"]

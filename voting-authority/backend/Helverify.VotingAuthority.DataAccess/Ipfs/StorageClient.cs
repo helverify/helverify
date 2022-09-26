@@ -1,4 +1,5 @@
 ﻿using Ipfs;
+using Ipfs.CoreApi;
 using Ipfs.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -29,9 +30,9 @@ namespace Helverify.VotingAuthority.DataAccess.Ipfs
         public async Task<string> Store<T>(T obj)
         {
             string json = JsonConvert.SerializeObject(obj, _serializerSettings);
-
+            
             IFileSystemNode fileSystemNode = await _ipfsClient.FileSystem.AddTextAsync(json);
-
+            
             return fileSystemNode.Id.ToString();
         }
 

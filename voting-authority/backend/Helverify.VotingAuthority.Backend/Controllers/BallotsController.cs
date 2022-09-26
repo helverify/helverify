@@ -93,5 +93,16 @@ namespace Helverify.VotingAuthority.Backend.Controllers
 
             return Ok();
         }
+
+        [HttpPost]
+        [Route("{ballotId}/evidence/evaluation")]
+        public async Task<IActionResult> PublishRandomSelections([FromRoute] string electionId)
+        {
+            Election election = await _electionService.GetAsync(electionId);
+            
+            await _ballotService.PublishRandomEvidence(election);
+
+            return Ok();
+        }
     }
 }

@@ -17,6 +17,8 @@ namespace Helverify.VotingAuthority.DataAccess.Dao
         public string ElectionId { get; set; }
 
         public bool Printed { get; set; }
+        
+        public bool Casted { get; set; }
 
         public IList<PrintOptionDao> Options { get; set; } = new List<PrintOptionDao>();
     }

@@ -34,16 +34,14 @@ namespace Helverify.VotingAuthority.Domain.Repository
             ElectionDeployment electionDeployment = new ElectionDeployment();
 
             IWeb3 web3 = _web3Loader.Web3Instance;
-
-            await UnlockAccountAsync();
-
+            
             return (await web3.Eth.GetContractDeploymentHandler<ElectionDeployment>().SendRequestAndWaitForReceiptAsync(electionDeployment)).ContractAddress;
         }
 
         /// <inheritdoc cref="IElectionContractRepository.SetUpAsync"/>
         public async Task SetUpAsync(Election election)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
+            ContractHandler contract = GetContractHandlerAsync(election);
 
             SetUpFunction setUpFunction = new SetUpFunction
             {
@@ -65,7 +63,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.StoreBallotsAsync"/>
         public async Task StoreBallotsAsync(Election election, IList<Model.Paper.PaperBallot> paperBallots)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
+            ContractHandler contract = GetContractHandlerAsync(election);
 
             List<PaperBallot> ballots = paperBallots.Select(pb =>
             {
@@ -86,14 +84,44 @@ namespace Helverify.VotingAuthority.Domain.Repository
             {
                 Ballots = ballots
             };
+            
+            await WithRetry(async() => await contract.SendRequestAsync(storeBallotFunction));
+        }
 
-            await contract.SendRequestAsync(storeBallotFunction);
+        /// <summary>
+        /// Retry pattern according to: https://docs.microsoft.com/en-us/azure/architecture/patterns/retry
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        private async Task WithRetry(Func<Task> action)
+        {
+            int tries = 0;
+
+            while (true)
+            {
+                try
+                {
+                    await action();
+
+                    break;
+                }
+                catch (Exception)
+                {
+                    if (tries > 10)
+                    {
+                        throw;
+                    }
+
+                    await Task.Delay(2000);
+                    tries++;
+                }
+            }
         }
 
         /// <inheritdoc cref="IElectionContractRepository.GetBallotIdsAsync"/>
         public async Task<Tuple<IList<string>, int>> GetBallotIdsAsync(Election election, int startIndex, int partitionSize)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
+            ContractHandler contract = GetContractHandlerAsync(election);
 
             GetAllBallotIdsFunction getAllBallotIdsFunction = new GetAllBallotIdsFunction
             {
@@ -113,7 +141,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.GetBallotAsync"/>
         public async Task<IList<PublishedBallot>> GetBallotAsync(Election election, string id)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
+            ContractHandler contract = GetContractHandlerAsync(election);
 
             RetrieveBallotFunction retrieveBallotFunction = new RetrieveBallotFunction
             {
@@ -142,7 +170,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.PublishBallotSelectionAsync"/>
         public async Task PublishBallotSelectionAsync(Election election, string id, string ballotCode, IList<string> shortCodes)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
+            ContractHandler contract = GetContractHandlerAsync(election);
 
             PublishBallotSelectionFunction publishShortCodesFunction = new PublishBallotSelectionFunction
             {
@@ -157,7 +185,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.SpoilBallotAsync"/>
         public async Task SpoilBallotAsync(string ballotId, string virtualBallotId, Election election, string ipfsCid)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
+            ContractHandler contract = GetContractHandlerAsync(election);
 
             SpoilBallotFunction spoilBallotFunction = new SpoilBallotFunction
             {
@@ -172,7 +200,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.GetNumberOfBallotsAsync"/>
         public async Task<int> GetNumberOfBallotsAsync(Election election)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
+            ContractHandler contract = GetContractHandlerAsync(election);
 
             GetNumberOfBallotsFunction getNumberOfBallotsFunction = new GetNumberOfBallotsFunction();
 
@@ -184,7 +212,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.GetNumberOfCastBallotsAsync"/>
         public async Task<int> GetNumberOfCastBallotsAsync(Election election)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
+            ContractHandler contract = GetContractHandlerAsync(election);
 
             GetNumberOfCastBallotsFunction getNumberOfCastBallotsFunction = new GetNumberOfCastBallotsFunction();
 
@@ -196,15 +224,15 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.GetCastBallotAsync"/>
         public async Task<Tuple<PublishedBallot, IList<string>>> GetCastBallotAsync(Election election, string ballotId)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
-
+            ContractHandler contract = GetContractHandlerAsync(election);
+            
             RetrieveCastBallotFunction castBallotsFunction = new RetrieveCastBallotFunction
             {
                 BallotId = ballotId
             };
 
             RetrieveCastBallotOutputDTO result = await contract.QueryAsync<RetrieveCastBallotFunction, RetrieveCastBallotOutputDTO>(castBallotsFunction);
-
+            
             CastBallot castBallot = result.ReturnValue1;
 
             PublishedBallot ballot = new()
@@ -222,7 +250,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.PublishResults"/>
         public async Task PublishResults(Election election, IList<DecryptedValue> results, string evidenceCid)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
+            ContractHandler contract = GetContractHandlerAsync(election);
 
             List<Result> contractResults = new List<Result>();
 
@@ -247,7 +275,7 @@ namespace Helverify.VotingAuthority.Domain.Repository
         /// <inheritdoc cref="IElectionContractRepository.GetResultsAsync"/>
         public async Task<ElectionResults> GetResultsAsync(Election election)
         {
-            ContractHandler contract = await GetContractHandlerAsync(election);
+            ContractHandler contract = GetContractHandlerAsync(election);
 
             GetResultsFunction getResultsFunction = new GetResultsFunction();
 
@@ -268,20 +296,11 @@ namespace Helverify.VotingAuthority.Domain.Repository
             }
         }
 
-        private async Task<ContractHandler> GetContractHandlerAsync(Election election)
+        private ContractHandler GetContractHandlerAsync(Election election)
         {
             IWeb3 web3 = _web3Loader.Web3Instance;
-
-            await UnlockAccountAsync();
 
             return web3.Eth.GetContractHandler(election.ContractAddress);
-        }
-
-        private async Task UnlockAccountAsync(int seconds = 120)
-        {
-            IWeb3 web3 = _web3Loader.Web3Instance;
-
-            await web3.Personal.UnlockAccount.SendRequestAsync(_web3Loader.Account.Address, _web3Loader.Password, 120);
         }
     }
 }

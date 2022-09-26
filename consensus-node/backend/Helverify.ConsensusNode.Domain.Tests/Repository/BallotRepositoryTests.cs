@@ -1,5 +1,4 @@
-﻿using System.IO.Abstractions.TestingHelpers;
-using AutoMapper;
+﻿using AutoMapper;
 using Helverify.ConsensusNode.DataAccess.Dao;
 using Helverify.ConsensusNode.DataAccess.Ipfs;
 using Helverify.ConsensusNode.Domain.Mapping;

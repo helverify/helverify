@@ -9,7 +9,7 @@ done
 
 for element in $(jq '.nodes[]' $ethdir/nodes.json);
 do
-    geth attach $ethdir/data/geth.ipc --exec "admin.addPeer($element)"
+    geth attach --exec "admin.addPeer($element)" $ethdir/data/geth.ipc 
 done
 
-geth attach $ethdir/data/geth.ipc --exec 'miner.start(1)'
+geth attach --exec 'miner.start(1)' $ethdir/data/geth.ipc

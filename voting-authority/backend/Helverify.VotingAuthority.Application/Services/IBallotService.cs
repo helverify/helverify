@@ -40,4 +40,12 @@ public interface IBallotService
     /// <param name="selectedOptions">Selected short codes on the cast ballot.</param>
     /// <returns></returns>
     Task PublishBallotEvidence(Election election, string ballotId, int spoiltBallotIndex, IList<string> selectedOptions);
+
+
+    /// <summary>
+    /// Publishes random selections for each ballot of an election. Only publishes selection, not spoilt ballot For evaluation purposes only.
+    /// </summary>
+    /// <param name="election"></param>
+    /// <returns></returns>
+    Task PublishRandomEvidence(Election election);
 }

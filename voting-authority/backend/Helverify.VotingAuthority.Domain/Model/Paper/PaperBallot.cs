@@ -31,7 +31,15 @@ namespace Helverify.VotingAuthority.Domain.Model.Paper
         /// </summary>
         public IList<PaperBallotOption> Options { get; private set; } = new List<PaperBallotOption>();
 
+	/// <summary>
+	/// Indicates whether the ballot has been printed
+	/// </summary>
         public bool Printed { get; set; }
+        
+        /// <summary>
+        /// Indicates whether the ballot has already been casted
+        /// </summary>
+        public bool Casted { get; set; }
 
         /// <summary>
         /// Constructor

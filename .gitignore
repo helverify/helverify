@@ -406,7 +406,6 @@ FodyWeavers.xsd
 /docker/consensus3/eth
 /docker/consensus4/eth
 
-/docker/ipfs*/
 *.key
 swarm.key
 /docker/consensus1/keys
@@ -414,3 +413,8 @@ swarm.key
 /docker/consensus3/keys
 /docker/consensus4/keys
 /docker/va/eth
+/docker/consensus5
+/docker/consensus6
+/docker/consensus7
+/docker/consensus8
+/docker/consensus-nodes.txt

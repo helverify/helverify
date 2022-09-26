@@ -7,4 +7,4 @@ do
     sleep 5
 done
 
-geth attach $ethdir/data/geth.ipc --exec admin.nodeInfo.enode > $ethdir/enode
+geth attach --exec 'admin.nodeInfo.enode' $ethdir/data/geth.ipc  > $ethdir/enode

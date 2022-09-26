@@ -45,7 +45,8 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
                 .ForMember(dest => dest.BallotId, opt => opt.MapFrom(src => src.BallotId))
                 .ForMember(dest => dest.ElectionId, opt => opt.MapFrom(src => src.Election.Id))
                 .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options))
-                .ForMember(dest => dest.Printed, opt => opt.MapFrom(src => src.Printed)); 
+                .ForMember(dest => dest.Printed, opt => opt.MapFrom(src => src.Printed))
+		.ForMember(dest => dest.Casted, opt => opt.MapFrom(src => src.Casted)); 
 
             CreateMap<PrintBallotDao, PaperBallot>()
                 .ConstructUsing((x, ctx) =>
@@ -54,7 +55,8 @@ namespace Helverify.VotingAuthority.Domain.Repository.Mapping
 
                     PaperBallot pb = new PaperBallot(x.BallotId, options)
                     {
-                        Printed = x.Printed
+                        Printed = x.Printed,
+                        Casted = x.Casted
                     };
 
                     return pb;

@@ -1,7 +1,9 @@
 ﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using Helverify.ConsensusNode.Domain.Model;
+using Helverify.ConsensusNode.Domain.Tests.Fakes;
 using Helverify.Cryptography.ZeroKnowledge;
+using Microsoft.Extensions.Caching.Memory;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
@@ -20,7 +22,7 @@ namespace Helverify.ConsensusNode.Domain.Tests.Model
         public void SetUp()
         {
             _fileSystem = new MockFileSystem();
-            _keyPairHandler = new KeyPairHandler(_fileSystem);
+            _keyPairHandler = new KeyPairHandler(_fileSystem, new FakeCache(null));
         }
 
         [Test]
@@ -85,9 +87,11 @@ namespace Helverify.ConsensusNode.Domain.Tests.Model
         public void TestLoadFromDisk()
         {
             // arrange
+            
             string electionId = "12fa92810";
             AsymmetricCipherKeyPair originalKeyPair = _keyPairHandler.CreateKeyPair(_p, _g);
-            
+            _keyPairHandler = new KeyPairHandler(_fileSystem, new FakeCache(originalKeyPair));
+
             BigInteger originalPublicKey = (originalKeyPair.Public as DHPublicKeyParameters).Y;
             BigInteger originalPrivateKey = (originalKeyPair.Private as DHPrivateKeyParameters).X;
             
