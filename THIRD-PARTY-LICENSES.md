@@ -50,7 +50,7 @@ This document contains the third-party dependencies used within Helverify with t
 | os-browserify<br/>https://github.com/CoderPuppy/os-browserify | [MIT](./third-party-licenses/MIT.txt) | Copyright (c) 2017 CoderPuppy |
 | path-browserify<br/>https://github.com/browserify/path-browserify | [MIT](./third-party-licenses/MIT.txt) | Copyright (c) 2013 James Halliday |
 | process<br/>https://github.com/shtylman/node-process | [MIT](./third-party-licenses/MIT.txt) | Copyright (c) 2013 Roman Shtylman <shtylman@gmail.com> |
-| randomcolor<br/>https://github.com/davidmerfield/randomColor | [CC0 1.0 Universal](./third-party-licenses/CC-1.0-Universal.txt) | - |
+| randomcolor<br/>https://github.com/davidmerfield/randomColor | [CC0 1.0 Universal](./third-party-licenses/CC0-1.0-Universal.txt) | - |
 | react<br/>https://github.com/facebook/react | [MIT](./third-party-licenses/MIT.txt) | Copyright (c) Meta Platforms, Inc. and affiliates. |
 | react-app-rewired<br/>https://github.com/timarney/react-app-rewired | [MIT](./third-party-licenses/MIT.txt) | Copyright (c) 2016 Tim Arney |
 | react-dom<br/>https://github.com/facebook/react | [MIT](./third-party-licenses/MIT.txt) | Copyright (c) Meta Platforms, Inc. and affiliates. |
